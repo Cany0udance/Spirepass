@@ -1,21 +1,57 @@
 package spirepass.screens;
 
+import basemod.BaseMod;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Matrix4;
+import com.esotericsoftware.spine.*;
+import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.characters.Ironclad;
+import com.megacrit.cardcrawl.core.AbstractCreature;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
+import spirepass.elements.SpirepassLevelBox;
+import spirepass.util.SpirepassPositionSettings;
+import spirepass.util.SpirepassRewardData;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import static spirepass.util.SpirepassPositionSettings.REWARD_PREVIEW_Y;
 
 public class SpirepassScreenRenderer {
     private Texture backgroundTexture;
     private Texture levelBoxTexture;
     private Texture currentLevelBoxTexture;
     private Texture lockedLevelBoxTexture;
-    // Constants for rendering
-    public static final float LEVEL_BOX_SIZE = 120.0f * Settings.scale;
-    private static final float TITLE_Y = Settings.HEIGHT * 0.9f;
-    public static final float LEVEL_BOX_Y = Settings.HEIGHT * 0.3f;
+
+    // Maps to hold our reward data and textures
+    private HashMap<Integer, SpirepassRewardData> rewardData;
+    private HashMap<Integer, Texture> rewardTextures;
+    private HashMap<String, Texture> backgroundTextures;
+
+    // Import the position settings
+    // Use constants from position settings class rather than defining them here
+    // This allows for easy adjustment from one place
+
+    private AbstractPlayer scaledIronclad = null;
+    private boolean ironCladInitialized = false;
+    private float originalAnimationTime = 0f;
+    private float customTimeScale = 0.5f; // Adjust this value to control animation speed (lower = slower)
+    private long lastRenderTime = 0L;
+    private float accumulatedTime = 0f;
+    private boolean ironcladPreviewInitialized = false;
+    private AbstractPlayer previewIronclad = null;
+
     public SpirepassScreenRenderer() {
         // Load the textures
         try {
@@ -24,12 +60,102 @@ public class SpirepassScreenRenderer {
             this.levelBoxTexture = ImageMaster.OPTION_CONFIRM;
             this.currentLevelBoxTexture = ImageMaster.OPTION_YES;
             this.lockedLevelBoxTexture = ImageMaster.OPTION_NO;
+
+            // Initialize our structures
+            this.rewardData = new HashMap<>();
+            this.rewardTextures = new HashMap<>();
+            this.backgroundTextures = new HashMap<>();
+
+            // Load background textures
+            loadBackgroundTextures();
+
+            // Initialize reward data and textures
+            initializeRewardData();
         } catch (Exception e) {
             // Fallback in case images can't be loaded
             System.err.println("Failed to load SpirePass textures: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    public void render(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding) {
+
+    private void loadBackgroundTextures() {
+        // Load the background textures for different rarities
+        String[] paths = {
+                "spirepass/images/screen/CommonRewardBackground.png",
+                "spirepass/images/screen/UncommonRewardBackground.png",
+                "spirepass/images/screen/RareRewardBackground.png"
+        };
+
+        for (String path : paths) {
+            try {
+                backgroundTextures.put(path, ImageMaster.loadImage(path));
+            } catch (Exception e) {
+                System.err.println("Failed to load background texture: " + path);
+            }
+        }
+    }
+
+    private void initializeRewardData() {
+        // Level 1: Ironclad skin (using character model)
+        rewardData.put(1, new SpirepassRewardData(
+                1,
+                "MS Paint Ironclad",
+                "A beautiful hand-drawn rendition of the Ironclad",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                "IRONCLAD"
+        ));
+
+        // Level 2: Cyan colorless cardback (image)
+        rewardData.put(2, new SpirepassRewardData(
+                2,
+                "Cyan Colorless Cardback",
+                "Slightly off-center blue cardback",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.IMAGE,
+                "spirepass/images/rewards/cardbacks/colorless/CyanColorlessCardbackReward.png"
+        ));
+
+        // Default reward for all other levels (badge image)
+        Texture badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
+
+        // Load the image textures for any image-type rewards
+        for (Integer level : rewardData.keySet()) {
+            SpirepassRewardData data = rewardData.get(level);
+            if (data.getType() == SpirepassRewardData.RewardType.IMAGE && data.getImagePath() != null) {
+                try {
+                    rewardTextures.put(level, ImageMaster.loadImage(data.getImagePath()));
+                } catch (Exception e) {
+                    System.err.println("Failed to load reward texture for level " + level);
+                }
+            }
+        }
+
+        // For any unspecified levels, use the badge texture as a fallback
+        for (int i = 0; i <= 30; i++) {
+            if (!rewardTextures.containsKey(i) && !rewardData.containsKey(i)) {
+                rewardTextures.put(i, badgeTexture);
+            }
+        }
+    }
+
+    public Texture getRewardTexture(int level) {
+        if (rewardTextures.containsKey(level)) {
+            return rewardTextures.get(level);
+        } else {
+            // Return the badge texture as default if level not found
+            for (Integer key : rewardTextures.keySet()) {
+                return rewardTextures.get(key);  // Return the first one we find
+            }
+            return null;  // Fallback
+        }
+    }
+
+    public SpirepassRewardData getRewardData(int level) {
+        return rewardData.getOrDefault(level, null);
+    }
+
+    public void render(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding, ArrayList<SpirepassLevelBox> levelBoxes) {
         // Render the background image to fill the entire screen
         if (this.backgroundTexture != null) {
             sb.setColor(Color.WHITE);
@@ -45,70 +171,313 @@ public class SpirepassScreenRenderer {
                     false, false
             );
         }
+
         // Render title
         FontHelper.renderFontCentered(
                 sb,
                 FontHelper.bannerNameFont,
                 "SPIREPASS",
                 Settings.WIDTH / 2.0f,
-                TITLE_Y,
+                SpirepassPositionSettings.TITLE_Y,
                 Color.WHITE
         );
-        // Render level boxes - pass the scrollX parameter
-        renderLevelBoxes(sb, screen, scrollX, edgePadding);
+
+        // Render level boxes
+        renderLevelBoxes(sb, screen, scrollX, edgePadding, levelBoxes);
+
         // Render the cancel button on top of everything
         screen.cancelButton.render(sb);
     }
-    private void renderLevelBoxes(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding) {
-        int maxLevel = screen.getMaxLevel();
-        int currentLevel = screen.getCurrentLevel();
-        float levelBoxSpacing = screen.getLevelBoxSpacing();
-        // Calculate which level boxes are currently visible
-        int firstVisibleLevel = Math.max(0, (int)(scrollX / levelBoxSpacing) - 1);
-        int lastVisibleLevel = Math.min(maxLevel, (int)((scrollX + Settings.WIDTH) / levelBoxSpacing) + 1);
-        // Render each visible level box
-        for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
-            float boxX = (i * levelBoxSpacing) + edgePadding - scrollX;
-            float boxY = LEVEL_BOX_Y;
-            // Select the appropriate texture based on level status
-            Texture boxTexture;
-            Color boxColor;
-            if (i == currentLevel) {
-                // Current level
-                boxTexture = currentLevelBoxTexture;
-                boxColor = Color.WHITE;
-            } else if (i > currentLevel) {
-                // Locked level
-                boxTexture = lockedLevelBoxTexture;
-                boxColor = Color.GRAY;
-            } else {
-                // Unlocked level
-                boxTexture = levelBoxTexture;
-                boxColor = Color.WHITE;
+
+    public void renderSelectedLevelReward(SpriteBatch sb, SpirepassLevelBox selectedBox) {
+        int level = selectedBox.getLevel();
+        boolean isUnlocked = selectedBox.isUnlocked();
+        SpirepassRewardData reward = getRewardData(level);
+
+        // If we have specific reward data, use it
+        if (reward != null) {
+            // Get the background texture path
+            String backgroundPath = reward.getBackgroundTexturePath();
+            Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
+
+            // Render the background if available
+            if (backgroundTexture != null) {
+                // Apply the single background scale factor
+                float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
+                float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float)backgroundTexture.getHeight());
+
+                sb.setColor(Color.WHITE);
+                sb.draw(
+                        backgroundTexture,
+                        Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                        SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                        previewWidth,
+                        previewHeight
+                );
             }
-            // Render the box
-            sb.setColor(boxColor);
-            sb.draw(
-                    boxTexture,
-                    boxX - LEVEL_BOX_SIZE/2, boxY - LEVEL_BOX_SIZE/2,
-                    LEVEL_BOX_SIZE, LEVEL_BOX_SIZE
-            );
-            // Render the level number
+
+            // Render reward preview based on type
+            if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL &&
+                    reward.getModelId().equals("IRONCLAD")) {
+                renderIroncladPreview(sb);
+            } else if (reward.getType() == SpirepassRewardData.RewardType.IMAGE) {
+                Texture rewardTexture = getRewardTexture(level);
+                if (rewardTexture != null) {
+                    // Apply the single content scale factor
+                    float previewHeight = SpirepassPositionSettings.REWARD_IMAGE_HEIGHT * SpirepassPositionSettings.REWARD_CONTENT_SCALE;
+
+                    // Calculate width based on the texture's aspect ratio
+                    float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
+                    float previewWidth = previewHeight * aspectRatio;
+
+                    sb.setColor(Color.WHITE);
+                    sb.draw(
+                            rewardTexture,
+                            Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                            SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                            previewWidth,
+                            previewHeight
+                    );
+                }
+            }
+
+            // Render reward title
             FontHelper.renderFontCentered(
                     sb,
-                    FontHelper.buttonLabelFont,
-                    String.valueOf(i),
-                    boxX,
-                    boxY,
-                    i <= currentLevel ? Color.WHITE : Color.DARK_GRAY
+                    FontHelper.tipBodyFont,
+                    reward.getName(),
+                    Settings.WIDTH / 2.0f,
+                    SpirepassPositionSettings.REWARD_NAME_Y,
+                    Color.WHITE
+            );
+
+            // Render description
+            FontHelper.renderFontCentered(
+                    sb,
+                    FontHelper.tipBodyFont,
+                    reward.getDescription(),
+                    Settings.WIDTH / 2.0f,
+                    SpirepassPositionSettings.REWARD_DESCRIPTION_Y,
+                    Color.LIGHT_GRAY
+            );
+        } else {
+            // Fallback for levels without specific reward data
+            // Use the original rendering code for reward preview
+            if (level == 1) {
+                renderIroncladPreview(sb);
+            } else if (getRewardTexture(level) != null) {
+                Texture rewardTexture = getRewardTexture(level);
+                if (rewardTexture != null) {
+                    // Set desired height for all reward images
+                    float previewHeight = 200.0f * Settings.scale;
+
+                    // Calculate width based on the texture's aspect ratio
+                    float aspectRatio = rewardTexture.getWidth() / (float)rewardTexture.getHeight();
+                    float previewWidth = previewHeight * aspectRatio;
+
+                    sb.setColor(Color.WHITE);
+                    sb.draw(
+                            rewardTexture,
+                            Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                            REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                            previewWidth,
+                            previewHeight
+                    );
+                }
+            }
+
+            // Render generic title
+            FontHelper.renderFontCentered(
+                    sb,
+                    FontHelper.tipBodyFont,
+                    "Level " + level + " Reward",
+                    Settings.WIDTH / 2.0f,
+                    SpirepassPositionSettings.REWARD_NAME_Y,
+                    Color.WHITE
             );
         }
+
+        // Render the equip button
+        float buttonWidth = SpirepassPositionSettings.BUTTON_WIDTH;
+        float buttonHeight = SpirepassPositionSettings.BUTTON_HEIGHT;
+
+        sb.setColor(isUnlocked ? Color.WHITE : Color.GRAY);
+        sb.draw(
+                ImageMaster.CANCEL_BUTTON,
+                Settings.WIDTH / 2.0f - buttonWidth / 2.0f,
+                SpirepassPositionSettings.REWARD_BUTTON_Y - buttonHeight / 2.0f,
+                buttonWidth,
+                buttonHeight
+        );
+
+        // Render button text
+        FontHelper.renderFontCentered(
+                sb,
+                FontHelper.buttonLabelFont,
+                isUnlocked ? "EQUIP" : "LOCKED",
+                Settings.WIDTH / 2.0f,
+                SpirepassPositionSettings.REWARD_BUTTON_Y,
+                isUnlocked ? Color.WHITE : Color.DARK_GRAY
+        );
     }
-    // For proper resource management
-    public void dispose() {
-        if (this.backgroundTexture != null) {
-            this.backgroundTexture.dispose();
+
+    private void initializeIroncladPreview() {
+        if (ironcladPreviewInitialized) {
+            return; // Already initialized
         }
-        // No need to dispose of levelBoxTexture etc. as they're from ImageMaster
+
+        try {
+            // Get the game's current Ironclad instance
+            AbstractPlayer originalIronclad = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.IRONCLAD);
+
+            if (originalIronclad != null) {
+                BaseMod.logger.info("Creating scaled Ironclad preview model");
+
+                // Create a new Ironclad instance via reflection since the constructor is package-private
+                Constructor<?> constructor = Class.forName("com.megacrit.cardcrawl.characters.Ironclad").getDeclaredConstructor(String.class);
+                constructor.setAccessible(true);
+                previewIronclad = (AbstractPlayer) constructor.newInstance("PreviewIronclad");
+
+                // Define animation paths
+                String atlasUrl = "images/characters/ironclad/idle/skeleton.atlas";
+                String skeletonUrl = "images/characters/ironclad/idle/skeleton.json";
+
+                // Load animation with scaled parameter
+                Method loadAnimationMethod = findMethod(AbstractCreature.class, "loadAnimation",
+                        String.class, String.class, float.class);
+                loadAnimationMethod.setAccessible(true);
+
+                // Calculate the scale ratio
+                float scaleRatio = 1.0f / SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
+                loadAnimationMethod.invoke(previewIronclad, atlasUrl, skeletonUrl, scaleRatio);
+
+                // Set the animation to Idle and loop it
+                Field stateField = AbstractCreature.class.getDeclaredField("state");
+                stateField.setAccessible(true);
+                Object state = stateField.get(previewIronclad);
+
+                Method setAnimationMethod = state.getClass().getMethod("setAnimation", int.class, String.class, boolean.class);
+                setAnimationMethod.invoke(state, 0, "Idle", true);
+
+                // Make the animation play at the right speed
+                Method getAnimationMethod = state.getClass().getMethod("getCurrent", int.class);
+                Object trackEntry = getAnimationMethod.invoke(state, 0);
+
+                // Apply time scaling similar to the original constructor
+                if (trackEntry != null) {
+                    Method setTimeScaleMethod = trackEntry.getClass().getMethod("setTimeScale", float.class);
+                    // Adjust time scale to compensate for the model scaling
+                    // If we scaled the model up by 2.0, we should slow down the animation accordingly
+                    float adjustedTimeScale = 0.6f * scaleRatio;
+                    setTimeScaleMethod.invoke(trackEntry, adjustedTimeScale);
+                }
+
+                ironcladPreviewInitialized = true;
+                BaseMod.logger.info("Ironclad preview model initialized successfully");
+            } else {
+                BaseMod.logger.info("Failed to initialize Ironclad preview: original model not found");
+            }
+        } catch (Exception e) {
+            BaseMod.logger.error("Error initializing Ironclad preview: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void renderIroncladPreview(SpriteBatch sb) {
+        // Initialize preview model if needed
+        if (!ironcladPreviewInitialized) {
+            initializeIroncladPreview();
+        }
+
+        if (previewIronclad != null) {
+            try {
+                // Position the model at the center of the reward preview area
+                previewIronclad.drawX = Settings.WIDTH / 2.0f;
+                previewIronclad.drawY = SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET;
+
+                // Update the animation state
+                Field stateField = AbstractCreature.class.getDeclaredField("state");
+                stateField.setAccessible(true);
+                Object state = stateField.get(previewIronclad);
+
+                Method updateMethod = state.getClass().getMethod("update", float.class);
+                updateMethod.invoke(state, Gdx.graphics.getDeltaTime());
+
+                // Render the scaled Ironclad
+                previewIronclad.renderPlayerImage(sb);
+            } catch (Exception e) {
+                BaseMod.logger.error("Error rendering Ironclad preview: " + e.getMessage());
+                // Fallback if rendering fails
+                renderFallbackText(sb, "Error Rendering Ironclad Preview", Color.RED);
+            }
+        } else {
+            // Fallback if no preview model
+            renderFallbackText(sb, "Ironclad Skin Preview", Color.WHITE);
+        }
+    }
+
+
+    // Add this method to your class as a utility for troubleshooting
+    private void resetIroncladPreview() {
+        if (scaledIronclad != null) {
+            // Clean up resources
+            scaledIronclad = null;
+        }
+        ironCladInitialized = false;
+        lastRenderTime = 0L;
+        accumulatedTime = 0f;
+        BaseMod.logger.info("Reset Ironclad preview model");
+    }
+
+    private void renderFallbackText(SpriteBatch sb, String text, Color color) {
+        FontHelper.renderFontCentered(
+                sb,
+                FontHelper.tipBodyFont,
+                text,
+                Settings.WIDTH / 2.0f,
+                SpirepassPositionSettings.REWARD_PREVIEW_Y,
+                color
+        );
+    }
+
+
+    // Helper method to find methods in class hierarchy
+    private Method findMethod(Class clz, String methodName, Class... parameterTypes) throws NoSuchMethodException {
+        try {
+            return clz.getDeclaredMethod(methodName, parameterTypes);
+        } catch (NoSuchMethodException var5) {
+            Class superClass = clz.getSuperclass();
+            if (superClass == null) {
+                throw var5;
+            } else {
+                return findMethod(superClass, methodName, parameterTypes);
+            }
+        }
+    }
+
+    private void renderLevelBoxes(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding, ArrayList<SpirepassLevelBox> levelBoxes) {
+        // Calculate which level boxes are currently visible
+        int firstVisibleLevel = Math.max(0, (int)((scrollX - edgePadding) / screen.getLevelBoxSpacing()) - 1);
+        int lastVisibleLevel = Math.min(screen.getMaxLevel(), (int)((scrollX + Settings.WIDTH - edgePadding) / screen.getLevelBoxSpacing()) + 1);
+
+        // Render each visible level box
+        for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
+            if (i < levelBoxes.size()) {
+                levelBoxes.get(i).render(sb);
+            }
+        }
+    }
+
+    // Getters for textures
+    public Texture getLevelBoxTexture() {
+        return levelBoxTexture;
+    }
+
+    public Texture getCurrentLevelBoxTexture() {
+        return currentLevelBoxTexture;
+    }
+
+    public Texture getLockedLevelBoxTexture() {
+        return lockedLevelBoxTexture;
     }
 }
