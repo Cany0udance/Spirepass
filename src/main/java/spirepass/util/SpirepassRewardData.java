@@ -22,8 +22,8 @@ public class SpirepassRewardData {
     private String imagePath; // For IMAGE type
     private String modelId;   // For CHARACTER_MODEL or CREATURE_MODEL type
 
-    public SpirepassRewardData(int level, String name, String description, RewardRarity rarity,
-                               RewardType type, String resourcePath) {
+    public SpirepassRewardData(int level, String name, String description,
+                               RewardRarity rarity, RewardType type, String resourcePath) {
         this.level = level;
         this.name = name;
         this.description = description;

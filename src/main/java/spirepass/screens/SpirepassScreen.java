@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.helpers.MathHelper;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
+import spirepass.Spirepass;
 import spirepass.elements.SpirepassLevelBox;
 import spirepass.util.SpirepassPositionSettings;
 import spirepass.util.SpirepassRewardData;
@@ -28,7 +29,7 @@ public class SpirepassScreen {
     private boolean hasDraggedSignificantly = false;
     // Spirepass level configuration
     private int maxLevel = 30; // Default max level
-    private int currentLevel = 0; // Player's current level
+    private int currentLevel = 30; // Player's current level
     private float levelBoxSpacing = 150f * Settings.scale; // Spacing between level boxes
     public float edgePadding = 100f * Settings.scale; // Adjust this value as needed
 
@@ -159,12 +160,11 @@ public class SpirepassScreen {
             close();
             return;
         }
-
         updateScrolling();
         updateLevelBoxPositions();
         updateLevelBoxes();
 
-        // Add this: Check for clicks on the equip button when a level is selected
+        // Check for clicks on the equip button when a level is selected
         if (selectedLevel != -1 && selectedLevel < levelBoxes.size() && InputHelper.justReleasedClickLeft) {
             SpirepassLevelBox selectedBox = levelBoxes.get(selectedLevel);
             float BUTTON_Y = Settings.HEIGHT * 0.6f;
@@ -181,15 +181,36 @@ public class SpirepassScreen {
                 if (selectedBox.isUnlocked()) {
                     // Equip the reward
                     CardCrawlGame.sound.play("UI_CLICK_1");
-                    // TODO: Implement equipping logic
-                    System.out.println("Equipped reward for level " + selectedLevel);
-                } else {
-                    // Can't equip - level is locked
-                    CardCrawlGame.sound.play("UI_CLICK_2");
-                    System.out.println("Level " + selectedLevel + " is locked!");
+
+                    // Get the reward data from the selected box
+                    SpirepassRewardData rewardData = selectedBox.getRewardData();
+
+                    if (rewardData != null && rewardData.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
+                        String modelId = rewardData.getModelId();
+                        toggleSkinEquipped(modelId);
+                    }
                 }
             }
         }
+    }
+
+    private void toggleSkinEquipped(String modelId) {
+        // Check if this skin is already equipped - if so, unequip it
+        boolean isUnequipping = modelId.equals(Spirepass.currentIroncladSkin);
+
+        // Set the new value
+        Spirepass.currentIroncladSkin = isUnequipping ? "" : modelId;
+
+        try {
+            Spirepass.config.setString("ironcladSkin", Spirepass.currentIroncladSkin);
+            Spirepass.config.save();
+            System.out.println((isUnequipping ? "Unequipped " : "Equipped ") + modelId + " Ironclad skin");
+        } catch (Exception e) {
+            System.err.println("Failed to save skin preference: " + e.getMessage());
+        }
+
+        // Debug print
+        System.out.println("DEBUG - currentIroncladSkin is now: '" + Spirepass.currentIroncladSkin + "'");
     }
 
     private void updateScrolling() {

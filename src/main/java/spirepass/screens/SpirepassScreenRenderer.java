@@ -5,13 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Matrix4;
-import com.esotericsoftware.spine.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
-import com.megacrit.cardcrawl.characters.Ironclad;
 import com.megacrit.cardcrawl.core.AbstractCreature;
-import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
@@ -23,7 +18,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static spirepass.util.SpirepassPositionSettings.REWARD_PREVIEW_Y;
@@ -51,13 +45,15 @@ public class SpirepassScreenRenderer {
     private float accumulatedTime = 0f;
     private boolean ironcladPreviewInitialized = false;
     private AbstractPlayer previewIronclad = null;
+    private HashMap<String, AbstractPlayer> ironcladModels = new HashMap<>();
+    private HashMap<String, Boolean> ironcladInitialized = new HashMap<>();
 
     public SpirepassScreenRenderer() {
         // Load the textures
         try {
             this.backgroundTexture = ImageMaster.loadImage("spirepass/images/screen/SpirepassBackground.jpg");
             // Using default textures as placeholders - replace with your own
-            this.levelBoxTexture = ImageMaster.OPTION_CONFIRM;
+            this.levelBoxTexture = ImageMaster.OPTION_YES;
             this.currentLevelBoxTexture = ImageMaster.OPTION_YES;
             this.lockedLevelBoxTexture = ImageMaster.OPTION_NO;
 
@@ -106,9 +102,29 @@ public class SpirepassScreenRenderer {
                 "IRONCLAD"
         ));
 
-        // Level 2: Cyan colorless cardback (image)
+        // Level 2: Weaponized 115 Ironclad skin
         rewardData.put(2, new SpirepassRewardData(
                 2,
+                "Weaponized 115 from the hit game Call of Duty®: Black Ops II",
+                "Ironclad with a radioactive glow and questionable side effects",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                "IRONCLAD_WEAPONIZED115"
+        ));
+
+        // Level 3: Invisible Man Ironclad skin
+        rewardData.put(3, new SpirepassRewardData(
+                3,
+                "Invisible Man",
+                "You can't see him, but the enemies still can",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                "IRONCLAD_INVISIBLEMAN"
+        ));
+
+        // Level 4: Cyan colorless cardback (image)
+        rewardData.put(4, new SpirepassRewardData(
+                4,
                 "Cyan Colorless Cardback",
                 "Slightly off-center blue cardback",
                 SpirepassRewardData.RewardRarity.UNCOMMON,
@@ -204,7 +220,7 @@ public class SpirepassScreenRenderer {
             if (backgroundTexture != null) {
                 // Apply the single background scale factor
                 float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
-                float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float)backgroundTexture.getHeight());
+                float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float) backgroundTexture.getHeight());
 
                 sb.setColor(Color.WHITE);
                 sb.draw(
@@ -217,9 +233,9 @@ public class SpirepassScreenRenderer {
             }
 
             // Render reward preview based on type
-            if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL &&
-                    reward.getModelId().equals("IRONCLAD")) {
-                renderIroncladPreview(sb);
+            if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
+                String modelId = reward.getModelId();
+                renderIroncladPreview(sb, getVariantFromModelId(modelId));
             } else if (reward.getType() == SpirepassRewardData.RewardType.IMAGE) {
                 Texture rewardTexture = getRewardTexture(level);
                 if (rewardTexture != null) {
@@ -264,7 +280,7 @@ public class SpirepassScreenRenderer {
             // Fallback for levels without specific reward data
             // Use the original rendering code for reward preview
             if (level == 1) {
-                renderIroncladPreview(sb);
+                renderIroncladPreview(sb, "default");
             } else if (getRewardTexture(level) != null) {
                 Texture rewardTexture = getRewardTexture(level);
                 if (rewardTexture != null) {
@@ -321,112 +337,112 @@ public class SpirepassScreenRenderer {
         );
     }
 
-    private void initializeIroncladPreview() {
-        if (ironcladPreviewInitialized) {
+    private String getVariantFromModelId(String modelId) {
+        if (modelId.equals("IRONCLAD")) {
+            return "default";
+        } else if (modelId.startsWith("IRONCLAD_")) {
+            return modelId.substring("IRONCLAD_".length()).toLowerCase();
+        }
+        return "default"; // fallback
+    }
+
+    private void initializeIroncladPreview(String variant) {
+        if (ironcladInitialized.getOrDefault(variant, false)) {
             return; // Already initialized
         }
 
         try {
-            // Get the game's current Ironclad instance
-            AbstractPlayer originalIronclad = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.IRONCLAD);
+            BaseMod.logger.info("Creating scaled Ironclad preview model for variant: " + variant);
 
-            if (originalIronclad != null) {
-                BaseMod.logger.info("Creating scaled Ironclad preview model");
+            // Create a new Ironclad instance via reflection since the constructor is package-private
+            Constructor<?> constructor = Class.forName("com.megacrit.cardcrawl.characters.Ironclad").getDeclaredConstructor(String.class);
+            constructor.setAccessible(true);
+            AbstractPlayer variantIronclad = (AbstractPlayer) constructor.newInstance("PreviewIronclad_" + variant);
 
-                // Create a new Ironclad instance via reflection since the constructor is package-private
-                Constructor<?> constructor = Class.forName("com.megacrit.cardcrawl.characters.Ironclad").getDeclaredConstructor(String.class);
-                constructor.setAccessible(true);
-                previewIronclad = (AbstractPlayer) constructor.newInstance("PreviewIronclad");
+            // Define animation paths based on the variant
+            String atlasUrl, skeletonUrl;
 
-                // Define animation paths
-                String atlasUrl = "images/characters/ironclad/idle/skeleton.atlas";
-                String skeletonUrl = "images/characters/ironclad/idle/skeleton.json";
-
-                // Load animation with scaled parameter
-                Method loadAnimationMethod = findMethod(AbstractCreature.class, "loadAnimation",
-                        String.class, String.class, float.class);
-                loadAnimationMethod.setAccessible(true);
-
-                // Calculate the scale ratio
-                float scaleRatio = 1.0f / SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
-                loadAnimationMethod.invoke(previewIronclad, atlasUrl, skeletonUrl, scaleRatio);
-
-                // Set the animation to Idle and loop it
-                Field stateField = AbstractCreature.class.getDeclaredField("state");
-                stateField.setAccessible(true);
-                Object state = stateField.get(previewIronclad);
-
-                Method setAnimationMethod = state.getClass().getMethod("setAnimation", int.class, String.class, boolean.class);
-                setAnimationMethod.invoke(state, 0, "Idle", true);
-
-                // Make the animation play at the right speed
-                Method getAnimationMethod = state.getClass().getMethod("getCurrent", int.class);
-                Object trackEntry = getAnimationMethod.invoke(state, 0);
-
-                // Apply time scaling similar to the original constructor
-                if (trackEntry != null) {
-                    Method setTimeScaleMethod = trackEntry.getClass().getMethod("setTimeScale", float.class);
-                    // Adjust time scale to compensate for the model scaling
-                    // If we scaled the model up by 2.0, we should slow down the animation accordingly
-                    float adjustedTimeScale = 0.6f * scaleRatio;
-                    setTimeScaleMethod.invoke(trackEntry, adjustedTimeScale);
-                }
-
-                ironcladPreviewInitialized = true;
-                BaseMod.logger.info("Ironclad preview model initialized successfully");
+            if (variant.equals("default")) {
+                atlasUrl = "images/characters/ironclad/idle/skeleton.atlas";
+                skeletonUrl = "images/characters/ironclad/idle/skeleton.json";
             } else {
-                BaseMod.logger.info("Failed to initialize Ironclad preview: original model not found");
+                atlasUrl = "spirepass/images/skins/ironclad/" + variant + "/skeleton.atlas";
+                skeletonUrl = "spirepass/images/skins/ironclad/" + variant + "/skeleton.json";
             }
+
+            // Load animation with scaled parameter
+            Method loadAnimationMethod = findMethod(AbstractCreature.class, "loadAnimation",
+                    String.class, String.class, float.class);
+            loadAnimationMethod.setAccessible(true);
+
+            // Calculate the scale ratio
+            float scaleRatio = 1.0f / SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
+            loadAnimationMethod.invoke(variantIronclad, atlasUrl, skeletonUrl, scaleRatio);
+
+            // Set the animation to Idle and loop it
+            Field stateField = AbstractCreature.class.getDeclaredField("state");
+            stateField.setAccessible(true);
+            Object state = stateField.get(variantIronclad);
+
+            Method setAnimationMethod = state.getClass().getMethod("setAnimation", int.class, String.class, boolean.class);
+            setAnimationMethod.invoke(state, 0, "Idle", true);
+
+            // Make the animation play at the right speed
+            Method getAnimationMethod = state.getClass().getMethod("getCurrent", int.class);
+            Object trackEntry = getAnimationMethod.invoke(state, 0);
+
+            // Apply time scaling similar to the original constructor
+            if (trackEntry != null) {
+                Method setTimeScaleMethod = trackEntry.getClass().getMethod("setTimeScale", float.class);
+                // Adjust time scale to compensate for the model scaling
+                float adjustedTimeScale = 0.6f * scaleRatio;
+                setTimeScaleMethod.invoke(trackEntry, adjustedTimeScale);
+            }
+
+            // Store the initialized model
+            ironcladModels.put(variant, variantIronclad);
+            ironcladInitialized.put(variant, true);
+
+            BaseMod.logger.info("Ironclad preview model for " + variant + " initialized successfully");
         } catch (Exception e) {
-            BaseMod.logger.error("Error initializing Ironclad preview: " + e.getMessage());
+            BaseMod.logger.error("Error initializing Ironclad preview for " + variant + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void renderIroncladPreview(SpriteBatch sb) {
+    private void renderIroncladPreview(SpriteBatch sb, String variant) {
         // Initialize preview model if needed
-        if (!ironcladPreviewInitialized) {
-            initializeIroncladPreview();
+        if (!ironcladInitialized.getOrDefault(variant, false)) {
+            initializeIroncladPreview(variant);
         }
 
-        if (previewIronclad != null) {
+        AbstractPlayer modelToRender = ironcladModels.get(variant);
+
+        if (modelToRender != null) {
             try {
                 // Position the model at the center of the reward preview area
-                previewIronclad.drawX = Settings.WIDTH / 2.0f;
-                previewIronclad.drawY = SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET;
+                modelToRender.drawX = Settings.WIDTH / 2.0f;
+                modelToRender.drawY = SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET;
 
                 // Update the animation state
                 Field stateField = AbstractCreature.class.getDeclaredField("state");
                 stateField.setAccessible(true);
-                Object state = stateField.get(previewIronclad);
+                Object state = stateField.get(modelToRender);
 
                 Method updateMethod = state.getClass().getMethod("update", float.class);
                 updateMethod.invoke(state, Gdx.graphics.getDeltaTime());
 
                 // Render the scaled Ironclad
-                previewIronclad.renderPlayerImage(sb);
+                modelToRender.renderPlayerImage(sb);
             } catch (Exception e) {
-                BaseMod.logger.error("Error rendering Ironclad preview: " + e.getMessage());
+                BaseMod.logger.error("Error rendering Ironclad preview for " + variant + ": " + e.getMessage());
                 // Fallback if rendering fails
                 renderFallbackText(sb, "Error Rendering Ironclad Preview", Color.RED);
             }
         } else {
             // Fallback if no preview model
-            renderFallbackText(sb, "Ironclad Skin Preview", Color.WHITE);
+            renderFallbackText(sb, variant + " Ironclad Skin Preview", Color.WHITE);
         }
-    }
-
-
-    // Add this method to your class as a utility for troubleshooting
-    private void resetIroncladPreview() {
-        if (scaledIronclad != null) {
-            // Clean up resources
-            scaledIronclad = null;
-        }
-        ironCladInitialized = false;
-        lastRenderTime = 0L;
-        accumulatedTime = 0f;
-        BaseMod.logger.info("Reset Ironclad preview model");
     }
 
     private void renderFallbackText(SpriteBatch sb, String text, Color color) {

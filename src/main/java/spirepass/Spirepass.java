@@ -3,6 +3,7 @@ package spirepass;
 import basemod.BaseMod;
 import basemod.interfaces.EditStringsSubscriber;
 import basemod.interfaces.PostInitializeSubscriber;
+import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 import spirepass.util.GeneralUtils;
 import spirepass.util.KeywordInfo;
 import spirepass.util.TextureLoader;
@@ -32,15 +33,33 @@ public class Spirepass implements
     static { loadModInfo(); }
     private static final String resourcesFolder = checkResourcesPath();
     public static final Logger logger = LogManager.getLogger(modID); //Used to output to the console.
-
-    //This is used to prefix the IDs of various objects like cards and relics,
-    //to avoid conflicts between different mods using the same name for things.
+    public static String currentIroncladSkin = "";
+    public static SpireConfig config;
     public static String makeID(String id) {
         return modID + ":" + id;
     }
 
-    //This will be called by ModTheSpire because of the @SpireInitializer annotation at the top of the class.
     public static void initialize() {
+        try {
+            // Simple config to store the current skin
+            Properties defaults = new Properties();
+            defaults.setProperty("ironcladSkin", "");
+
+            config = new SpireConfig(modID, "config", defaults);
+        } catch (Exception e) {
+            logger.error("Failed to load config: " + e.getMessage());
+        }
+
+        // Load the saved skin preference
+        try {
+            if (config != null) {
+                currentIroncladSkin = config.getString("ironcladSkin");
+                logger.info("Loaded saved skin preference: " + currentIroncladSkin);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load skin preference: " + e.getMessage());
+        }
+
         new Spirepass();
     }
 

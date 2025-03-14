@@ -7,6 +7,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.Hitbox;
+import spirepass.Spirepass;
 import spirepass.util.SpirepassRewardData;
 
 public class SpirepassLevelBox {
@@ -72,11 +73,40 @@ public class SpirepassLevelBox {
     }
 
     private void onButtonClicked() {
-        if (isUnlocked) {
+        if (isUnlocked && rewardData != null) {
             // Equip the reward
             CardCrawlGame.sound.play("UI_CLICK_1");
-            // TODO: Implement equipping logic
-            System.out.println("Equipped reward for level " + level);
+
+            // Check if this is an Ironclad skin
+            if (rewardData.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
+                String modelId = rewardData.getModelId();
+
+                // For default Ironclad
+                if (modelId.equals("IRONCLAD")) {
+                    Spirepass.currentIroncladSkin = "default";
+                    try {
+                        Spirepass.config.setString("ironcladSkin", "default");
+                        Spirepass.config.save();
+                    } catch (Exception e) {
+                        System.err.println("Failed to save skin preference: " + e.getMessage());
+                    }
+                    System.out.println("Equipped default Ironclad skin");
+                }
+                // For custom Ironclad skins
+                else if (modelId.startsWith("IRONCLAD_")) {
+                    String skinName = modelId.substring("IRONCLAD_".length()).toLowerCase();
+                    Spirepass.currentIroncladSkin = skinName;
+                    try {
+                        Spirepass.config.setString("ironcladSkin", skinName);
+                        Spirepass.config.save();
+                    } catch (Exception e) {
+                        System.err.println("Failed to save skin preference: " + e.getMessage());
+                    }
+                    System.out.println("Equipped Ironclad skin: " + skinName);
+                }
+            }
+
+            // TODO: Handle other reward types here
         } else {
             // Can't equip - level is locked
             CardCrawlGame.sound.play("UI_CLICK_2");
