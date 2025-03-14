@@ -29,38 +29,85 @@ public class Spirepass implements
         EditStringsSubscriber,
         PostInitializeSubscriber {
     public static ModInfo info;
-    public static String modID; //Edit your pom.xml to change this
+    public static String modID;
     static { loadModInfo(); }
     private static final String resourcesFolder = checkResourcesPath();
-    public static final Logger logger = LogManager.getLogger(modID); //Used to output to the console.
-    public static String currentIroncladSkin = "";
+    public static final Logger logger = LogManager.getLogger(modID);
+
+    // Replace single skin string with a map of entity IDs to skin IDs
+    public static Map<String, String> appliedSkins = new HashMap<>();
+
+    // Define constants for entity IDs
+    public static final String ENTITY_IRONCLAD = "ironclad";
+    public static final String ENTITY_WATCHER = "watcher";
+    public static final String ENTITY_JAW_WORM = "jaw_worm";
+
     public static SpireConfig config;
+
+    // Helper method to get the applied skin for an entity
+    public static String getAppliedSkin(String entityId) {
+        return appliedSkins.getOrDefault(entityId, "");
+    }
+
+    // Helper method to set an applied skin for an entity
+    public static void setAppliedSkin(String entityId, String skinId) {
+        appliedSkins.put(entityId, skinId);
+        saveConfig();
+    }
+
     public static String makeID(String id) {
         return modID + ":" + id;
     }
 
     public static void initialize() {
         try {
-            // Simple config to store the current skin
+            // Simple config to store skin preferences
             Properties defaults = new Properties();
-            defaults.setProperty("ironcladSkin", "");
+            defaults.setProperty(ENTITY_IRONCLAD, "");
+            defaults.setProperty(ENTITY_WATCHER, "");
+            defaults.setProperty(ENTITY_JAW_WORM, "");
 
             config = new SpireConfig(modID, "config", defaults);
         } catch (Exception e) {
             logger.error("Failed to load config: " + e.getMessage());
         }
 
-        // Load the saved skin preference
+        // Load the saved skin preferences
         try {
             if (config != null) {
-                currentIroncladSkin = config.getString("ironcladSkin");
-                logger.info("Loaded saved skin preference: " + currentIroncladSkin);
+                // Add each entity type to the map
+                appliedSkins.put(ENTITY_IRONCLAD, config.getString(ENTITY_IRONCLAD));
+                appliedSkins.put(ENTITY_WATCHER, config.getString(ENTITY_WATCHER));
+                appliedSkins.put(ENTITY_JAW_WORM, config.getString(ENTITY_JAW_WORM));
+
+                // Backward compatibility for old config format
+                if (config.has("ironcladSkin")) {
+                    String oldSkin = config.getString("ironcladSkin");
+                    if (!oldSkin.isEmpty()) {
+                        appliedSkins.put(ENTITY_IRONCLAD, oldSkin);
+                    }
+                }
+
+                logger.info("Loaded skin preferences: " + appliedSkins);
             }
         } catch (Exception e) {
-            logger.error("Failed to load skin preference: " + e.getMessage());
+            logger.error("Failed to load skin preferences: " + e.getMessage());
         }
 
         new Spirepass();
+    }
+
+    // Add method to save config
+    public static void saveConfig() {
+        try {
+            for (Map.Entry<String, String> entry : appliedSkins.entrySet()) {
+                config.setString(entry.getKey(), entry.getValue());
+            }
+            config.save();
+            logger.info("Saved skin preferences: " + appliedSkins);
+        } catch (Exception e) {
+            logger.error("Failed to save skin preferences: " + e.getMessage());
+        }
     }
 
     public Spirepass() {

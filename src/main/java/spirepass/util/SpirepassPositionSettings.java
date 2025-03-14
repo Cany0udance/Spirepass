@@ -21,6 +21,7 @@ public class SpirepassPositionSettings {
     public static final float REWARD_BACKGROUND_SCALE = 1.4f;  // Single scale factor for all backgrounds
     public static final float REWARD_CONTENT_SCALE = 1.4f;     // Single scale factor for all reward content
     public static final float CHARACTER_MODEL_SCALE = 1.3f;    // Scale factor for character models
+    public static final float MONSTER_MODEL_SCALE = 1.3f; // Adjust this value as needed for monsters
 
     // Base sizes (before scaling)
     public static final float REWARD_PREVIEW_HEIGHT = 300.0f * Settings.scale;
@@ -32,4 +33,5 @@ public class SpirepassPositionSettings {
 
     // Character model offset (for proper positioning)
     public static final float CHARACTER_MODEL_Y_OFFSET = 125.0f * Settings.scale;
+    public static final float MONSTER_MODEL_Y_OFFSET = 50.0f * Settings.scale; // Adjust as needed
 }

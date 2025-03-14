@@ -72,6 +72,8 @@ public class SpirepassLevelBox {
         return this.rewardData;
     }
 
+    /*
+
     private void onButtonClicked() {
         if (isUnlocked && rewardData != null) {
             // Equip the reward
@@ -113,6 +115,8 @@ public class SpirepassLevelBox {
             System.out.println("Level " + level + " is locked!");
         }
     }
+    
+     */
 
     public void render(SpriteBatch sb) {
         // Render the level box

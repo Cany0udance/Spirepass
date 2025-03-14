@@ -187,31 +187,38 @@ public class SpirepassScreen {
 
                     if (rewardData != null && rewardData.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
                         String modelId = rewardData.getModelId();
-                        toggleSkinEquipped(modelId);
+                        String entityId = rewardData.getEntityId();
+
+                        // Toggle the skin equipped state using entity ID
+                        toggleSkinEquipped(entityId, modelId);
                     }
                 }
             }
         }
     }
 
-    private void toggleSkinEquipped(String modelId) {
+    private void toggleSkinEquipped(String entityId, String modelId) {
+        // Get the current skin for this entity type
+        String currentSkin = Spirepass.getAppliedSkin(entityId);
+
         // Check if this skin is already equipped - if so, unequip it
-        boolean isUnequipping = modelId.equals(Spirepass.currentIroncladSkin);
+        boolean isUnequipping = modelId.equals(currentSkin);
 
         // Set the new value
-        Spirepass.currentIroncladSkin = isUnequipping ? "" : modelId;
+        Spirepass.setAppliedSkin(entityId, isUnequipping ? "" : modelId);
 
         try {
-            Spirepass.config.setString("ironcladSkin", Spirepass.currentIroncladSkin);
-            Spirepass.config.save();
-            System.out.println((isUnequipping ? "Unequipped " : "Equipped ") + modelId + " Ironclad skin");
+            // No need to manually save config here, setAppliedSkin handles it
+            System.out.println((isUnequipping ? "Unequipped " : "Equipped ") +
+                    entityId + " skin: " + modelId);
         } catch (Exception e) {
             System.err.println("Failed to save skin preference: " + e.getMessage());
         }
 
         // Debug print
-        System.out.println("DEBUG - currentIroncladSkin is now: '" + Spirepass.currentIroncladSkin + "'");
+        System.out.println("DEBUG - Current skins: " + Spirepass.appliedSkins);
     }
+
 
     private void updateScrolling() {
         // Handle mouse drag scrolling
