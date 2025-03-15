@@ -8,7 +8,7 @@ import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
 import javassist.CtBehavior;
 import spirepass.screens.SpirepassScreen;
-import spirepass.util.SpirepassManager;
+import spirepass.spirepassutil.SpirepassManager;
 
 public class MainMenuPatches {
     // Define new enum values

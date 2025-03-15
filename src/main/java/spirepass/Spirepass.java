@@ -36,11 +36,14 @@ public class Spirepass implements
 
     // Replace single skin string with a map of entity IDs to skin IDs
     public static Map<String, String> appliedSkins = new HashMap<>();
+    public static Map<String, String> appliedCardbacks = new HashMap<>();
 
     // Define constants for entity IDs
     public static final String ENTITY_IRONCLAD = "ironclad";
     public static final String ENTITY_WATCHER = "watcher";
     public static final String ENTITY_JAW_WORM = "jaw_worm";
+    public static final String CARDBACK_COLORLESS = "colorless";
+    public static final String CARDBACK_CURSE = "curse";
 
     public static SpireConfig config;
 
@@ -55,30 +58,48 @@ public class Spirepass implements
         saveConfig();
     }
 
+    public static String getAppliedCardback(String cardbackType) {
+        return appliedCardbacks.getOrDefault(cardbackType, "");
+    }
+
+    // Helper method to set an applied cardback
+    public static void setAppliedCardback(String cardbackType, String cardbackId) {
+        appliedCardbacks.put(cardbackType, cardbackId);
+        saveConfig();
+    }
+
     public static String makeID(String id) {
         return modID + ":" + id;
     }
 
     public static void initialize() {
         try {
-            // Simple config to store skin preferences
+            // Simple config to store skin and cardback preferences
             Properties defaults = new Properties();
+            // Existing entity defaults
             defaults.setProperty(ENTITY_IRONCLAD, "");
             defaults.setProperty(ENTITY_WATCHER, "");
             defaults.setProperty(ENTITY_JAW_WORM, "");
+            // Add cardback defaults
+            defaults.setProperty(CARDBACK_COLORLESS, "");
+            defaults.setProperty(CARDBACK_CURSE, "");
 
             config = new SpireConfig(modID, "config", defaults);
         } catch (Exception e) {
             logger.error("Failed to load config: " + e.getMessage());
         }
 
-        // Load the saved skin preferences
+        // Load the saved preferences
         try {
             if (config != null) {
                 // Add each entity type to the map
                 appliedSkins.put(ENTITY_IRONCLAD, config.getString(ENTITY_IRONCLAD));
                 appliedSkins.put(ENTITY_WATCHER, config.getString(ENTITY_WATCHER));
                 appliedSkins.put(ENTITY_JAW_WORM, config.getString(ENTITY_JAW_WORM));
+
+                // Load cardback preferences
+                appliedCardbacks.put(CARDBACK_COLORLESS, config.getString(CARDBACK_COLORLESS));
+                appliedCardbacks.put(CARDBACK_CURSE, config.getString(CARDBACK_CURSE));
 
                 // Backward compatibility for old config format
                 if (config.has("ironcladSkin")) {
@@ -89,24 +110,29 @@ public class Spirepass implements
                 }
 
                 logger.info("Loaded skin preferences: " + appliedSkins);
+                logger.info("Loaded cardback preferences: " + appliedCardbacks);
             }
         } catch (Exception e) {
-            logger.error("Failed to load skin preferences: " + e.getMessage());
+            logger.error("Failed to load preferences: " + e.getMessage());
         }
 
         new Spirepass();
     }
 
-    // Add method to save config
+    // Update saveConfig method to save cardback preferences
     public static void saveConfig() {
         try {
             for (Map.Entry<String, String> entry : appliedSkins.entrySet()) {
                 config.setString(entry.getKey(), entry.getValue());
             }
+            for (Map.Entry<String, String> entry : appliedCardbacks.entrySet()) {
+                config.setString(entry.getKey(), entry.getValue());
+            }
             config.save();
             logger.info("Saved skin preferences: " + appliedSkins);
+            logger.info("Saved cardback preferences: " + appliedCardbacks);
         } catch (Exception e) {
-            logger.error("Failed to save skin preferences: " + e.getMessage());
+            logger.error("Failed to save preferences: " + e.getMessage());
         }
     }
 

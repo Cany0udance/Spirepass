@@ -1,6 +1,7 @@
 package spirepass.screens;
 
 import basemod.BaseMod;
+import basemod.ModLabeledButton;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,29 +14,194 @@ import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import spirepass.Spirepass;
 import spirepass.elements.SpirepassLevelBox;
-import spirepass.util.SpirepassPositionSettings;
-import spirepass.util.SpirepassRewardData;
+import spirepass.spirepassutil.SpirepassPositionSettings;
+import spirepass.spirepassutil.SpirepassRewardData;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 public class SpirepassScreenRenderer {
+    // ==================== TEXTURES ====================
     private Texture backgroundTexture;
     private Texture levelBoxTexture;
     private Texture currentLevelBoxTexture;
     private Texture lockedLevelBoxTexture;
 
+    // ==================== DATA STRUCTURES ====================
     // Maps to hold our reward data and textures
     private HashMap<Integer, SpirepassRewardData> rewardData;
     private HashMap<Integer, Texture> rewardTextures;
     private HashMap<String, Texture> backgroundTextures;
 
+    // ==================== ANIMATION RELATED ====================
     // Maps for entity previews - generalized for any entity type
     private HashMap<String, HashMap<String, AnimationState>> previewAnimations = new HashMap<>();
     private HashMap<String, HashMap<String, Skeleton>> previewSkeletons = new HashMap<>();
     private HashMap<String, HashMap<String, Boolean>> animationInitialized = new HashMap<>();
     private static SkeletonMeshRenderer skeletonMeshRenderer;
     private PolygonSpriteBatch polyBatch;
+
+    // ==================== UI ELEMENTS ====================
+    private ModLabeledButton equipButton;
+
+    // ==================== INITIALIZATION ====================
+
+    public SpirepassScreenRenderer() {
+        // Load the textures
+        try {
+            this.backgroundTexture = ImageMaster.loadImage("spirepass/images/screen/SpirepassBackground.jpg");
+            // Using default textures as placeholders - replace with your own
+            this.levelBoxTexture = ImageMaster.OPTION_YES;
+            this.currentLevelBoxTexture = ImageMaster.OPTION_YES;
+            this.lockedLevelBoxTexture = ImageMaster.OPTION_NO;
+
+            // Initialize our structures
+            this.rewardData = new HashMap<>();
+            this.rewardTextures = new HashMap<>();
+            this.backgroundTextures = new HashMap<>();
+
+            // Initialize entity preview maps
+            initializeAnimationMaps();
+
+            // Load background textures
+            loadBackgroundTextures();
+
+            // Initialize reward data and textures
+            initializeRewardData();
+        } catch (Exception e) {
+            // Fallback in case images can't be loaded
+            System.err.println("Failed to load SpirePass textures: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        this.polyBatch = new PolygonSpriteBatch();
+        skeletonMeshRenderer = new SkeletonMeshRenderer();
+        skeletonMeshRenderer.setPremultipliedAlpha(true);
+    }
+
+    private void loadBackgroundTextures() {
+        // Load the background textures for different rarities
+        String[] paths = {
+                "spirepass/images/screen/CommonRewardBackground.png",
+                "spirepass/images/screen/UncommonRewardBackground.png",
+                "spirepass/images/screen/RareRewardBackground.png"
+        };
+
+        for (String path : paths) {
+            try {
+                backgroundTextures.put(path, ImageMaster.loadImage(path));
+            } catch (Exception e) {
+                System.err.println("Failed to load background texture: " + path);
+            }
+        }
+    }
+
+    private void initializeRewardData() {
+        // Level 1: Ironclad skin
+        rewardData.put(1, new SpirepassRewardData(
+                1,
+                "MS Paint Ironclad",
+                "A beautiful hand-drawn rendition of the Ironclad",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_IRONCLAD,
+                "IRONCLAD"
+        ));
+
+        // Level 2: Weaponized 115 Ironclad skin
+        rewardData.put(2, new SpirepassRewardData(
+                2,
+                "Weaponized 115 from the hit game Call of Duty®: Black Ops II",
+                "Ironclad with a radioactive glow and questionable side effects",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_IRONCLAD,
+                "IRONCLAD_WEAPONIZED115"
+        ));
+
+        // Level 3: Invisible Man Ironclad skin
+        rewardData.put(3, new SpirepassRewardData(
+                3,
+                "Invisible Man",
+                "You can't see him, but the enemies still can",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_IRONCLAD,
+                "IRONCLAD_INVISIBLEMAN"
+        ));
+
+        // Level 4: Cyan colorless cardback
+        rewardData.put(4, new SpirepassRewardData(
+                4,
+                "Cyan Colorless Cardback",
+                "Slightly off-center blue cardback",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CARDBACK,
+                Spirepass.CARDBACK_COLORLESS,
+                "COLORLESS_CYAN",
+                "spirepass/images/rewards/cardbacks/colorless/CyanColorlessCardbackReward.png"
+        ));
+
+        // Add Watcher skin
+        rewardData.put(5, new SpirepassRewardData(
+                5,
+                "Sickly Watcher",
+                "A Watcher that's seen better days",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_WATCHER,
+                "WATCHER_SICKLY"
+        ));
+
+        // Add Jaw Worm skin
+        rewardData.put(6, new SpirepassRewardData(
+                6,
+                "Bloodied Jaw Worm",
+                "A Jaw Worm that's taken a few hits",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_JAW_WORM,
+                "JAW_WORM_BLOODIED"
+        ));
+
+        // Add Harold Curse cardback at level 7
+        rewardData.put(7, new SpirepassRewardData(
+                7,
+                "Harold Curse Cardback",
+                ":)",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CARDBACK,
+                Spirepass.CARDBACK_CURSE,
+                "CURSE_HAROLD",
+                "spirepass/images/rewards/cardbacks/curse/HaroldLarge.png"
+        ));
+
+        // Default reward for all other levels (badge image)
+        Texture badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
+
+        // Load the image textures for any image-type or cardback-type rewards
+        for (Integer level : rewardData.keySet()) {
+            SpirepassRewardData data = rewardData.get(level);
+            if (data.getImagePath() != null) {
+                try {
+                    rewardTextures.put(level, ImageMaster.loadImage(data.getImagePath()));
+                } catch (Exception e) {
+                    System.err.println("Failed to load reward texture for level " + level);
+                }
+            }
+        }
+
+        // For any unspecified levels, use the badge texture as a fallback
+        for (int i = 0; i <= 30; i++) {
+            if (!rewardTextures.containsKey(i) && !rewardData.containsKey(i)) {
+                rewardTextures.put(i, badgeTexture);
+            }
+        }
+    }
+
+    // ==================== ANIMATION MANAGEMENT ====================
 
     private void initializeAnimationMaps() {
         previewAnimations.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
@@ -56,8 +222,10 @@ public class SpirepassScreenRenderer {
         if (animationInitialized.get(entityId).getOrDefault(variant, false)) {
             return;
         }
+
         try {
             BaseMod.logger.info("Creating animation preview for " + entityId + " variant: " + variant);
+
             // Define animation paths based on variant and entity
             String atlasUrl, skeletonUrl;
             if (variant.equals("default")) {
@@ -87,6 +255,7 @@ public class SpirepassScreenRenderer {
                 atlasUrl = basePath + "skeleton.atlas";
                 skeletonUrl = basePath + "skeleton.json";
             }
+
             // Load the skeleton directly
             TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(atlasUrl));
             SkeletonJson json = new SkeletonJson(atlas);
@@ -104,7 +273,6 @@ public class SpirepassScreenRenderer {
             BaseMod.logger.info("Available animations for " + entityId + ":");
             for (Animation anim : skeletonData.getAnimations()) {
                 BaseMod.logger.info(" - " + anim.getName() + " (duration: " + anim.getDuration() + ")");
-
                 // Look for idle animation with case-insensitive comparison
                 if (anim.getName().equalsIgnoreCase("idle")) {
                     idleAnimation = anim.getName();
@@ -114,7 +282,6 @@ public class SpirepassScreenRenderer {
             // Set appropriate idle animation if found
             if (idleAnimation != null) {
                 state.setAnimation(0, idleAnimation, true);
-
                 // Set animation speed
                 float scale = getScaleFactor(entityId);
                 state.getCurrent(0).setTimeScale(0.6f * scale);
@@ -123,6 +290,7 @@ public class SpirepassScreenRenderer {
                 previewAnimations.get(entityId).put(variant, state);
                 previewSkeletons.get(entityId).put(variant, skeleton);
                 animationInitialized.get(entityId).put(variant, true);
+
                 BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized successfully with animation: " + idleAnimation);
             } else {
                 // If no idle animation was found, try to use the first available animation
@@ -136,6 +304,7 @@ public class SpirepassScreenRenderer {
                     previewAnimations.get(entityId).put(variant, state);
                     previewSkeletons.get(entityId).put(variant, skeleton);
                     animationInitialized.get(entityId).put(variant, true);
+
                     BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized with fallback animation: " + firstAnim);
                 } else {
                     throw new Exception("No animations found in skeleton data");
@@ -146,6 +315,7 @@ public class SpirepassScreenRenderer {
             e.printStackTrace();
         }
     }
+
     private void renderAnimationPreview(SpriteBatch sb, String entityId, String variant) {
         // Initialize if needed
         if (!animationInitialized.get(entityId).getOrDefault(variant, false)) {
@@ -197,7 +367,6 @@ public class SpirepassScreenRenderer {
                 if (batchWasDrawing) {
                     sb.begin();
                 }
-
             } catch (Exception e) {
                 BaseMod.logger.error("Error rendering animation for " + entityId + "/" + variant + ": " + e.getMessage());
                 e.printStackTrace();
@@ -214,162 +383,145 @@ public class SpirepassScreenRenderer {
         }
     }
 
-    public SpirepassScreenRenderer() {
-        // Load the textures
-        try {
-            this.backgroundTexture = ImageMaster.loadImage("spirepass/images/screen/SpirepassBackground.jpg");
-            // Using default textures as placeholders - replace with your own
-            this.levelBoxTexture = ImageMaster.OPTION_YES;
-            this.currentLevelBoxTexture = ImageMaster.OPTION_YES;
-            this.lockedLevelBoxTexture = ImageMaster.OPTION_NO;
-
-            // Initialize our structures
-            this.rewardData = new HashMap<>();
-            this.rewardTextures = new HashMap<>();
-            this.backgroundTextures = new HashMap<>();
-
-            // Initialize entity preview maps
-            initializeAnimationMaps();
-
-            // Load background textures
-            loadBackgroundTextures();
-
-            // Initialize reward data and textures
-            initializeRewardData();
-        } catch (Exception e) {
-            // Fallback in case images can't be loaded
-            System.err.println("Failed to load SpirePass textures: " + e.getMessage());
-            e.printStackTrace();
+    // Get the scale factor for different entity types
+    private float getScaleFactor(String entityId) {
+        // Different entities might need different scaling
+        if (entityId.equals(Spirepass.ENTITY_IRONCLAD) ||
+                entityId.equals(Spirepass.ENTITY_WATCHER)) {
+            return SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
+        } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
+            return SpirepassPositionSettings.MONSTER_MODEL_SCALE;
         }
-        this.polyBatch = new PolygonSpriteBatch();
-        skeletonMeshRenderer = new SkeletonMeshRenderer();
-        skeletonMeshRenderer.setPremultipliedAlpha(true);
-
+        return SpirepassPositionSettings.CHARACTER_MODEL_SCALE; // Default
     }
 
+    private String getVariantFromModelId(String entityId, String modelId) {
+        if (entityId.equals(Spirepass.ENTITY_IRONCLAD)) {
+            if (modelId.equals("IRONCLAD")) {
+                return "default";
+            } else if (modelId.startsWith("IRONCLAD_")) {
+                return modelId.substring("IRONCLAD_".length()).toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
+            if (modelId.equals("WATCHER")) {
+                return "default";
+            } else if (modelId.startsWith("WATCHER_")) {
+                return modelId.substring("WATCHER_".length()).toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
+            if (modelId.equals("JAW_WORM")) {
+                return "default";
+            } else if (modelId.startsWith("JAW_WORM_")) {
+                return modelId.substring("JAW_WORM_".length()).toLowerCase();
+            }
+        }
+        return "default"; // fallback
+    }
 
-    private void loadBackgroundTextures() {
-        // Load the background textures for different rarities (unchanged)
-        String[] paths = {
-                "spirepass/images/screen/CommonRewardBackground.png",
-                "spirepass/images/screen/UncommonRewardBackground.png",
-                "spirepass/images/screen/RareRewardBackground.png"
+    // ==================== UI BUTTON MANAGEMENT ====================
+
+    private void updateEquipButton(SpirepassLevelBox selectedBox) {
+        boolean isUnlocked = selectedBox.isUnlocked();
+        SpirepassRewardData reward = getRewardData(selectedBox.getLevel());
+
+        // Determine if equipped
+        boolean isEquipped = false;
+        String entityId = null;
+        String modelId = null;
+        String cardbackType = null;
+        String cardbackId = null;
+
+        if (reward != null) {
+            if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
+                modelId = reward.getModelId();
+                entityId = reward.getEntityId();
+                String currentSkin = Spirepass.getAppliedSkin(entityId);
+                isEquipped = modelId.equals(currentSkin);
+            } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
+                cardbackType = reward.getCardbackType();
+                cardbackId = reward.getCardbackId();
+                String currentCardback = Spirepass.getAppliedCardback(cardbackType);
+                isEquipped = cardbackId.equals(currentCardback);
+            }
+        }
+
+        // Create button with appropriate text and colors
+        String buttonText = isUnlocked ? (isEquipped ? "UNEQUIP" : "EQUIP") : "LOCKED";
+        Color buttonColor = isUnlocked ? (isEquipped ? Color.ORANGE : Color.WHITE) : Color.GRAY;
+        Color hoverColor = isUnlocked ? (isEquipped ? Color.YELLOW : Color.GREEN) : Color.DARK_GRAY;
+        float buttonX = Settings.WIDTH / 2.0f - 80.0f;
+        float buttonY = SpirepassPositionSettings.REWARD_BUTTON_Y - 25.0f;
+
+        // Store final values for lambda
+        final String finalEntityId = entityId;
+        final String finalModelId = modelId;
+        final String finalCardbackType = cardbackType;
+        final String finalCardbackId = cardbackId;
+        final boolean finalIsUnlocked = isUnlocked;
+        final SpirepassRewardData finalReward = reward;
+
+        // Create a consumer for the button click
+        Consumer<ModLabeledButton> clickConsumer = (button) -> {
+            handleButtonClick(finalIsUnlocked, finalReward, finalEntityId, finalModelId,
+                    finalCardbackType, finalCardbackId);
         };
 
-        for (String path : paths) {
-            try {
-                backgroundTextures.put(path, ImageMaster.loadImage(path));
-            } catch (Exception e) {
-                System.err.println("Failed to load background texture: " + path);
-            }
-        }
-    }
-
-    private void initializeRewardData() {
-        // Level 1: Ironclad skin
-        rewardData.put(1, new SpirepassRewardData(
-                1,
-                "MS Paint Ironclad",
-                "A beautiful hand-drawn rendition of the Ironclad",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                Spirepass.ENTITY_IRONCLAD,
-                "IRONCLAD"
-        ));
-
-        // Level 2: Weaponized 115 Ironclad skin
-        rewardData.put(2, new SpirepassRewardData(
-                2,
-                "Weaponized 115 from the hit game Call of Duty®: Black Ops II",
-                "Ironclad with a radioactive glow and questionable side effects",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                Spirepass.ENTITY_IRONCLAD,
-                "IRONCLAD_WEAPONIZED115"
-        ));
-
-        // Level 3: Invisible Man Ironclad skin
-        rewardData.put(3, new SpirepassRewardData(
-                3,
-                "Invisible Man",
-                "You can't see him, but the enemies still can",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                Spirepass.ENTITY_IRONCLAD,
-                "IRONCLAD_INVISIBLEMAN"
-        ));
-
-        // Level 4: Cyan colorless cardback (image)
-        rewardData.put(4, new SpirepassRewardData(
-                4,
-                "Cyan Colorless Cardback",
-                "Slightly off-center blue cardback",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.IMAGE,
-                "spirepass/images/rewards/cardbacks/colorless/CyanColorlessCardbackReward.png"
-        ));
-
-        // Add Watcher skin
-        rewardData.put(5, new SpirepassRewardData(
-                5,
-                "Sickly Watcher",
-                "A Watcher that's seen better days",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                Spirepass.ENTITY_WATCHER,
-                "WATCHER_SICKLY"
-        ));
-
-        // Add Jaw Worm skin
-        rewardData.put(6, new SpirepassRewardData(
-                6,
-                "Bloodied Jaw Worm",
-                "A Jaw Worm that's taken a few hits",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                Spirepass.ENTITY_JAW_WORM,
-                "JAW_WORM_BLOODIED"
-        ));
-
-        // Default reward for all other levels (badge image)
-        Texture badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
-
-        // Load the image textures for any image-type rewards
-        for (Integer level : rewardData.keySet()) {
-            SpirepassRewardData data = rewardData.get(level);
-            if (data.getType() == SpirepassRewardData.RewardType.IMAGE && data.getImagePath() != null) {
-                try {
-                    rewardTextures.put(level, ImageMaster.loadImage(data.getImagePath()));
-                } catch (Exception e) {
-                    System.err.println("Failed to load reward texture for level " + level);
-                }
-            }
-        }
-
-        // For any unspecified levels, use the badge texture as a fallback
-        for (int i = 0; i <= 30; i++) {
-            if (!rewardTextures.containsKey(i) && !rewardData.containsKey(i)) {
-                rewardTextures.put(i, badgeTexture);
-            }
-        }
-    }
-
-
-    public Texture getRewardTexture(int level) {
-        if (rewardTextures.containsKey(level)) {
-            return rewardTextures.get(level);
+        if (equipButton == null) {
+            // Create a new button
+            equipButton = new ModLabeledButton(buttonText, buttonX / Settings.scale, buttonY / Settings.scale,
+                    buttonColor, hoverColor, null, clickConsumer);
         } else {
-            // Return the badge texture as default if level not found
-            for (Integer key : rewardTextures.keySet()) {
-                return rewardTextures.get(key);  // Return the first one we find
+            // Update existing button
+            equipButton.label = buttonText;
+            equipButton.color = buttonColor;
+            equipButton.colorHover = hoverColor;
+            equipButton.set(buttonX / Settings.scale, buttonY / Settings.scale);
+
+            // Update click handler using reflection
+            try {
+                Field clickField = ModLabeledButton.class.getDeclaredField("click");
+                clickField.setAccessible(true);
+                clickField.set(equipButton, clickConsumer);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                BaseMod.logger.error("Failed to update button click handler: " + e.getMessage());
+                e.printStackTrace();
             }
-            return null;  // Fallback
         }
     }
 
-    public SpirepassRewardData getRewardData(int level) {
-        return rewardData.getOrDefault(level, null);
+    private void handleButtonClick(boolean isUnlocked, SpirepassRewardData reward,
+                                   String entityId, String modelId,
+                                   String cardbackType, String cardbackId) {
+        System.out.println("Button clicked, unlocked: " + isUnlocked);
+
+        if (!isUnlocked || reward == null) {
+            return;
+        }
+
+        if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL && entityId != null && modelId != null) {
+            System.out.println("Handling character model: " + entityId + ", " + modelId);
+
+            // Toggle the skin directly
+            String currentSkin = Spirepass.getAppliedSkin(entityId);
+            boolean shouldUnequip = modelId.equals(currentSkin);
+            Spirepass.setAppliedSkin(entityId, shouldUnequip ? "" : modelId);
+
+            System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
+                    entityId + " skin: " + modelId);
+        } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK && cardbackType != null && cardbackId != null) {
+            System.out.println("Handling cardback: " + cardbackType + ", " + cardbackId);
+
+            // Toggle the cardback directly
+            String currentCardback = Spirepass.getAppliedCardback(cardbackType);
+            boolean shouldUnequip = cardbackId.equals(currentCardback);
+            Spirepass.setAppliedCardback(cardbackType, shouldUnequip ? "" : cardbackId);
+
+            System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
+                    cardbackType + " cardback: " + cardbackId);
+        }
     }
+
+    // ==================== RENDERING ====================
 
     public void render(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding, ArrayList<SpirepassLevelBox> levelBoxes) {
         // Render the background image to fill the entire screen
@@ -400,9 +552,19 @@ public class SpirepassScreenRenderer {
 
         // Render level boxes
         renderLevelBoxes(sb, screen, scrollX, edgePadding, levelBoxes);
+    }
 
-        // Render the cancel button on top of everything
-        screen.cancelButton.render(sb);
+    private void renderLevelBoxes(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding, ArrayList<SpirepassLevelBox> levelBoxes) {
+        // Calculate which level boxes are currently visible
+        int firstVisibleLevel = Math.max(0, (int) ((scrollX - edgePadding) / screen.getLevelBoxSpacing()) - 1);
+        int lastVisibleLevel = Math.min(screen.getMaxLevel(), (int) ((scrollX + Settings.WIDTH - edgePadding) / screen.getLevelBoxSpacing()) + 1);
+
+        // Render each visible level box
+        for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
+            if (i < levelBoxes.size()) {
+                levelBoxes.get(i).render(sb);
+            }
+        }
     }
 
     public void renderSelectedLevelReward(SpriteBatch sb, SpirepassLevelBox selectedBox) {
@@ -412,181 +574,155 @@ public class SpirepassScreenRenderer {
 
         // If we have specific reward data, use it
         if (reward != null) {
-            // Get the background texture path
-            String backgroundPath = reward.getBackgroundTexturePath();
-            Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
+            renderRewardWithData(sb, level, isUnlocked, reward);
+        } else {
+            renderDefaultReward(sb, level);
+        }
 
-            // Render the background if available
-            if (backgroundTexture != null) {
-                // Apply the single background scale factor
-                float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
-                float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float) backgroundTexture.getHeight());
+        // Update and render the equip button
+        updateEquipButton(selectedBox);
+        if (equipButton != null) {
+            equipButton.render(sb);
+        }
+    }
+
+    private void renderRewardWithData(SpriteBatch sb, int level, boolean isUnlocked, SpirepassRewardData reward) {
+        // Get the background texture path
+        String backgroundPath = reward.getBackgroundTexturePath();
+        Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
+
+        // Render the background if available
+        if (backgroundTexture != null) {
+            // Apply the single background scale factor
+            float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
+            float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float) backgroundTexture.getHeight());
+
+            sb.setColor(Color.WHITE);
+            sb.draw(
+                    backgroundTexture,
+                    Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                    previewWidth,
+                    previewHeight
+            );
+        }
+
+        // Render reward preview based on type
+        if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
+            String modelId = reward.getModelId();
+            String entityId = reward.getEntityId();
+
+            // Get the variant from the model ID
+            String variant = getVariantFromModelId(entityId, modelId);
+
+            // Render the appropriate entity preview
+            renderAnimationPreview(sb, entityId, variant);
+        } else if (reward.getType() == SpirepassRewardData.RewardType.IMAGE ||
+                reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
+            // For both IMAGE and CARDBACK types, display the image preview
+            Texture rewardTexture = getRewardTexture(level);
+
+            if (rewardTexture != null) {
+                // Apply the single content scale factor
+                float previewHeight = SpirepassPositionSettings.REWARD_IMAGE_HEIGHT * SpirepassPositionSettings.REWARD_CONTENT_SCALE;
+                // Calculate width based on the texture's aspect ratio
+                float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
+                float previewWidth = previewHeight * aspectRatio;
 
                 sb.setColor(Color.WHITE);
                 sb.draw(
-                        backgroundTexture,
+                        rewardTexture,
                         Settings.WIDTH / 2.0f - previewWidth / 2.0f,
                         SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
                         previewWidth,
                         previewHeight
                 );
             }
-
-            // Render reward preview based on type
-            if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
-                String modelId = reward.getModelId();
-                String entityId = reward.getEntityId();
-
-                // Get the variant from the model ID
-                String variant = getVariantFromModelId(entityId, modelId);
-
-                // Render the appropriate entity preview
-                renderAnimationPreview(sb, entityId, variant);
-            } else if (reward.getType() == SpirepassRewardData.RewardType.IMAGE) {
-                Texture rewardTexture = getRewardTexture(level);
-                if (rewardTexture != null) {
-                    // Apply the single content scale factor
-                    float previewHeight = SpirepassPositionSettings.REWARD_IMAGE_HEIGHT * SpirepassPositionSettings.REWARD_CONTENT_SCALE;
-
-                    // Calculate width based on the texture's aspect ratio
-                    float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
-                    float previewWidth = previewHeight * aspectRatio;
-
-                    sb.setColor(Color.WHITE);
-                    sb.draw(
-                            rewardTexture,
-                            Settings.WIDTH / 2.0f - previewWidth / 2.0f,
-                            SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
-                            previewWidth,
-                            previewHeight
-                    );
-                }
-            }
-
-            // Render reward title
-            FontHelper.renderFontCentered(
-                    sb,
-                    FontHelper.tipBodyFont,
-                    reward.getName(),
-                    Settings.WIDTH / 2.0f,
-                    SpirepassPositionSettings.REWARD_NAME_Y,
-                    Color.WHITE
-            );
-
-            // Render description
-            FontHelper.renderFontCentered(
-                    sb,
-                    FontHelper.tipBodyFont,
-                    reward.getDescription(),
-                    Settings.WIDTH / 2.0f,
-                    SpirepassPositionSettings.REWARD_DESCRIPTION_Y,
-                    Color.LIGHT_GRAY
-            );
-        } else {
-            // Fallback for levels without specific reward data
-            // Try to guess what kind of reward this might be based on the level
-            if (level == 1) {
-                // Default to Ironclad preview for level 1
-                renderAnimationPreview(sb, Spirepass.ENTITY_IRONCLAD, "default");
-            } else if (level == 5) {
-                // Default to Watcher preview for level 5
-                renderAnimationPreview(sb, Spirepass.ENTITY_WATCHER, "default");
-            } else if (level == 6) {
-                // Default to Jaw Worm preview for level 6
-                renderAnimationPreview(sb, Spirepass.ENTITY_JAW_WORM, "default");
-            } else if (getRewardTexture(level) != null) {
-                // Otherwise show the texture if available
-                Texture rewardTexture = getRewardTexture(level);
-                if (rewardTexture != null) {
-                    // Set desired height for all reward images
-                    float previewHeight = 200.0f * Settings.scale;
-
-                    // Calculate width based on the texture's aspect ratio
-                    float aspectRatio = rewardTexture.getWidth() / (float)rewardTexture.getHeight();
-                    float previewWidth = previewHeight * aspectRatio;
-
-                    sb.setColor(Color.WHITE);
-                    sb.draw(
-                            rewardTexture,
-                            Settings.WIDTH / 2.0f - previewWidth / 2.0f,
-                            SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
-                            previewWidth,
-                            previewHeight
-                    );
-                }
-            }
-
-            // Render generic title
-            FontHelper.renderFontCentered(
-                    sb,
-                    FontHelper.tipBodyFont,
-                    "Level " + level + " Reward",
-                    Settings.WIDTH / 2.0f,
-                    SpirepassPositionSettings.REWARD_NAME_Y,
-                    Color.WHITE
-            );
         }
 
-        // Render the equip button
-        float buttonWidth = SpirepassPositionSettings.BUTTON_WIDTH;
-        float buttonHeight = SpirepassPositionSettings.BUTTON_HEIGHT;
-
-        sb.setColor(isUnlocked ? Color.WHITE : Color.GRAY);
-        sb.draw(
-                ImageMaster.CANCEL_BUTTON,
-                Settings.WIDTH / 2.0f - buttonWidth / 2.0f,
-                SpirepassPositionSettings.REWARD_BUTTON_Y - buttonHeight / 2.0f,
-                buttonWidth,
-                buttonHeight
-        );
-
-        // Render button text
+        // Render reward title
         FontHelper.renderFontCentered(
                 sb,
-                FontHelper.buttonLabelFont,
-                isUnlocked ? "EQUIP" : "LOCKED",
+                FontHelper.tipBodyFont,
+                reward.getName(),
                 Settings.WIDTH / 2.0f,
-                SpirepassPositionSettings.REWARD_BUTTON_Y,
-                isUnlocked ? Color.WHITE : Color.DARK_GRAY
+                SpirepassPositionSettings.REWARD_NAME_Y,
+                Color.WHITE
+        );
+
+        // Render description
+        FontHelper.renderFontCentered(
+                sb,
+                FontHelper.tipBodyFont,
+                reward.getDescription(),
+                Settings.WIDTH / 2.0f,
+                SpirepassPositionSettings.REWARD_DESCRIPTION_Y,
+                Color.LIGHT_GRAY
+        );
+
+        // For cardbacks, show the current status
+        if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
+            String cardbackType = reward.getCardbackType();
+            String cardbackId = reward.getCardbackId();
+            String currentCardback = Spirepass.getAppliedCardback(cardbackType);
+            boolean isEquipped = cardbackId.equals(currentCardback);
+
+            // Show equipped status beneath the description
+            FontHelper.renderFontCentered(
+                    sb,
+                    FontHelper.tipBodyFont,
+                    isEquipped ? "Currently Equipped" : "Not Equipped",
+                    Settings.WIDTH / 2.0f,
+                    SpirepassPositionSettings.REWARD_DESCRIPTION_Y - 30.0f * Settings.scale,
+                    isEquipped ? Color.GREEN : Color.GRAY
+            );
+        }
+    }
+
+    private void renderDefaultReward(SpriteBatch sb, int level) {
+        // Fallback for levels without specific reward data
+        if (level == 1) {
+            // Default to Ironclad preview for level 1
+            renderAnimationPreview(sb, Spirepass.ENTITY_IRONCLAD, "default");
+        } else if (level == 5) {
+            // Default to Watcher preview for level 5
+            renderAnimationPreview(sb, Spirepass.ENTITY_WATCHER, "default");
+        } else if (level == 6) {
+            // Default to Jaw Worm preview for level 6
+            renderAnimationPreview(sb, Spirepass.ENTITY_JAW_WORM, "default");
+        } else if (getRewardTexture(level) != null) {
+            // Otherwise show the texture if available
+            Texture rewardTexture = getRewardTexture(level);
+            if (rewardTexture != null) {
+                // Set desired height for all reward images
+                float previewHeight = 200.0f * Settings.scale;
+                // Calculate width based on the texture's aspect ratio
+                float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
+                float previewWidth = previewHeight * aspectRatio;
+
+                sb.setColor(Color.WHITE);
+                sb.draw(
+                        rewardTexture,
+                        Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                        SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                        previewWidth,
+                        previewHeight
+                );
+            }
+        }
+
+        // Render generic title
+        FontHelper.renderFontCentered(
+                sb,
+                FontHelper.tipBodyFont,
+                "Level " + level + " Reward",
+                Settings.WIDTH / 2.0f,
+                SpirepassPositionSettings.REWARD_NAME_Y,
+                Color.WHITE
         );
     }
 
-
-    private String getVariantFromModelId(String entityId, String modelId) {
-        if (entityId.equals(Spirepass.ENTITY_IRONCLAD)) {
-            if (modelId.equals("IRONCLAD")) {
-                return "default";
-            } else if (modelId.startsWith("IRONCLAD_")) {
-                return modelId.substring("IRONCLAD_".length()).toLowerCase();
-            }
-        } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
-            if (modelId.equals("WATCHER")) {
-                return "default";
-            } else if (modelId.startsWith("WATCHER_")) {
-                return modelId.substring("WATCHER_".length()).toLowerCase();
-            }
-        } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
-            if (modelId.equals("JAW_WORM")) {
-                return "default";
-            } else if (modelId.startsWith("JAW_WORM_")) {
-                return modelId.substring("JAW_WORM_".length()).toLowerCase();
-            }
-        }
-
-        return "default"; // fallback
-    }
-
-    // Get the scale factor for different entity types
-    private float getScaleFactor(String entityId) {
-        // Different entities might need different scaling
-        if (entityId.equals(Spirepass.ENTITY_IRONCLAD) ||
-                entityId.equals(Spirepass.ENTITY_WATCHER)) {
-            return SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
-        } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
-            return SpirepassPositionSettings.MONSTER_MODEL_SCALE;
-        }
-        return SpirepassPositionSettings.CHARACTER_MODEL_SCALE; // Default
-    }
+// ==================== UTILITY METHODS ====================
 
     private void renderFallbackText(SpriteBatch sb, String text, Color color) {
         FontHelper.renderFontCentered(
@@ -599,26 +735,14 @@ public class SpirepassScreenRenderer {
         );
     }
 
-    private void renderLevelBoxes(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding, ArrayList<SpirepassLevelBox> levelBoxes) {
-        // Calculate which level boxes are currently visible
-        int firstVisibleLevel = Math.max(0, (int)((scrollX - edgePadding) / screen.getLevelBoxSpacing()) - 1);
-        int lastVisibleLevel = Math.min(screen.getMaxLevel(), (int)((scrollX + Settings.WIDTH - edgePadding) / screen.getLevelBoxSpacing()) + 1);
-
-        // Render each visible level box
-        for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
-            if (i < levelBoxes.size()) {
-                levelBoxes.get(i).render(sb);
-            }
-        }
-    }
-
     public void dispose() {
         if (polyBatch != null) {
             polyBatch.dispose();
         }
     }
 
-    // Getters for textures
+// ==================== GETTERS ====================
+
     public Texture getLevelBoxTexture() {
         return levelBoxTexture;
     }
@@ -629,5 +753,25 @@ public class SpirepassScreenRenderer {
 
     public Texture getLockedLevelBoxTexture() {
         return lockedLevelBoxTexture;
+    }
+
+    public ModLabeledButton getEquipButton() {
+        return equipButton;
+    }
+
+    public SpirepassRewardData getRewardData(int level) {
+        return rewardData.getOrDefault(level, null);
+    }
+
+    public Texture getRewardTexture(int level) {
+        if (rewardTextures.containsKey(level)) {
+            return rewardTextures.get(level);
+        } else {
+            // Return the badge texture as default if level not found
+            for (Integer key : rewardTextures.keySet()) {
+                return rewardTextures.get(key);  // Return the first one we find
+            }
+            return null;  // Fallback
+        }
     }
 }

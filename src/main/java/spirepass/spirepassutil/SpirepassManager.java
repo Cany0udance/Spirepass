@@ -1,4 +1,4 @@
-package spirepass.util;
+package spirepass.spirepassutil;
 
 import spirepass.screens.SpirepassScreen;
 

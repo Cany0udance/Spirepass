@@ -1,5 +1,6 @@
 package spirepass.screens;
 
+import basemod.ModLabeledButton;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
@@ -8,34 +9,44 @@ import com.megacrit.cardcrawl.helpers.MathHelper;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
-import spirepass.Spirepass;
 import spirepass.elements.SpirepassLevelBox;
-import spirepass.util.SpirepassPositionSettings;
-import spirepass.util.SpirepassRewardData;
+import spirepass.spirepassutil.SpirepassPositionSettings;
+import spirepass.spirepassutil.SpirepassRewardData;
 
 import java.util.ArrayList;
 
 public class SpirepassScreen {
+    // UI components
     public MenuCancelButton cancelButton;
-    public boolean isScreenOpened;
     private SpirepassScreenRenderer renderer;
+
+    // State variables
+    public boolean isScreenOpened;
+    private int selectedLevel = -1;
+
     // Scrolling variables
     private float scrollX = 0f;
     private float targetScrollX = 0f;
+    private float minScrollX = 0f;
+    private float maxScrollX = 0f;
+
+    // Drag handling
     private boolean isDragging = false;
     private float dragStartX = 0f;
     private float lastMouseX = 0f;
-    private static final float DRAG_THRESHOLD = 5.0f * Settings.scale;
     private boolean hasDraggedSignificantly = false;
-    // Spirepass level configuration
+    private static final float DRAG_THRESHOLD = 5.0f * Settings.scale;
+
+    // Configuration
     private int maxLevel = 30; // Default max level
-    private int currentLevel = 30; // Player's current level
-    private float levelBoxSpacing = 150f * Settings.scale; // Spacing between level boxes
-    public float edgePadding = 100f * Settings.scale; // Adjust this value as needed
+    private int currentLevel = 20; // Player's current level
+    private float levelBoxSpacing = 150f * Settings.scale;
+    public float edgePadding = 100f * Settings.scale;
 
     // Level boxes
     private ArrayList<SpirepassLevelBox> levelBoxes;
-    private int selectedLevel = -1;
+
+    // ==================== LIFECYCLE METHODS ====================
 
     public SpirepassScreen() {
         this.cancelButton = new MenuCancelButton();
@@ -44,22 +55,135 @@ public class SpirepassScreen {
         this.levelBoxes = new ArrayList<>();
     }
 
-    private float minScrollX = 0f;
-    private float maxScrollX = 0f;
+    public void open() {
+        this.cancelButton.show(CardCrawlGame.languagePack.getUIString("DungeonMapScreen").TEXT[1]);
+        this.isScreenOpened = true;
 
-    private void calculateScrollBounds() {
-        // Content width should include both edge paddings
-        float contentWidth = (maxLevel * levelBoxSpacing) + (2 * edgePadding);
-        minScrollX = 0; // Start at zero
-        maxScrollX = Math.max(0, contentWidth - Settings.WIDTH);
+        // Setup level boxes and scrolling
+        initializeLevelBoxes();
+        calculateScrollBounds();
+        centerOnLevel(currentLevel);
+        setSelectedLevel(currentLevel);
+
+        // Ignore clicks for a brief moment
+        InputHelper.justClickedLeft = false;
+        InputHelper.justReleasedClickLeft = false;
     }
 
-    public void centerOnLevel(int level) {
-        float targetX = (level * levelBoxSpacing) + edgePadding - (Settings.WIDTH / 2);
-        targetScrollX = Math.max(minScrollX, Math.min(targetX, maxScrollX));
+    public void close() {
+        CardCrawlGame.mainMenuScreen.lighten();
+        this.cancelButton.hide();
+        CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.MAIN_MENU;
+        this.isScreenOpened = false;
+    }
 
-        // Set the selected level
-        setSelectedLevel(level);
+    public void update() {
+        // Handle cancel button
+        this.cancelButton.update();
+        if (this.cancelButton.hb.clicked || InputHelper.pressedEscape) {
+            InputHelper.pressedEscape = false;
+            this.cancelButton.hb.clicked = false;
+            close();
+            return;
+        }
+
+        // Main update logic
+        updateScrolling();
+        updateLevelBoxPositions();
+        updateLevelBoxes();
+
+        // Update equipment button if a level is selected
+        if (selectedLevel != -1 && selectedLevel < levelBoxes.size()) {
+            ModLabeledButton button = renderer.getEquipButton();
+            if (button != null) {
+                button.update();
+            }
+        }
+    }
+
+    public void render(SpriteBatch sb) {
+        // Render main screen elements
+        this.renderer.render(sb, this, scrollX, edgePadding, levelBoxes);
+
+        // Render selected level details
+        if (selectedLevel != -1 && selectedLevel < levelBoxes.size()) {
+            SpirepassLevelBox selectedBox = levelBoxes.get(selectedLevel);
+            this.renderer.renderSelectedLevelReward(sb, selectedBox);
+        }
+
+        this.cancelButton.render(sb);
+    }
+
+    // ==================== LEVEL BOX MANAGEMENT ====================
+
+    private void initializeLevelBoxes() {
+        levelBoxes.clear();
+
+        for (int i = 0; i <= maxLevel; i++) {
+            // Choose appropriate texture
+            Texture boxTexture;
+            if (i == currentLevel) {
+                boxTexture = renderer.getCurrentLevelBoxTexture();
+            } else if (i > currentLevel) {
+                boxTexture = renderer.getLockedLevelBoxTexture();
+            } else {
+                boxTexture = renderer.getLevelBoxTexture();
+            }
+
+            // Get reward texture for this level
+            Texture rewardTexture = renderer.getRewardTexture(i);
+
+            // Create the level box with initial position
+            float boxX = (i * levelBoxSpacing) + edgePadding - scrollX;
+            float boxY = SpirepassPositionSettings.LEVEL_BOX_Y;
+            boolean isUnlocked = i <= currentLevel;
+
+            SpirepassLevelBox levelBox = new SpirepassLevelBox(i, boxX, boxY, isUnlocked, boxTexture, rewardTexture);
+
+            // Set the reward data if available
+            SpirepassRewardData rewardData = renderer.getRewardData(i);
+            if (rewardData != null) {
+                levelBox.setRewardData(rewardData);
+            }
+
+            levelBoxes.add(levelBox);
+        }
+    }
+
+    private void updateLevelBoxPositions() {
+        for (int i = 0; i < levelBoxes.size(); i++) {
+            float boxX = (i * levelBoxSpacing) + edgePadding - scrollX;
+            levelBoxes.get(i).update(boxX);
+        }
+    }
+
+    private void updateLevelBoxes() {
+        // Optimization: Calculate visible range once
+        int firstVisibleLevel = Math.max(0, (int)((scrollX - edgePadding) / levelBoxSpacing) - 1);
+        int lastVisibleLevel = Math.min(maxLevel, (int)((scrollX + Settings.WIDTH - edgePadding) / levelBoxSpacing) + 1);
+
+        // Update visible level boxes and check for clicks in one pass
+        boolean checkForClicks = InputHelper.justReleasedClickLeft && !hasDraggedSignificantly;
+        float mouseX = InputHelper.mX;
+        float mouseY = InputHelper.mY;
+
+        for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
+            if (i < levelBoxes.size()) {
+                SpirepassLevelBox box = levelBoxes.get(i);
+                box.update((i * levelBoxSpacing) + edgePadding - scrollX);
+
+                // Check for clicks as part of the same loop
+                if (checkForClicks && box.checkForClick(mouseX, mouseY)) {
+                    onLevelBoxClicked(i);
+                    break; // Only one box can be clicked at a time
+                }
+            }
+        }
+    }
+
+    private void onLevelBoxClicked(int level) {
+        centerOnLevel(level);
+        CardCrawlGame.sound.play("UI_CLICK_1");
     }
 
     private void setSelectedLevel(int level) {
@@ -77,226 +201,50 @@ public class SpirepassScreen {
         }
     }
 
-    public float getEdgePadding() {
-        return edgePadding;
+    public void centerOnLevel(int level) {
+        float targetX = (level * levelBoxSpacing) + edgePadding - (Settings.WIDTH / 2);
+        targetScrollX = Math.max(minScrollX, Math.min(targetX, maxScrollX));
+        setSelectedLevel(level);
     }
 
-    public void open() {
-        // Don't darken the menu screen since we're replacing it with our own background
-        this.cancelButton.show(CardCrawlGame.languagePack.getUIString("DungeonMapScreen").TEXT[1]);
-        this.isScreenOpened = true;
+    // ==================== SCROLLING MANAGEMENT ====================
 
-        // Initialize or update level boxes
-        initializeLevelBoxes();
-
-        calculateScrollBounds();
-        centerOnLevel(currentLevel);
-
-        // Explicitly set the current level as selected
-        setSelectedLevel(currentLevel);
-
-        // Ignore clicks for a brief moment
-        InputHelper.justClickedLeft = false;
-        InputHelper.justReleasedClickLeft = false;
+    private void calculateScrollBounds() {
+        float contentWidth = (maxLevel * levelBoxSpacing) + (2 * edgePadding);
+        minScrollX = 0;
+        maxScrollX = Math.max(0, contentWidth - Settings.WIDTH);
     }
-
-    // Replace your initializeLevelBoxes method with this updated version:
-    private void initializeLevelBoxes() {
-        levelBoxes.clear();
-
-        // Create level boxes
-        for (int i = 0; i <= maxLevel; i++) {
-            // Calculate initial position
-            float boxX = (i * levelBoxSpacing) + edgePadding - scrollX;
-            float boxY = SpirepassPositionSettings.LEVEL_BOX_Y;
-
-            // Choose appropriate texture
-            Texture boxTexture;
-            if (i == currentLevel) {
-                boxTexture = renderer.getCurrentLevelBoxTexture();
-            } else if (i > currentLevel) {
-                boxTexture = renderer.getLockedLevelBoxTexture();
-            } else {
-                boxTexture = renderer.getLevelBoxTexture();
-            }
-
-            // Get reward texture for this level
-            Texture rewardTexture = renderer.getRewardTexture(i);
-
-            // Create the level box
-            boolean isUnlocked = i <= currentLevel;
-            SpirepassLevelBox levelBox = new SpirepassLevelBox(i, boxX, boxY, isUnlocked, boxTexture, rewardTexture);
-
-            // Set the reward data if available
-            SpirepassRewardData rewardData = renderer.getRewardData(i);
-            if (rewardData != null) {
-                levelBox.setRewardData(rewardData);
-            }
-
-            levelBoxes.add(levelBox);
-        }
-    }
-
-    private void updateLevelBoxPositions() {
-        // Update the positions of all level boxes based on current scroll
-        for (int i = 0; i < levelBoxes.size(); i++) {
-            float boxX = (i * levelBoxSpacing) + edgePadding - scrollX;
-            levelBoxes.get(i).update(boxX);
-        }
-    }
-
-    public void close() {
-        CardCrawlGame.mainMenuScreen.lighten();
-        this.cancelButton.hide();
-        CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.MAIN_MENU;
-        this.isScreenOpened = false;
-    }
-
-    public void update() {
-        this.cancelButton.update();
-        if (this.cancelButton.hb.clicked || InputHelper.pressedEscape) {
-            InputHelper.pressedEscape = false;
-            this.cancelButton.hb.clicked = false;
-            close();
-            return;
-        }
-        updateScrolling();
-        updateLevelBoxPositions();
-        updateLevelBoxes();
-
-        // Check for clicks on the equip button when a level is selected
-        if (selectedLevel != -1 && selectedLevel < levelBoxes.size() && InputHelper.justReleasedClickLeft) {
-            SpirepassLevelBox selectedBox = levelBoxes.get(selectedLevel);
-            float BUTTON_Y = Settings.HEIGHT * 0.6f;
-            float BUTTON_WIDTH = 160.0f * Settings.scale;
-            float BUTTON_HEIGHT = 50.0f * Settings.scale;
-
-            // Check if mouse is over the button
-            if (InputHelper.mX >= Settings.WIDTH / 2.0f - BUTTON_WIDTH / 2.0f &&
-                    InputHelper.mX <= Settings.WIDTH / 2.0f + BUTTON_WIDTH / 2.0f &&
-                    InputHelper.mY >= BUTTON_Y - BUTTON_HEIGHT / 2.0f &&
-                    InputHelper.mY <= BUTTON_Y + BUTTON_HEIGHT / 2.0f) {
-
-                // Handle button click
-                if (selectedBox.isUnlocked()) {
-                    // Equip the reward
-                    CardCrawlGame.sound.play("UI_CLICK_1");
-
-                    // Get the reward data from the selected box
-                    SpirepassRewardData rewardData = selectedBox.getRewardData();
-
-                    if (rewardData != null && rewardData.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
-                        String modelId = rewardData.getModelId();
-                        String entityId = rewardData.getEntityId();
-
-                        // Toggle the skin equipped state using entity ID
-                        toggleSkinEquipped(entityId, modelId);
-                    }
-                }
-            }
-        }
-    }
-
-    private void toggleSkinEquipped(String entityId, String modelId) {
-        // Get the current skin for this entity type
-        String currentSkin = Spirepass.getAppliedSkin(entityId);
-
-        // Check if this skin is already equipped - if so, unequip it
-        boolean isUnequipping = modelId.equals(currentSkin);
-
-        // Set the new value
-        Spirepass.setAppliedSkin(entityId, isUnequipping ? "" : modelId);
-
-        try {
-            // No need to manually save config here, setAppliedSkin handles it
-            System.out.println((isUnequipping ? "Unequipped " : "Equipped ") +
-                    entityId + " skin: " + modelId);
-        } catch (Exception e) {
-            System.err.println("Failed to save skin preference: " + e.getMessage());
-        }
-
-        // Debug print
-        System.out.println("DEBUG - Current skins: " + Spirepass.appliedSkins);
-    }
-
 
     private void updateScrolling() {
-        // Handle mouse drag scrolling
+        // Start drag
         if (InputHelper.justClickedLeft) {
             isDragging = true;
-            hasDraggedSignificantly = false; // Reset at the start of a new drag
+            hasDraggedSignificantly = false;
             dragStartX = InputHelper.mX;
             lastMouseX = dragStartX;
-        } else if (InputHelper.justReleasedClickLeft) {
+        }
+        // End drag
+        else if (InputHelper.justReleasedClickLeft) {
             isDragging = false;
-            // Don't reset hasDraggedSignificantly here, so it persists until the next click
         }
 
+        // Handle dragging
         if (isDragging && InputHelper.isMouseDown) {
-            // Only apply scrolling if we've dragged beyond the threshold
             if (Math.abs(dragStartX - InputHelper.mX) > DRAG_THRESHOLD) {
                 float deltaX = lastMouseX - InputHelper.mX;
                 targetScrollX += deltaX;
-                hasDraggedSignificantly = true; // Mark that we've dragged significantly
+                hasDraggedSignificantly = true;
             }
             lastMouseX = InputHelper.mX;
         }
 
-        // Clamp scrolling
+        // Clamp and smooth scrolling
         targetScrollX = Math.max(minScrollX, Math.min(targetScrollX, maxScrollX));
-        // Smooth scrolling
         scrollX = MathHelper.scrollSnapLerpSpeed(scrollX, targetScrollX);
     }
 
-    private void updateLevelBoxes() {
-        // Calculate which level boxes are currently visible
-        int firstVisibleLevel = Math.max(0, (int)((scrollX - edgePadding) / levelBoxSpacing) - 1);
-        int lastVisibleLevel = Math.min(maxLevel, (int)((scrollX + Settings.WIDTH - edgePadding) / levelBoxSpacing) + 1);
+    // ==================== GETTERS ====================
 
-        // Update all visible level boxes first
-        for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
-            if (i < levelBoxes.size()) {
-                levelBoxes.get(i).update((i * levelBoxSpacing) + edgePadding - scrollX);
-            }
-        }
-
-        // Handle manual click detection - only if we haven't dragged significantly
-        if (InputHelper.justReleasedClickLeft && !hasDraggedSignificantly) {
-            float mouseX = InputHelper.mX;
-            float mouseY = InputHelper.mY;
-
-            for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
-                if (i < levelBoxes.size()) {
-                    SpirepassLevelBox box = levelBoxes.get(i);
-                    if (box.checkForClick(mouseX, mouseY)) {
-                        onLevelBoxClicked(i);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    private void onLevelBoxClicked(int level) {
-        // Center on the level that was clicked
-        centerOnLevel(level);
-        // Play a sound
-        CardCrawlGame.sound.play("UI_CLICK_1");
-    }
-
-    public void render(SpriteBatch sb) {
-        this.renderer.render(sb, this, scrollX, edgePadding, levelBoxes);
-
-        // Always render the selected level rewards, regardless of visibility
-        if (selectedLevel != -1 && selectedLevel < levelBoxes.size()) {
-            SpirepassLevelBox selectedBox = levelBoxes.get(selectedLevel);
-            this.renderer.renderSelectedLevelReward(sb, selectedBox);
-        }
-
-        this.cancelButton.render(sb);
-    }
-
-    // Getters for the renderer
     public int getMaxLevel() {
         return maxLevel;
     }
@@ -304,5 +252,4 @@ public class SpirepassScreen {
     public float getLevelBoxSpacing() {
         return levelBoxSpacing;
     }
-
 }
