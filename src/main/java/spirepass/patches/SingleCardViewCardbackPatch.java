@@ -28,23 +28,19 @@ public class SingleCardViewCardbackPatch {
         // Get the card from the SingleCardViewPopup instance
         AbstractCard card = (AbstractCard) ReflectionHacks.getPrivate(__instance, SingleCardViewPopup.class, "card");
 
-        // Only apply for colorless and curse cards
-        if (card.color == AbstractCard.CardColor.COLORLESS ||
+        // Only apply for colorless (excluding status) and curse cards
+        if ((card.color == AbstractCard.CardColor.COLORLESS && card.type != AbstractCard.CardType.STATUS) ||
                 card.color == AbstractCard.CardColor.CURSE) {
-
             String cardbackType = card.color == AbstractCard.CardColor.COLORLESS ?
                     Spirepass.CARDBACK_COLORLESS : Spirepass.CARDBACK_CURSE;
-
             String cardbackId = Spirepass.getAppliedCardback(cardbackType);
-
             if (cardbackId != null && !cardbackId.isEmpty()) {
                 try {
                     // Get the path for the large cardback texture
-                    String texturePath = getLargeCardbackTexturePath(cardbackType, cardbackId);
+                    String texturePath = getLargeCardbackTexturePath(cardbackType, cardbackId, card);
                     if (texturePath == null) {
                         return __result;
                     }
-
                     // Get or create the atlas region
                     TextureAtlas.AtlasRegion region = getOrCreateAtlasRegion(texturePath);
                     if (region != null) {
@@ -55,14 +51,27 @@ public class SingleCardViewCardbackPatch {
                 }
             }
         }
-
         return __result;
     }
 
-    private static String getLargeCardbackTexturePath(String cardbackType, String cardbackId) {
+    private static String getLargeCardbackTexturePath(String cardbackType, String cardbackId, AbstractCard card) {
         if (cardbackType.equals(Spirepass.CARDBACK_COLORLESS)) {
-            if (cardbackId.equals("COLORLESS_CYAN")) {
-                return "spirepass/images/rewards/cardbacks/colorless/CyanLarge.png";
+            String cardType = "";
+
+            // Determine card type
+            if (card.type == AbstractCard.CardType.ATTACK) {
+                cardType = "Attack";
+            } else if (card.type == AbstractCard.CardType.SKILL) {
+                cardType = "Skill";
+            } else if (card.type == AbstractCard.CardType.POWER) {
+                cardType = "Power";
+            } else {
+                // Use Skill as default for STATUS and other types
+                cardType = "Skill";
+            }
+
+            if (cardbackId.equals("COLORLESS_SPONSORED")) {
+                return "spirepass/images/rewards/cardbacks/colorless/sponsored/RAID" + cardType + "Large.png";
             }
             // Add other colorless cardbacks here
         } else if (cardbackType.equals(Spirepass.CARDBACK_CURSE)) {
@@ -71,7 +80,6 @@ public class SingleCardViewCardbackPatch {
             }
             // Add other curse cardbacks here
         }
-
         return null; // Unknown format or default cardback
     }
 
@@ -86,6 +94,7 @@ public class SingleCardViewCardbackPatch {
                             texture, 0, 0, texture.getWidth(), texture.getHeight());
                     cardbackRegionCache.put(path, region);
                 } else {
+                    Spirepass.logger.error("Large cardback texture not found: " + path);
                     return null;
                 }
             } catch (Exception e) {

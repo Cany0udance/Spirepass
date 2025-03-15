@@ -11,6 +11,7 @@ import com.esotericsoftware.spine.*;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireReturn;
+import com.megacrit.cardcrawl.characters.Defect;
 import com.megacrit.cardcrawl.characters.Ironclad;
 import com.megacrit.cardcrawl.characters.Watcher;
 import com.megacrit.cardcrawl.core.AbstractCreature;
@@ -56,6 +57,8 @@ public class EntitySkinPatch {
 
             if (__instance instanceof Ironclad) {
                 entityId = Spirepass.ENTITY_IRONCLAD;
+            } else if (__instance instanceof Defect) {
+                entityId = Spirepass.ENTITY_DEFECT;
             } else if (__instance instanceof Watcher) {
                 entityId = Spirepass.ENTITY_WATCHER;
             } else if (__instance instanceof JawWorm) {
@@ -168,6 +171,13 @@ public class EntitySkinPatch {
             } else if (skinId.startsWith("IRONCLAD_")) {
                 String variant = skinId.substring("IRONCLAD_".length()).toLowerCase();
                 return "spirepass/images/skins/ironclad/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_DEFECT)) {
+            if (skinId.equals("DEFECT")) {
+                return null; // Default Watcher
+            } else if (skinId.startsWith("DEFECT_")) {
+                String variant = skinId.substring("DEFECT_".length()).toLowerCase();
+                return "spirepass/images/skins/defect/" + variant + "/";
             }
         } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
             if (skinId.equals("WATCHER")) {

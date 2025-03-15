@@ -99,22 +99,22 @@ public class SpirepassScreenRenderer {
     }
 
     private void initializeRewardData() {
-        // Level 1: Ironclad skin
+        // Level 1: Defect skin
         rewardData.put(1, new SpirepassRewardData(
                 1,
-                "MS Paint Ironclad",
-                "A beautiful hand-drawn rendition of the Ironclad",
+                "avwejkanaklwjv e",
+                "yeah",
                 SpirepassRewardData.RewardRarity.UNCOMMON,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                Spirepass.ENTITY_IRONCLAD,
-                "IRONCLAD"
+                Spirepass.ENTITY_DEFECT,
+                "DEFECT_GARBLE"
         ));
 
         // Level 2: Weaponized 115 Ironclad skin
         rewardData.put(2, new SpirepassRewardData(
                 2,
                 "Weaponized 115 from the hit game Call of Duty®: Black Ops II",
-                "Ironclad with a radioactive glow and questionable side effects",
+                "The Weaponized 115 Personalization Pack brings out the power of Zombies to any Multiplayer match. Pack your weapons with an all-new Call of Duty: Black Ops II Origins-inspired camo, set of reticles, and undead animated calling card.",
                 SpirepassRewardData.RewardRarity.RARE,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
                 Spirepass.ENTITY_IRONCLAD,
@@ -132,16 +132,16 @@ public class SpirepassScreenRenderer {
                 "IRONCLAD_INVISIBLEMAN"
         ));
 
-        // Level 4: Cyan colorless cardback
+        // Level 4: Sponsored colorless cardback
         rewardData.put(4, new SpirepassRewardData(
                 4,
-                "Cyan Colorless Cardback",
-                "Slightly off-center blue cardback",
+                "Sponsored",
+                "Legal note: this cardback does not represent any official affiliation with a brand.",
                 SpirepassRewardData.RewardRarity.UNCOMMON,
                 SpirepassRewardData.RewardType.CARDBACK,
                 Spirepass.CARDBACK_COLORLESS,
-                "COLORLESS_CYAN",
-                "spirepass/images/rewards/cardbacks/colorless/CyanColorlessCardbackReward.png"
+                "COLORLESS_SPONSORED",
+                "spirepass/images/rewards/cardbacks/colorless/sponsored/RAIDSkillLarge.png"
         ));
 
         // Add Watcher skin
@@ -202,7 +202,7 @@ public class SpirepassScreenRenderer {
                 10,
                 "Red",
                 "We have red slaver at home",
-                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardRarity.UNCOMMON,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
                 Spirepass.ENTITY_BLUE_SLAVER,
                 "BLUE_SLAVER_RED"
@@ -235,6 +235,7 @@ public class SpirepassScreenRenderer {
 
     private void initializeAnimationMaps() {
         previewAnimations.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_DEFECT, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
@@ -242,6 +243,7 @@ public class SpirepassScreenRenderer {
         previewAnimations.put(Spirepass.ENTITY_AWAKENED_ONE, new HashMap<>());
 
         previewSkeletons.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_DEFECT, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
@@ -249,6 +251,7 @@ public class SpirepassScreenRenderer {
         previewSkeletons.put(Spirepass.ENTITY_AWAKENED_ONE, new HashMap<>());
 
         animationInitialized.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_DEFECT, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
@@ -270,6 +273,8 @@ public class SpirepassScreenRenderer {
             String basePath = "";
             if (entityId.equals(Spirepass.ENTITY_IRONCLAD)) {
                 basePath = "spirepass/images/skins/ironclad/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_DEFECT)) {
+                basePath = "spirepass/images/skins/defect/" + variant + "/";
             } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
                 basePath = "spirepass/images/skins/watcher/" + variant + "/";
             } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
@@ -416,7 +421,8 @@ public class SpirepassScreenRenderer {
     private float getScaleFactor(String entityId) {
         // Different entities might need different scaling
         if (entityId.equals(Spirepass.ENTITY_IRONCLAD) ||
-                entityId.equals(Spirepass.ENTITY_WATCHER)) {
+                entityId.equals(Spirepass.ENTITY_WATCHER) ||
+                entityId.equals(Spirepass.ENTITY_DEFECT)) {
             return SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
         } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM) ||
                 entityId.equals(Spirepass.ENTITY_AWAKENED_ONE) ||
@@ -433,6 +439,12 @@ public class SpirepassScreenRenderer {
                 return modelId.substring("IRONCLAD_".length()).toLowerCase();
             } else {
                 // Just use the modelId directly (or a portion of it) for non-prefixed names
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_DEFECT)) {
+            if (modelId.startsWith("DEFECT_")) {
+                return modelId.substring("DEFECT_".length()).toLowerCase();
+            } else {
                 return modelId.toLowerCase();
             }
         } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {

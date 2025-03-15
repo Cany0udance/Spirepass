@@ -40,6 +40,7 @@ public class Spirepass implements
 
     // Define constants for entity IDs
     public static final String ENTITY_IRONCLAD = "ironclad";
+    public static final String ENTITY_DEFECT = "defect";
     public static final String ENTITY_WATCHER = "watcher";
     public static final String ENTITY_JAW_WORM = "jaw_worm";
     public static final String ENTITY_BLUE_SLAVER = "blue_slaver";
@@ -81,6 +82,7 @@ public class Spirepass implements
             Properties defaults = new Properties();
             // Existing entity defaults
             defaults.setProperty(ENTITY_IRONCLAD, "");
+            defaults.setProperty(ENTITY_DEFECT, "");
             defaults.setProperty(ENTITY_WATCHER, "");
             defaults.setProperty(ENTITY_JAW_WORM, "");
             defaults.setProperty(ENTITY_BLUE_SLAVER, "");
@@ -100,6 +102,7 @@ public class Spirepass implements
             if (config != null) {
                 // Add each entity type to the map
                 appliedSkins.put(ENTITY_IRONCLAD, config.getString(ENTITY_IRONCLAD));
+                appliedSkins.put(ENTITY_DEFECT, config.getString(ENTITY_DEFECT));
                 appliedSkins.put(ENTITY_WATCHER, config.getString(ENTITY_WATCHER));
                 appliedSkins.put(ENTITY_JAW_WORM, config.getString(ENTITY_JAW_WORM));
                 appliedSkins.put(ENTITY_BLUE_SLAVER, config.getString(ENTITY_BLUE_SLAVER));
