@@ -33,6 +33,8 @@ public class SpirepassLevelBox {
 
     public SpirepassLevelBox(int level, float x, float y, boolean isUnlocked, Texture boxTexture, Texture rewardTexture) {
         this.level = level;
+        this.x = x;
+        this.y = y;
         this.isSelected = false;
         this.isUnlocked = isUnlocked;
         this.boxTexture = boxTexture;
@@ -42,8 +44,7 @@ public class SpirepassLevelBox {
         this.boxHitbox = new Hitbox(BOX_SIZE, BOX_SIZE);
         this.buttonHitbox = new Hitbox(BUTTON_WIDTH, BUTTON_HEIGHT);
 
-        // Position the box (also updates hitboxes)
-        update(x);
+        updateHitboxPositions();
     }
 
     public void update(float newX) {

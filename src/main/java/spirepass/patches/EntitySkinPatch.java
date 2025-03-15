@@ -16,7 +16,10 @@ import com.megacrit.cardcrawl.characters.Watcher;
 import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.monsters.beyond.AwakenedOne;
 import com.megacrit.cardcrawl.monsters.exordium.JawWorm;
+import com.megacrit.cardcrawl.monsters.exordium.SlaverBlue;
+import com.megacrit.cardcrawl.monsters.exordium.SlaverRed;
 import spirepass.Spirepass;
 
 import java.io.PrintWriter;
@@ -57,6 +60,12 @@ public class EntitySkinPatch {
                 entityId = Spirepass.ENTITY_WATCHER;
             } else if (__instance instanceof JawWorm) {
                 entityId = Spirepass.ENTITY_JAW_WORM;
+            } else if (__instance instanceof SlaverBlue) {
+                entityId = Spirepass.ENTITY_BLUE_SLAVER;
+            } else if (__instance instanceof SlaverRed) {
+                entityId = Spirepass.ENTITY_RED_SLAVER;
+            } else if (__instance instanceof AwakenedOne) {
+                entityId = Spirepass.ENTITY_AWAKENED_ONE;
             }
 
             // If we recognized the entity and have a skin for it
@@ -174,7 +183,29 @@ public class EntitySkinPatch {
                 String variant = skinId.substring("JAW_WORM_".length()).toLowerCase();
                 return "spirepass/images/skins/jaw_worm/" + variant + "/";
             }
+        } else if (entityId.equals(Spirepass.ENTITY_BLUE_SLAVER)) {
+            if (skinId.equals("BLUE_SLAVER")) {
+                return null; // Default Jaw Worm
+            } else if (skinId.startsWith("BLUE_SLAVER_")) {
+                String variant = skinId.substring("BLUE_SLAVER_".length()).toLowerCase();
+                return "spirepass/images/skins/blueSlaver/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_RED_SLAVER)) {
+            if (skinId.equals("RED_SLAVER")) {
+                return null; // Default Jaw Worm
+            } else if (skinId.startsWith("RED_SLAVER_")) {
+                String variant = skinId.substring("RED_SLAVER_".length()).toLowerCase();
+                return "spirepass/images/skins/redSlaver/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_AWAKENED_ONE)) {
+            if (skinId.equals("AWAKENED_ONE")) {
+                return null; // Default Awakened One
+            } else if (skinId.startsWith("AWAKENED_ONE_")) {
+                String variant = skinId.substring("AWAKENED_ONE_".length()).toLowerCase();
+                return "spirepass/images/skins/awakened_one/" + variant + "/";
+            }
         }
+
 
         return null; // Unknown format or default skin
     }

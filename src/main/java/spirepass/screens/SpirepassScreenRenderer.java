@@ -178,6 +178,36 @@ public class SpirepassScreenRenderer {
                 "spirepass/images/rewards/cardbacks/curse/HaroldLarge.png"
         ));
 
+        rewardData.put(8, new SpirepassRewardData(
+                8,
+                "Big Bird",
+                "I don't know any Sesame Street references to put here. Sorry",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_AWAKENED_ONE,
+                "AWAKENED_ONE_BIGBIRD"
+        ));
+
+        rewardData.put(9, new SpirepassRewardData(
+                9,
+                "Blue",
+                "he's blue, da ba dee da ba di",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_RED_SLAVER,
+                "RED_SLAVER_BLUE"
+        ));
+
+        rewardData.put(10, new SpirepassRewardData(
+                10,
+                "Red",
+                "We have red slaver at home",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_BLUE_SLAVER,
+                "BLUE_SLAVER_RED"
+        ));
+
         // Default reward for all other levels (badge image)
         Texture badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
 
@@ -207,14 +237,23 @@ public class SpirepassScreenRenderer {
         previewAnimations.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_RED_SLAVER, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_AWAKENED_ONE, new HashMap<>());
 
         previewSkeletons.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_RED_SLAVER, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_AWAKENED_ONE, new HashMap<>());
 
         animationInitialized.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_RED_SLAVER, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_AWAKENED_ONE, new HashMap<>());
     }
 
     private void initializeAnimationPreview(String entityId, String variant) {
@@ -222,39 +261,31 @@ public class SpirepassScreenRenderer {
         if (animationInitialized.get(entityId).getOrDefault(variant, false)) {
             return;
         }
-
         try {
             BaseMod.logger.info("Creating animation preview for " + entityId + " variant: " + variant);
-
             // Define animation paths based on variant and entity
             String atlasUrl, skeletonUrl;
-            if (variant.equals("default")) {
-                // Default game assets
-                if (entityId.equals(Spirepass.ENTITY_IRONCLAD)) {
-                    atlasUrl = "images/characters/ironclad/idle/skeleton.atlas";
-                    skeletonUrl = "images/characters/ironclad/idle/skeleton.json";
-                } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
-                    atlasUrl = "images/characters/watcher/idle/skeleton.atlas";
-                    skeletonUrl = "images/characters/watcher/idle/skeleton.json";
-                } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
-                    atlasUrl = "images/monsters/theBottom/jawWorm/skeleton.atlas";
-                    skeletonUrl = "images/monsters/theBottom/jawWorm/skeleton.json";
-                } else {
-                    throw new Exception("Unknown entity type: " + entityId);
-                }
+
+            // Always use skin asset paths, never default
+            String basePath = "";
+            if (entityId.equals(Spirepass.ENTITY_IRONCLAD)) {
+                basePath = "spirepass/images/skins/ironclad/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
+                basePath = "spirepass/images/skins/watcher/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
+                basePath = "spirepass/images/skins/jaw_worm/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_AWAKENED_ONE)) {
+                basePath = "spirepass/images/skins/awakened_one/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_BLUE_SLAVER)) {
+                basePath = "spirepass/images/skins/blueSlaver/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_RED_SLAVER)) {
+                basePath = "spirepass/images/skins/redSlaver/" + variant + "/";
             } else {
-                // Skin asset paths
-                String basePath = "";
-                if (entityId.equals(Spirepass.ENTITY_IRONCLAD)) {
-                    basePath = "spirepass/images/skins/ironclad/" + variant + "/";
-                } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
-                    basePath = "spirepass/images/skins/watcher/" + variant + "/";
-                } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
-                    basePath = "spirepass/images/skins/jaw_worm/" + variant + "/";
-                }
-                atlasUrl = basePath + "skeleton.atlas";
-                skeletonUrl = basePath + "skeleton.json";
+                throw new Exception("Unknown entity type: " + entityId);
             }
+
+            atlasUrl = basePath + "skeleton.atlas";
+            skeletonUrl = basePath + "skeleton.json";
 
             // Load the skeleton directly
             TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(atlasUrl));
@@ -270,49 +301,49 @@ public class SpirepassScreenRenderer {
 
             // Check available animations and determine the correct idle animation name
             String idleAnimation = null;
+            String idle1Animation = null;
             BaseMod.logger.info("Available animations for " + entityId + ":");
             for (Animation anim : skeletonData.getAnimations()) {
                 BaseMod.logger.info(" - " + anim.getName() + " (duration: " + anim.getDuration() + ")");
                 // Look for idle animation with case-insensitive comparison
                 if (anim.getName().equalsIgnoreCase("idle")) {
                     idleAnimation = anim.getName();
+                } else if (anim.getName().equalsIgnoreCase("idle_1")) {
+                    idle1Animation = anim.getName();
                 }
             }
 
             // Set appropriate idle animation if found
             if (idleAnimation != null) {
                 state.setAnimation(0, idleAnimation, true);
-                // Set animation speed
-                float scale = getScaleFactor(entityId);
-                state.getCurrent(0).setTimeScale(0.6f * scale);
-
-                // Store animation and skeleton
-                previewAnimations.get(entityId).put(variant, state);
-                previewSkeletons.get(entityId).put(variant, skeleton);
-                animationInitialized.get(entityId).put(variant, true);
-
-                BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized successfully with animation: " + idleAnimation);
+                BaseMod.logger.info(entityId + " using 'idle' animation: " + idleAnimation);
+            } else if (idle1Animation != null) {
+                state.setAnimation(0, idle1Animation, true);
+                BaseMod.logger.info(entityId + " using 'idle_1' animation: " + idle1Animation);
             } else {
                 // If no idle animation was found, try to use the first available animation
                 if (skeletonData.getAnimations().size > 0) {
                     String firstAnim = skeletonData.getAnimations().get(0).getName();
                     state.setAnimation(0, firstAnim, true);
-
-                    float scale = getScaleFactor(entityId);
-                    state.getCurrent(0).setTimeScale(0.6f * scale);
-
-                    previewAnimations.get(entityId).put(variant, state);
-                    previewSkeletons.get(entityId).put(variant, skeleton);
-                    animationInitialized.get(entityId).put(variant, true);
-
                     BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized with fallback animation: " + firstAnim);
                 } else {
                     throw new Exception("No animations found in skeleton data");
                 }
             }
+
+            // Set animation speed
+            float scale = getScaleFactor(entityId);
+            state.getCurrent(0).setTimeScale(0.6f * scale);
+
+            // Store animation and skeleton
+            previewAnimations.get(entityId).put(variant, state);
+            previewSkeletons.get(entityId).put(variant, skeleton);
+            animationInitialized.get(entityId).put(variant, true);
+            BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized successfully");
         } catch (Exception e) {
             BaseMod.logger.error("Error initializing animation for " + entityId + "/" + variant + ": " + e.getMessage());
             e.printStackTrace();
+            // Don't store anything for failed animations - let it fail properly
         }
     }
 
@@ -370,16 +401,14 @@ public class SpirepassScreenRenderer {
             } catch (Exception e) {
                 BaseMod.logger.error("Error rendering animation for " + entityId + "/" + variant + ": " + e.getMessage());
                 e.printStackTrace();
-
                 // Make sure we restart the main batch if there was an error
                 if (!sb.isDrawing()) {
                     sb.begin();
                 }
-
                 renderFallbackText(sb, "Error Rendering Animation", Color.RED);
             }
         } else {
-            renderFallbackText(sb, entityId + " " + variant + " Preview", Color.WHITE);
+            renderFallbackText(sb, entityId + " " + variant + " Preview", Color.RED);
         }
     }
 
@@ -389,7 +418,10 @@ public class SpirepassScreenRenderer {
         if (entityId.equals(Spirepass.ENTITY_IRONCLAD) ||
                 entityId.equals(Spirepass.ENTITY_WATCHER)) {
             return SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
-        } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
+        } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM) ||
+                entityId.equals(Spirepass.ENTITY_AWAKENED_ONE) ||
+                entityId.equals(Spirepass.ENTITY_BLUE_SLAVER) ||
+                entityId.equals(Spirepass.ENTITY_RED_SLAVER)) {
             return SpirepassPositionSettings.MONSTER_MODEL_SCALE;
         }
         return SpirepassPositionSettings.CHARACTER_MODEL_SCALE; // Default
@@ -397,25 +429,45 @@ public class SpirepassScreenRenderer {
 
     private String getVariantFromModelId(String entityId, String modelId) {
         if (entityId.equals(Spirepass.ENTITY_IRONCLAD)) {
-            if (modelId.equals("IRONCLAD")) {
-                return "default";
-            } else if (modelId.startsWith("IRONCLAD_")) {
+            if (modelId.startsWith("IRONCLAD_")) {
                 return modelId.substring("IRONCLAD_".length()).toLowerCase();
+            } else {
+                // Just use the modelId directly (or a portion of it) for non-prefixed names
+                return modelId.toLowerCase();
             }
         } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
-            if (modelId.equals("WATCHER")) {
-                return "default";
-            } else if (modelId.startsWith("WATCHER_")) {
+            if (modelId.startsWith("WATCHER_")) {
                 return modelId.substring("WATCHER_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
             }
         } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
-            if (modelId.equals("JAW_WORM")) {
-                return "default";
-            } else if (modelId.startsWith("JAW_WORM_")) {
+            if (modelId.startsWith("JAW_WORM_")) {
                 return modelId.substring("JAW_WORM_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_AWAKENED_ONE)) {
+            if (modelId.startsWith("AWAKENED_ONE_")) {
+                return modelId.substring("AWAKENED_ONE_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_BLUE_SLAVER)) {
+            if (modelId.startsWith("BLUE_SLAVER_")) {
+                return modelId.substring("BLUE_SLAVER_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_RED_SLAVER)) {
+            if (modelId.startsWith("RED_SLAVER_")) {
+                return modelId.substring("RED_SLAVER_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
             }
         }
-        return "default"; // fallback
+
+        return modelId.toLowerCase(); // Use the modelId directly
     }
 
     // ==================== UI BUTTON MANAGEMENT ====================
@@ -493,29 +545,24 @@ public class SpirepassScreenRenderer {
                                    String entityId, String modelId,
                                    String cardbackType, String cardbackId) {
         System.out.println("Button clicked, unlocked: " + isUnlocked);
-
         if (!isUnlocked || reward == null) {
             return;
         }
 
         if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL && entityId != null && modelId != null) {
             System.out.println("Handling character model: " + entityId + ", " + modelId);
-
             // Toggle the skin directly
             String currentSkin = Spirepass.getAppliedSkin(entityId);
             boolean shouldUnequip = modelId.equals(currentSkin);
             Spirepass.setAppliedSkin(entityId, shouldUnequip ? "" : modelId);
-
             System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
                     entityId + " skin: " + modelId);
         } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK && cardbackType != null && cardbackId != null) {
             System.out.println("Handling cardback: " + cardbackType + ", " + cardbackId);
-
             // Toggle the cardback directly
             String currentCardback = Spirepass.getAppliedCardback(cardbackType);
             boolean shouldUnequip = cardbackId.equals(currentCardback);
             Spirepass.setAppliedCardback(cardbackType, shouldUnequip ? "" : cardbackId);
-
             System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
                     cardbackType + " cardback: " + cardbackId);
         }
@@ -680,35 +727,25 @@ public class SpirepassScreenRenderer {
     }
 
     private void renderDefaultReward(SpriteBatch sb, int level) {
-        // Fallback for levels without specific reward data
-        if (level == 1) {
-            // Default to Ironclad preview for level 1
-            renderAnimationPreview(sb, Spirepass.ENTITY_IRONCLAD, "default");
-        } else if (level == 5) {
-            // Default to Watcher preview for level 5
-            renderAnimationPreview(sb, Spirepass.ENTITY_WATCHER, "default");
-        } else if (level == 6) {
-            // Default to Jaw Worm preview for level 6
-            renderAnimationPreview(sb, Spirepass.ENTITY_JAW_WORM, "default");
-        } else if (getRewardTexture(level) != null) {
-            // Otherwise show the texture if available
-            Texture rewardTexture = getRewardTexture(level);
-            if (rewardTexture != null) {
-                // Set desired height for all reward images
-                float previewHeight = 200.0f * Settings.scale;
-                // Calculate width based on the texture's aspect ratio
-                float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
-                float previewWidth = previewHeight * aspectRatio;
-
-                sb.setColor(Color.WHITE);
-                sb.draw(
-                        rewardTexture,
-                        Settings.WIDTH / 2.0f - previewWidth / 2.0f,
-                        SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
-                        previewWidth,
-                        previewHeight
-                );
-            }
+        // No specific reward data, just show level number and a generic message
+        Texture rewardTexture = getRewardTexture(level);
+        if (rewardTexture != null) {
+            // Set desired height for all reward images
+            float previewHeight = 200.0f * Settings.scale;
+            // Calculate width based on the texture's aspect ratio
+            float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
+            float previewWidth = previewHeight * aspectRatio;
+            sb.setColor(Color.WHITE);
+            sb.draw(
+                    rewardTexture,
+                    Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                    previewWidth,
+                    previewHeight
+            );
+        } else {
+            // Only show text if no texture is available
+            renderFallbackText(sb, "No preview available for Level " + level, Color.ORANGE);
         }
 
         // Render generic title

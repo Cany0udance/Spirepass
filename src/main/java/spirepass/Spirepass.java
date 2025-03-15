@@ -42,6 +42,9 @@ public class Spirepass implements
     public static final String ENTITY_IRONCLAD = "ironclad";
     public static final String ENTITY_WATCHER = "watcher";
     public static final String ENTITY_JAW_WORM = "jaw_worm";
+    public static final String ENTITY_BLUE_SLAVER = "blue_slaver";
+    public static final String ENTITY_RED_SLAVER = "red_slaver";
+    public static final String ENTITY_AWAKENED_ONE = "awakened_one";
     public static final String CARDBACK_COLORLESS = "colorless";
     public static final String CARDBACK_CURSE = "curse";
 
@@ -80,6 +83,9 @@ public class Spirepass implements
             defaults.setProperty(ENTITY_IRONCLAD, "");
             defaults.setProperty(ENTITY_WATCHER, "");
             defaults.setProperty(ENTITY_JAW_WORM, "");
+            defaults.setProperty(ENTITY_BLUE_SLAVER, "");
+            defaults.setProperty(ENTITY_RED_SLAVER, "");
+            defaults.setProperty(ENTITY_AWAKENED_ONE, "");
             // Add cardback defaults
             defaults.setProperty(CARDBACK_COLORLESS, "");
             defaults.setProperty(CARDBACK_CURSE, "");
@@ -96,6 +102,9 @@ public class Spirepass implements
                 appliedSkins.put(ENTITY_IRONCLAD, config.getString(ENTITY_IRONCLAD));
                 appliedSkins.put(ENTITY_WATCHER, config.getString(ENTITY_WATCHER));
                 appliedSkins.put(ENTITY_JAW_WORM, config.getString(ENTITY_JAW_WORM));
+                appliedSkins.put(ENTITY_BLUE_SLAVER, config.getString(ENTITY_BLUE_SLAVER));
+                appliedSkins.put(ENTITY_RED_SLAVER, config.getString(ENTITY_RED_SLAVER));
+                appliedSkins.put(ENTITY_AWAKENED_ONE, config.getString(ENTITY_AWAKENED_ONE));
 
                 // Load cardback preferences
                 appliedCardbacks.put(CARDBACK_COLORLESS, config.getString(CARDBACK_COLORLESS));
