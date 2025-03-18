@@ -147,12 +147,12 @@ public class SpirepassScreenRenderer {
         // Add Watcher skin
         rewardData.put(5, new SpirepassRewardData(
                 5,
-                "Sickly Watcher",
-                "A Watcher that's seen better days",
+                "kris deltarune",
+                "\"W...Watcher? Are you OK? You're yelling...\"",
                 SpirepassRewardData.RewardRarity.UNCOMMON,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
                 Spirepass.ENTITY_WATCHER,
-                "WATCHER_SICKLY"
+                "WATCHER_DREEMURR"
         ));
 
         // Add Jaw Worm skin
@@ -171,7 +171,7 @@ public class SpirepassScreenRenderer {
                 7,
                 "Harold Curse Cardback",
                 ":)",
-                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardRarity.UNCOMMON,
                 SpirepassRewardData.RewardType.CARDBACK,
                 Spirepass.CARDBACK_CURSE,
                 "CURSE_HAROLD",
@@ -181,7 +181,7 @@ public class SpirepassScreenRenderer {
         rewardData.put(8, new SpirepassRewardData(
                 8,
                 "Big Bird",
-                "I don't know any Sesame Street references to put here. Sorry",
+                "he big",
                 SpirepassRewardData.RewardRarity.COMMON,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
                 Spirepass.ENTITY_AWAKENED_ONE,
@@ -192,7 +192,7 @@ public class SpirepassScreenRenderer {
                 9,
                 "Blue",
                 "he's blue, da ba dee da ba di",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardRarity.COMMON,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
                 Spirepass.ENTITY_RED_SLAVER,
                 "RED_SLAVER_BLUE"
@@ -202,10 +202,111 @@ public class SpirepassScreenRenderer {
                 10,
                 "Red",
                 "We have red slaver at home",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardRarity.COMMON,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
                 Spirepass.ENTITY_BLUE_SLAVER,
                 "BLUE_SLAVER_RED"
+        ));
+
+        rewardData.put(11, new SpirepassRewardData(
+                11,
+                "Disarmed",
+                "It's like that one beta art",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_CULTIST,
+                "CULTIST_DISARMED"
+        ));
+
+        rewardData.put(12, new SpirepassRewardData(
+                12,
+                "Law Abiding Citizen",
+                "Deal 3 damage. Increase the damage of ALL Claw cards by 2 this combat.",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_DEFECT,
+                "DEFECT_LAWABIDINGCITIZEN"
+        ));
+
+        rewardData.put(13, new SpirepassRewardData(
+                13,
+                "Bear",
+                "Somehow, the rest of the Red Mask Gang still haven't noticed.",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_BEAR,
+                "BEAR_ACTUALBEAR"
+        ));
+
+        rewardData.put(14, new SpirepassRewardData(
+                14,
+                "Spaghetti & Meatballs",
+                "Comes with a side of Parasites.",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_WRITHING_MASS,
+                "WRITHING_MASS_SPAGHETTI"
+        ));
+
+        rewardData.put(15, new SpirepassRewardData(
+                15,
+                "Giantama",
+                "\"No\"",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_GIANT_HEAD,
+                "GIANT_HEAD_GIANTAMA"
+        ));
+
+        rewardData.put(16, new SpirepassRewardData(
+                16,
+                "Blurry",
+                "where are my glasses??",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_SILENT,
+                "SILENT_BLURRY"
+        ));
+
+        rewardData.put(17, new SpirepassRewardData(
+                17,
+                "Space Blanket",
+                "Are you telling me that my RNG just happens to be so unlucky? No! He orchestrated it! Casey!!!",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_SILENT,
+                "SILENT_SPACEBLANKET"
+        ));
+
+        rewardData.put(18, new SpirepassRewardData(
+                18,
+                "Pajama Sam",
+                "The Darkness orbs are really starting to get to me.",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_DEFECT,
+                "DEFECT_PAJAMASAM"
+        ));
+
+        rewardData.put(19, new SpirepassRewardData(
+                19,
+                "Urban Legend",
+                "Pages 3/8",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                Spirepass.ENTITY_GREMLIN_NOB,
+                "GREMLIN_NOB_URBANLEGEND"
+        ));
+
+        rewardData.put(20, new SpirepassRewardData(
+                20,
+                "Favorite Customer",
+                "Do you like this cardback? It's not for sale",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CARDBACK,
+                Spirepass.CARDBACK_COLORLESS,
+                "COLORLESS_FAVORITECUSTOMER",
+                "spirepass/images/rewards/cardbacks/colorless/favoritecustomer/FavoriteCustomerSkillLarge.png"
         ));
 
         // Default reward for all other levels (badge image)
@@ -235,27 +336,45 @@ public class SpirepassScreenRenderer {
 
     private void initializeAnimationMaps() {
         previewAnimations.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_SILENT, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_DEFECT, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_CULTIST, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_RED_SLAVER, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_GREMLIN_NOB, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_BEAR, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_WRITHING_MASS, new HashMap<>());
+        previewAnimations.put(Spirepass.ENTITY_GIANT_HEAD, new HashMap<>());
         previewAnimations.put(Spirepass.ENTITY_AWAKENED_ONE, new HashMap<>());
 
         previewSkeletons.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_SILENT, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_DEFECT, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_CULTIST, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_RED_SLAVER, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_GREMLIN_NOB, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_BEAR, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_WRITHING_MASS, new HashMap<>());
+        previewSkeletons.put(Spirepass.ENTITY_GIANT_HEAD, new HashMap<>());
         previewSkeletons.put(Spirepass.ENTITY_AWAKENED_ONE, new HashMap<>());
 
         animationInitialized.put(Spirepass.ENTITY_IRONCLAD, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_SILENT, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_DEFECT, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_WATCHER, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_JAW_WORM, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_CULTIST, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_BLUE_SLAVER, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_RED_SLAVER, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_GREMLIN_NOB, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_BEAR, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_WRITHING_MASS, new HashMap<>());
+        animationInitialized.put(Spirepass.ENTITY_GIANT_HEAD, new HashMap<>());
         animationInitialized.put(Spirepass.ENTITY_AWAKENED_ONE, new HashMap<>());
     }
 
@@ -273,12 +392,24 @@ public class SpirepassScreenRenderer {
             String basePath = "";
             if (entityId.equals(Spirepass.ENTITY_IRONCLAD)) {
                 basePath = "spirepass/images/skins/ironclad/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_SILENT)) {
+                basePath = "spirepass/images/skins/silent/" + variant + "/";
             } else if (entityId.equals(Spirepass.ENTITY_DEFECT)) {
                 basePath = "spirepass/images/skins/defect/" + variant + "/";
             } else if (entityId.equals(Spirepass.ENTITY_WATCHER)) {
                 basePath = "spirepass/images/skins/watcher/" + variant + "/";
             } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
                 basePath = "spirepass/images/skins/jaw_worm/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_CULTIST)) {
+                basePath = "spirepass/images/skins/cultist/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_GREMLIN_NOB)) {
+                basePath = "spirepass/images/skins/gremlin_nob/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_BEAR)) {
+                basePath = "spirepass/images/skins/bear/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_WRITHING_MASS)) {
+                basePath = "spirepass/images/skins/writhing_mass/" + variant + "/";
+            } else if (entityId.equals(Spirepass.ENTITY_GIANT_HEAD)) {
+                basePath = "spirepass/images/skins/giant_head/" + variant + "/";
             } else if (entityId.equals(Spirepass.ENTITY_AWAKENED_ONE)) {
                 basePath = "spirepass/images/skins/awakened_one/" + variant + "/";
             } else if (entityId.equals(Spirepass.ENTITY_BLUE_SLAVER)) {
@@ -421,11 +552,17 @@ public class SpirepassScreenRenderer {
     private float getScaleFactor(String entityId) {
         // Different entities might need different scaling
         if (entityId.equals(Spirepass.ENTITY_IRONCLAD) ||
+                entityId.equals(Spirepass.ENTITY_SILENT) ||
                 entityId.equals(Spirepass.ENTITY_WATCHER) ||
                 entityId.equals(Spirepass.ENTITY_DEFECT)) {
             return SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
         } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM) ||
+                entityId.equals(Spirepass.ENTITY_CULTIST) ||
                 entityId.equals(Spirepass.ENTITY_AWAKENED_ONE) ||
+                entityId.equals(Spirepass.ENTITY_GREMLIN_NOB) ||
+                entityId.equals(Spirepass.ENTITY_BEAR) ||
+                entityId.equals(Spirepass.ENTITY_GIANT_HEAD) ||
+                entityId.equals(Spirepass.ENTITY_WRITHING_MASS) ||
                 entityId.equals(Spirepass.ENTITY_BLUE_SLAVER) ||
                 entityId.equals(Spirepass.ENTITY_RED_SLAVER)) {
             return SpirepassPositionSettings.MONSTER_MODEL_SCALE;
@@ -439,6 +576,12 @@ public class SpirepassScreenRenderer {
                 return modelId.substring("IRONCLAD_".length()).toLowerCase();
             } else {
                 // Just use the modelId directly (or a portion of it) for non-prefixed names
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_SILENT)) {
+            if (modelId.startsWith("SILENT_")) {
+                return modelId.substring("SILENT_".length()).toLowerCase();
+            } else {
                 return modelId.toLowerCase();
             }
         } else if (entityId.equals(Spirepass.ENTITY_DEFECT)) {
@@ -456,6 +599,36 @@ public class SpirepassScreenRenderer {
         } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
             if (modelId.startsWith("JAW_WORM_")) {
                 return modelId.substring("JAW_WORM_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_CULTIST)) {
+            if (modelId.startsWith("CULTIST_")) {
+                return modelId.substring("CULTIST_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_GREMLIN_NOB)) {
+            if (modelId.startsWith("GREMLIN_NOB_")) {
+                return modelId.substring("GREMLIN_NOB_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_BEAR)) {
+            if (modelId.startsWith("BEAR_")) {
+                return modelId.substring("BEAR_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_WRITHING_MASS)) {
+            if (modelId.startsWith("WRITHING_MASS_")) {
+                return modelId.substring("WRITHING_MASS_".length()).toLowerCase();
+            } else {
+                return modelId.toLowerCase();
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_GIANT_HEAD)) {
+            if (modelId.startsWith("GIANT_HEAD_")) {
+                return modelId.substring("GIANT_HEAD_".length()).toLowerCase();
             } else {
                 return modelId.toLowerCase();
             }

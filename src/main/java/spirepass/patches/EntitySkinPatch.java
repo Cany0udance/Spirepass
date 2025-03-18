@@ -11,16 +11,15 @@ import com.esotericsoftware.spine.*;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireReturn;
-import com.megacrit.cardcrawl.characters.Defect;
-import com.megacrit.cardcrawl.characters.Ironclad;
-import com.megacrit.cardcrawl.characters.Watcher;
+import com.megacrit.cardcrawl.characters.*;
 import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.monsters.beyond.AwakenedOne;
-import com.megacrit.cardcrawl.monsters.exordium.JawWorm;
-import com.megacrit.cardcrawl.monsters.exordium.SlaverBlue;
-import com.megacrit.cardcrawl.monsters.exordium.SlaverRed;
+import com.megacrit.cardcrawl.monsters.beyond.GiantHead;
+import com.megacrit.cardcrawl.monsters.beyond.WrithingMass;
+import com.megacrit.cardcrawl.monsters.city.BanditBear;
+import com.megacrit.cardcrawl.monsters.exordium.*;
 import spirepass.Spirepass;
 
 import java.io.PrintWriter;
@@ -51,22 +50,43 @@ public class EntitySkinPatch {
         boolean isLoadingSave = CardCrawlGame.loadingSave;
         boolean isPreview = __instance.name != null && __instance.name.contains("Preview");
 
-        if ((inDungeon || isLoadingSave) && !isPreview) {
+        // The below variables are experimental, meant to fix the issue where skins wouldn't apply
+        // when first entering a game
+
+        boolean isPlayerCharacter = __instance instanceof AbstractPlayer;
+        boolean isInGameMode = CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT ||
+                CardCrawlGame.mode == CardCrawlGame.GameMode.GAMEPLAY;
+
+        if ((inDungeon || isLoadingSave || (isPlayerCharacter && isInGameMode)) && !isPreview) {
+            // Original check: if ((inDungeon || isLoadingSave) && !isPreview) {
+
             // Determine which entity type this is
             String entityId = null;
 
             if (__instance instanceof Ironclad) {
                 entityId = Spirepass.ENTITY_IRONCLAD;
+            } else if (__instance instanceof TheSilent) {
+                entityId = Spirepass.ENTITY_SILENT;
             } else if (__instance instanceof Defect) {
                 entityId = Spirepass.ENTITY_DEFECT;
             } else if (__instance instanceof Watcher) {
                 entityId = Spirepass.ENTITY_WATCHER;
             } else if (__instance instanceof JawWorm) {
                 entityId = Spirepass.ENTITY_JAW_WORM;
+            } else if (__instance instanceof Cultist) {
+                entityId = Spirepass.ENTITY_CULTIST;
             } else if (__instance instanceof SlaverBlue) {
                 entityId = Spirepass.ENTITY_BLUE_SLAVER;
             } else if (__instance instanceof SlaverRed) {
                 entityId = Spirepass.ENTITY_RED_SLAVER;
+            } else if (__instance instanceof GremlinNob) {
+                entityId = Spirepass.ENTITY_GREMLIN_NOB;
+            } else if (__instance instanceof BanditBear) {
+                entityId = Spirepass.ENTITY_BEAR;
+            } else if (__instance instanceof WrithingMass) {
+                entityId = Spirepass.ENTITY_WRITHING_MASS;
+            } else if (__instance instanceof GiantHead) {
+                entityId = Spirepass.ENTITY_GIANT_HEAD;
             } else if (__instance instanceof AwakenedOne) {
                 entityId = Spirepass.ENTITY_AWAKENED_ONE;
             }
@@ -172,9 +192,16 @@ public class EntitySkinPatch {
                 String variant = skinId.substring("IRONCLAD_".length()).toLowerCase();
                 return "spirepass/images/skins/ironclad/" + variant + "/";
             }
+        } else if (entityId.equals(Spirepass.ENTITY_SILENT)) {
+            if (skinId.equals("SILENT")) {
+                return null; // Default Watcher
+            } else if (skinId.startsWith("SILENT_")) {
+                String variant = skinId.substring("SILENT_".length()).toLowerCase();
+                return "spirepass/images/skins/silent/" + variant + "/";
+            }
         } else if (entityId.equals(Spirepass.ENTITY_DEFECT)) {
             if (skinId.equals("DEFECT")) {
-                return null; // Default Watcher
+                return null;
             } else if (skinId.startsWith("DEFECT_")) {
                 String variant = skinId.substring("DEFECT_".length()).toLowerCase();
                 return "spirepass/images/skins/defect/" + variant + "/";
@@ -188,21 +215,56 @@ public class EntitySkinPatch {
             }
         } else if (entityId.equals(Spirepass.ENTITY_JAW_WORM)) {
             if (skinId.equals("JAW_WORM")) {
-                return null; // Default Jaw Worm
+                return null;
             } else if (skinId.startsWith("JAW_WORM_")) {
                 String variant = skinId.substring("JAW_WORM_".length()).toLowerCase();
                 return "spirepass/images/skins/jaw_worm/" + variant + "/";
             }
+        } else if (entityId.equals(Spirepass.ENTITY_CULTIST)) {
+            if (skinId.equals("CULTIST")) {
+                return null;
+            } else if (skinId.startsWith("CULTIST_")) {
+                String variant = skinId.substring("CULTIST_".length()).toLowerCase();
+                return "spirepass/images/skins/cultist/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_GREMLIN_NOB)) {
+            if (skinId.equals("GREMLIN_NOB")) {
+                return null;
+            } else if (skinId.startsWith("GREMLIN_NOB_")) {
+                String variant = skinId.substring("GREMLIN_NOB_".length()).toLowerCase();
+                return "spirepass/images/skins/gremlin_nob/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_BEAR)) {
+            if (skinId.equals("BEAR")) {
+                return null;
+            } else if (skinId.startsWith("BEAR_")) {
+                String variant = skinId.substring("BEAR_".length()).toLowerCase();
+                return "spirepass/images/skins/bear/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_WRITHING_MASS)) {
+            if (skinId.equals("WRITHING_MASS")) {
+                return null;
+            } else if (skinId.startsWith("WRITHING_MASS_")) {
+                String variant = skinId.substring("WRITHING_MASS_".length()).toLowerCase();
+                return "spirepass/images/skins/writhing_mass/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_GIANT_HEAD)) {
+            if (skinId.equals("GIANT_HEAD")) {
+                return null;
+            } else if (skinId.startsWith("GIANT_HEAD_")) {
+                String variant = skinId.substring("GIANT_HEAD_".length()).toLowerCase();
+                return "spirepass/images/skins/giant_head/" + variant + "/";
+            }
         } else if (entityId.equals(Spirepass.ENTITY_BLUE_SLAVER)) {
             if (skinId.equals("BLUE_SLAVER")) {
-                return null; // Default Jaw Worm
+                return null;
             } else if (skinId.startsWith("BLUE_SLAVER_")) {
                 String variant = skinId.substring("BLUE_SLAVER_".length()).toLowerCase();
                 return "spirepass/images/skins/blueSlaver/" + variant + "/";
             }
         } else if (entityId.equals(Spirepass.ENTITY_RED_SLAVER)) {
             if (skinId.equals("RED_SLAVER")) {
-                return null; // Default Jaw Worm
+                return null;
             } else if (skinId.startsWith("RED_SLAVER_")) {
                 String variant = skinId.substring("RED_SLAVER_".length()).toLowerCase();
                 return "spirepass/images/skins/redSlaver/" + variant + "/";

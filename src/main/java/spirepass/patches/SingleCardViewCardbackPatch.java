@@ -73,6 +73,10 @@ public class SingleCardViewCardbackPatch {
             if (cardbackId.equals("COLORLESS_SPONSORED")) {
                 return "spirepass/images/rewards/cardbacks/colorless/sponsored/RAID" + cardType + "Large.png";
             }
+
+            if (cardbackId.equals("COLORLESS_FAVORITECUSTOMER")) {
+                return "spirepass/images/rewards/cardbacks/colorless/favoritecustomer/FavoriteCustomer" + cardType + "Large.png";
+            }
             // Add other colorless cardbacks here
         } else if (cardbackType.equals(Spirepass.CARDBACK_CURSE)) {
             if (cardbackId.equals("CURSE_HAROLD")) {

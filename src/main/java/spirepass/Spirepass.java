@@ -40,11 +40,17 @@ public class Spirepass implements
 
     // Define constants for entity IDs
     public static final String ENTITY_IRONCLAD = "ironclad";
+    public static final String ENTITY_SILENT = "silent";
     public static final String ENTITY_DEFECT = "defect";
     public static final String ENTITY_WATCHER = "watcher";
     public static final String ENTITY_JAW_WORM = "jaw_worm";
+    public static final String ENTITY_CULTIST = "cultist";
     public static final String ENTITY_BLUE_SLAVER = "blue_slaver";
     public static final String ENTITY_RED_SLAVER = "red_slaver";
+    public static final String ENTITY_GREMLIN_NOB = "gremlin_nob";
+    public static final String ENTITY_BEAR = "bear";
+    public static final String ENTITY_WRITHING_MASS = "writhing_mass";
+    public static final String ENTITY_GIANT_HEAD = "giant_head";
     public static final String ENTITY_AWAKENED_ONE = "awakened_one";
     public static final String CARDBACK_COLORLESS = "colorless";
     public static final String CARDBACK_CURSE = "curse";
@@ -82,11 +88,17 @@ public class Spirepass implements
             Properties defaults = new Properties();
             // Existing entity defaults
             defaults.setProperty(ENTITY_IRONCLAD, "");
+            defaults.setProperty(ENTITY_SILENT, "");
             defaults.setProperty(ENTITY_DEFECT, "");
             defaults.setProperty(ENTITY_WATCHER, "");
             defaults.setProperty(ENTITY_JAW_WORM, "");
+            defaults.setProperty(ENTITY_CULTIST, "");
             defaults.setProperty(ENTITY_BLUE_SLAVER, "");
             defaults.setProperty(ENTITY_RED_SLAVER, "");
+            defaults.setProperty(ENTITY_GREMLIN_NOB, "");
+            defaults.setProperty(ENTITY_BEAR, "");
+            defaults.setProperty(ENTITY_WRITHING_MASS, "");
+            defaults.setProperty(ENTITY_GIANT_HEAD, "");
             defaults.setProperty(ENTITY_AWAKENED_ONE, "");
             // Add cardback defaults
             defaults.setProperty(CARDBACK_COLORLESS, "");
@@ -102,24 +114,22 @@ public class Spirepass implements
             if (config != null) {
                 // Add each entity type to the map
                 appliedSkins.put(ENTITY_IRONCLAD, config.getString(ENTITY_IRONCLAD));
+                appliedSkins.put(ENTITY_SILENT, config.getString(ENTITY_SILENT));
                 appliedSkins.put(ENTITY_DEFECT, config.getString(ENTITY_DEFECT));
                 appliedSkins.put(ENTITY_WATCHER, config.getString(ENTITY_WATCHER));
                 appliedSkins.put(ENTITY_JAW_WORM, config.getString(ENTITY_JAW_WORM));
+                appliedSkins.put(ENTITY_CULTIST, config.getString(ENTITY_CULTIST));
                 appliedSkins.put(ENTITY_BLUE_SLAVER, config.getString(ENTITY_BLUE_SLAVER));
                 appliedSkins.put(ENTITY_RED_SLAVER, config.getString(ENTITY_RED_SLAVER));
+                appliedSkins.put(ENTITY_GREMLIN_NOB, config.getString(ENTITY_GREMLIN_NOB));
+                appliedSkins.put(ENTITY_BEAR, config.getString(ENTITY_BEAR));
+                appliedSkins.put(ENTITY_WRITHING_MASS, config.getString(ENTITY_WRITHING_MASS));
+                appliedSkins.put(ENTITY_GIANT_HEAD, config.getString(ENTITY_GIANT_HEAD));
                 appliedSkins.put(ENTITY_AWAKENED_ONE, config.getString(ENTITY_AWAKENED_ONE));
 
                 // Load cardback preferences
                 appliedCardbacks.put(CARDBACK_COLORLESS, config.getString(CARDBACK_COLORLESS));
                 appliedCardbacks.put(CARDBACK_CURSE, config.getString(CARDBACK_CURSE));
-
-                // Backward compatibility for old config format
-                if (config.has("ironcladSkin")) {
-                    String oldSkin = config.getString("ironcladSkin");
-                    if (!oldSkin.isEmpty()) {
-                        appliedSkins.put(ENTITY_IRONCLAD, oldSkin);
-                    }
-                }
 
                 logger.info("Loaded skin preferences: " + appliedSkins);
                 logger.info("Loaded cardback preferences: " + appliedCardbacks);
