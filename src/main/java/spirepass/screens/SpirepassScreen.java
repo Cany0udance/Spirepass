@@ -9,6 +9,7 @@ import com.megacrit.cardcrawl.helpers.MathHelper;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
+import spirepass.challengeutil.ChallengeHelper;
 import spirepass.elements.SpirepassLevelBox;
 import spirepass.spirepassutil.SpirepassPositionSettings;
 import spirepass.spirepassutil.SpirepassRewardData;
@@ -39,7 +40,7 @@ public class SpirepassScreen {
 
     // Configuration
     private int maxLevel = 30; // Default max level
-    private int currentLevel = 20; // Player's current level
+    private int currentLevel = 30; // Player's current level
     private float levelBoxSpacing = 150f * Settings.scale;
     public float edgePadding = 100f * Settings.scale;
 
@@ -68,6 +69,7 @@ public class SpirepassScreen {
         // Ignore clicks for a brief moment
         InputHelper.justClickedLeft = false;
         InputHelper.justReleasedClickLeft = false;
+        ChallengeHelper.completeChallenge("weekly_hoarder");
     }
 
     public void close() {

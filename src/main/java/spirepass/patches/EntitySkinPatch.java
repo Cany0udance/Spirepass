@@ -19,6 +19,8 @@ import com.megacrit.cardcrawl.monsters.beyond.AwakenedOne;
 import com.megacrit.cardcrawl.monsters.beyond.GiantHead;
 import com.megacrit.cardcrawl.monsters.beyond.WrithingMass;
 import com.megacrit.cardcrawl.monsters.city.BanditBear;
+import com.megacrit.cardcrawl.monsters.city.Centurion;
+import com.megacrit.cardcrawl.monsters.city.Snecko;
 import com.megacrit.cardcrawl.monsters.exordium.*;
 import spirepass.Spirepass;
 
@@ -79,10 +81,16 @@ public class EntitySkinPatch {
                 entityId = Spirepass.ENTITY_BLUE_SLAVER;
             } else if (__instance instanceof SlaverRed) {
                 entityId = Spirepass.ENTITY_RED_SLAVER;
+            } else if (__instance instanceof Sentry) {
+                entityId = Spirepass.ENTITY_SENTRY;
             } else if (__instance instanceof GremlinNob) {
                 entityId = Spirepass.ENTITY_GREMLIN_NOB;
             } else if (__instance instanceof BanditBear) {
                 entityId = Spirepass.ENTITY_BEAR;
+            } else if (__instance instanceof Centurion) {
+                entityId = Spirepass.ENTITY_CENTURION;
+            } else if (__instance instanceof Snecko) {
+                entityId = Spirepass.ENTITY_SNECKO;
             } else if (__instance instanceof WrithingMass) {
                 entityId = Spirepass.ENTITY_WRITHING_MASS;
             } else if (__instance instanceof GiantHead) {
@@ -227,6 +235,13 @@ public class EntitySkinPatch {
                 String variant = skinId.substring("CULTIST_".length()).toLowerCase();
                 return "spirepass/images/skins/cultist/" + variant + "/";
             }
+        } else if (entityId.equals(Spirepass.ENTITY_SENTRY)) {
+            if (skinId.equals("SENTRY")) {
+                return null;
+            } else if (skinId.startsWith("SENTRY_")) {
+                String variant = skinId.substring("SENTRY_".length()).toLowerCase();
+                return "spirepass/images/skins/sentry/" + variant + "/";
+            }
         } else if (entityId.equals(Spirepass.ENTITY_GREMLIN_NOB)) {
             if (skinId.equals("GREMLIN_NOB")) {
                 return null;
@@ -240,6 +255,20 @@ public class EntitySkinPatch {
             } else if (skinId.startsWith("BEAR_")) {
                 String variant = skinId.substring("BEAR_".length()).toLowerCase();
                 return "spirepass/images/skins/bear/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_CENTURION)) {
+            if (skinId.equals("CENTURION")) {
+                return null;
+            } else if (skinId.startsWith("CENTURION_")) {
+                String variant = skinId.substring("CENTURION_".length()).toLowerCase();
+                return "spirepass/images/skins/centurion/" + variant + "/";
+            }
+        } else if (entityId.equals(Spirepass.ENTITY_SNECKO)) {
+            if (skinId.equals("SNECKO")) {
+                return null;
+            } else if (skinId.startsWith("SNECKO_")) {
+                String variant = skinId.substring("SNECKO_".length()).toLowerCase();
+                return "spirepass/images/skins/snecko/" + variant + "/";
             }
         } else if (entityId.equals(Spirepass.ENTITY_WRITHING_MASS)) {
             if (skinId.equals("WRITHING_MASS")) {
