@@ -146,8 +146,7 @@ public class Spirepass implements
     }
 
     public Spirepass() {
-        BaseMod.subscribe(this); //This will make BaseMod trigger all the subscribers at their appropriate times.
-        logger.info(modID + " subscribed to BaseMod.");
+        BaseMod.subscribe(this);
     }
 
     @Override
@@ -210,7 +209,7 @@ public class Spirepass implements
             // For centering the buttons
             private final float BUTTON_X = Settings.WIDTH / 2.0f / Settings.scale - 75.0f;
             private final float BUTTON_Y_TOP = Settings.HEIGHT / 2.0f / Settings.scale - 10.0f;
-            private final float BUTTON_Y_BOTTOM = BUTTON_Y_TOP - 150.0f; // 150 units below the top button
+            private final float BUTTON_Y_BOTTOM = BUTTON_Y_TOP - 50.0f; // 50 units below the top button
 
             private boolean wasInArea = false;
 

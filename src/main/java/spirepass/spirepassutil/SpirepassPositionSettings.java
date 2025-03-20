@@ -1,5 +1,6 @@
 package spirepass.spirepassutil;
 
+import com.badlogic.gdx.graphics.Color;
 import com.megacrit.cardcrawl.core.Settings;
 
 /**
@@ -34,4 +35,12 @@ public class SpirepassPositionSettings {
     // Character model offset (for proper positioning)
     public static final float CHARACTER_MODEL_Y_OFFSET = 125.0f * Settings.scale;
     public static final float MONSTER_MODEL_Y_OFFSET = 50.0f * Settings.scale; // Adjust as needed
+    // Progress bar settings
+    // Progress bar settings
+    public static final float PROGRESS_BAR_HEIGHT = 8.0f * Settings.scale;
+    public static final float PROGRESS_BAR_Y_OFFSET = -55.0f * Settings.scale; // Offset from the level box bottom
+    public static final float PROGRESS_BAR_X_OFFSET = 5.0f * Settings.scale; // Horizontal offset
+    public static final Color PROGRESS_BAR_BG_COLOR = new Color(0.3f, 0.3f, 0.3f, 0.8f);
+    public static final Color PROGRESS_BAR_CURRENT_COLOR = new Color(0.2f, 0.6f, 1.0f, 0.9f); // Blue for current level
+    public static final Color PROGRESS_BAR_COMPLETED_COLOR = new Color(0.2f, 0.8f, 0.2f, 0.9f); // Green for completed levels
 }

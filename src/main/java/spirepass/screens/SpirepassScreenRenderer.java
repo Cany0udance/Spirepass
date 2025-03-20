@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
 import com.esotericsoftware.spine.*;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
@@ -853,15 +854,87 @@ public class SpirepassScreenRenderer {
         renderLevelBoxes(sb, screen, scrollX, edgePadding, levelBoxes);
     }
 
+    // Add this method to SpirepassScreenRenderer
+    // Update the renderLevelProgressBar method in SpirepassScreenRenderer
+    public void renderLevelProgressBar(SpriteBatch sb, int fromLevel, int toLevel, float xPos, float yPos, float width) {
+        // Get current level
+        int currentLevel = Spirepass.getCurrentLevel();
+
+        // Skip rendering for future levels (levels beyond current+1)
+        if (fromLevel > currentLevel) {
+            return;
+        }
+
+        // Calculate progress percentage and determine color
+        float progress = 0.0f;
+        boolean isCompletedLevel = false;
+
+        if (fromLevel == currentLevel) {
+            // This is the progress bar for the current level
+            // Calculate how far into the current level the player is
+            int xpForNextLevel = Spirepass.getXPForNextLevel();
+            int xpPerLevel = Spirepass.XP_PER_LEVEL;
+
+            progress = 1.0f - ((float)xpForNextLevel / xpPerLevel);
+            progress = MathUtils.clamp(progress, 0.0f, 1.0f);
+        } else if (fromLevel < currentLevel) {
+            // This is a completed level
+            progress = 1.0f;
+            isCompletedLevel = true;
+        }
+
+        // Draw background
+        sb.setColor(SpirepassPositionSettings.PROGRESS_BAR_BG_COLOR);
+        sb.draw(ImageMaster.WHITE_SQUARE_IMG,
+                xPos,
+                yPos,
+                width,
+                SpirepassPositionSettings.PROGRESS_BAR_HEIGHT);
+
+        // Draw progress with appropriate color (green for completed, blue for current)
+        if (isCompletedLevel) {
+            sb.setColor(SpirepassPositionSettings.PROGRESS_BAR_COMPLETED_COLOR); // Green for completed levels
+        } else {
+            sb.setColor(SpirepassPositionSettings.PROGRESS_BAR_CURRENT_COLOR); // Blue for current level
+        }
+
+        sb.draw(ImageMaster.WHITE_SQUARE_IMG,
+                xPos,
+                yPos,
+                width * progress,
+                SpirepassPositionSettings.PROGRESS_BAR_HEIGHT);
+    }
+
+    // Update the renderLevelBoxes method in SpirepassScreenRenderer
     private void renderLevelBoxes(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding, ArrayList<SpirepassLevelBox> levelBoxes) {
         // Calculate which level boxes are currently visible
         int firstVisibleLevel = Math.max(0, (int) ((scrollX - edgePadding) / screen.getLevelBoxSpacing()) - 1);
         int lastVisibleLevel = Math.min(screen.getMaxLevel(), (int) ((scrollX + Settings.WIDTH - edgePadding) / screen.getLevelBoxSpacing()) + 1);
 
-        // Render each visible level box
+        for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
+            if (i < levelBoxes.size() - 1) {
+                SpirepassLevelBox currentBox = levelBoxes.get(i);
+                SpirepassLevelBox nextBox = levelBoxes.get(i + 1);
+
+                // Calculate progress bar position
+                float barWidth = (nextBox.getX() - currentBox.getX() - currentBox.getBoxSize()) * (2.2f * Settings.scale);
+                float barX = currentBox.getX() + (currentBox.getBoxSize() / 2) - (barWidth - (nextBox.getX() - currentBox.getX() - currentBox.getBoxSize())) / 2;
+
+                // Apply the horizontal offset (shift to the left)
+                barX -= SpirepassPositionSettings.PROGRESS_BAR_X_OFFSET;
+
+                float barY = currentBox.getY() - (currentBox.getBoxSize() / 2) - SpirepassPositionSettings.PROGRESS_BAR_Y_OFFSET;
+
+                // Render the progress bar on top of the boxes
+                renderLevelProgressBar(sb, i, i + 1, barX, barY, barWidth);
+            }
+        }
+
         for (int i = firstVisibleLevel; i <= lastVisibleLevel; i++) {
             if (i < levelBoxes.size()) {
-                levelBoxes.get(i).render(sb);
+                SpirepassLevelBox currentBox = levelBoxes.get(i);
+                // Render the level box first
+                currentBox.render(sb);
             }
         }
     }
