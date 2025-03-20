@@ -1,6 +1,7 @@
 package spirepass.challengeutil;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
+import spirepass.Spirepass;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +14,11 @@ public class ChallengeManager {
 
     private List<Challenge> dailyChallenges;
     private List<Challenge> weeklyChallenges;
+    public static final String LAST_DAILY_REFRESH = "lastDailyRefresh";
+    public static final String LAST_WEEKLY_REFRESH = "lastWeeklyRefresh";
 
     // Track challenge completion status
-    private HashMap<String, Boolean> completedChallenges;
+    public HashMap<String, Boolean> completedChallenges;
 
     // Track when challenges were last refreshed
     private long lastDailyRefreshTime;
@@ -52,17 +55,49 @@ public class ChallengeManager {
      * Clear all completion statuses (useful for dev testing)
      */
     public void clearAllCompletionStatus() {
+        int beforeCount = completedChallenges.size();
+
+        // Remove each completion status from the config file
+        for (String challengeId : completedChallenges.keySet()) {
+            try {
+                Spirepass.config.remove("completed_" + challengeId);
+            } catch (Exception e) {
+                logger.error("Failed to remove completion status from config: " + e.getMessage());
+            }
+        }
+
+        // Clear the map in memory
         completedChallenges.clear();
+
+        // Save the config after removing keys
+        try {
+            Spirepass.config.save();
+        } catch (Exception e) {
+            logger.error("Failed to save config after clearing completion statuses: " + e.getMessage());
+        }
+
+        logger.info("clearAllCompletionStatus: Cleared " + beforeCount + " completion entries, map now has " + completedChallenges.size() + " entries");
     }
+
 
     // Method called when a challenge is completed
     public void onComplete(Challenge challenge) {
+        // If already completed, don't award XP again
+        if (completedChallenges.containsKey(challenge.getId()) && completedChallenges.get(challenge.getId())) {
+            return;
+        }
+
         // Mark the challenge as completed
         completedChallenges.put(challenge.getId(), true);
 
-        // TODO: Implementation for rewards
-        // For now, just log completion
-        System.out.println("Challenge completed: " + challenge.getName());
+        // Award XP based on challenge type
+        if (challenge.getType() == Challenge.ChallengeType.DAILY) {
+            Spirepass.addXP(Spirepass.DAILY_CHALLENGE_XP);
+            logger.info("Awarded " + Spirepass.DAILY_CHALLENGE_XP + " XP for completing daily challenge: " + challenge.getName());
+        } else if (challenge.getType() == Challenge.ChallengeType.WEEKLY) {
+            Spirepass.addXP(Spirepass.WEEKLY_CHALLENGE_XP);
+            logger.info("Awarded " + Spirepass.WEEKLY_CHALLENGE_XP + " XP for completing weekly challenge: " + challenge.getName());
+        }
     }
 
     // Check if a challenge is completed
@@ -144,6 +179,8 @@ public class ChallengeManager {
             logger.error("Failed to save challenge data: " + e.getMessage());
             e.printStackTrace();
         }
+        logger.info("saveData: Completed challenges map contains " + completedChallenges.size() +
+                " entries after saving");
     }
 
     // Helper method to save a list of challenges
@@ -214,12 +251,30 @@ public class ChallengeManager {
                 }
             }
 
+            // Load refresh timestamps
+            if (config.has(LAST_DAILY_REFRESH)) {
+                String dailyRefresh = config.getString(LAST_DAILY_REFRESH);
+                if (dailyRefresh != null && !dailyRefresh.isEmpty()) {
+                    lastDailyRefreshTime = Long.parseLong(dailyRefresh);
+                }
+            }
+
+            if (config.has(LAST_WEEKLY_REFRESH)) {
+                String weeklyRefresh = config.getString(LAST_WEEKLY_REFRESH);
+                if (weeklyRefresh != null && !weeklyRefresh.isEmpty()) {
+                    lastWeeklyRefreshTime = Long.parseLong(weeklyRefresh);
+                }
+            }
+
             logger.info("Loaded " + dailyChallenges.size() + " daily challenges and " +
                     weeklyChallenges.size() + " weekly challenges");
+            logger.info("Last daily refresh: " + new java.util.Date(lastDailyRefreshTime));
+            logger.info("Last weekly refresh: " + new java.util.Date(lastWeeklyRefreshTime));
         } catch (Exception e) {
             logger.error("Failed to load challenge data: " + e.getMessage());
             e.printStackTrace();
         }
+        logger.info("loadData: Loaded " + completedChallenges.size() + " challenge completion statuses");
     }
 
     // Helper method to load a single challenge

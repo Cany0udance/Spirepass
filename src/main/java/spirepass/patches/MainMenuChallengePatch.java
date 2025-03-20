@@ -215,16 +215,24 @@ public class MainMenuChallengePatch {
      * Force refresh all challenges for development purposes
      */
     private static void refreshAllChallenges() {
-        logger.info("DEV: Manually refreshing all challenges");
+        logger.info("DEV: Manually refreshing all challenges - BEFORE clear, completed count: " +
+                ChallengeManager.getInstance().completedChallenges.size());
 
-        // Generate new daily and weekly challenges
+        // Clear all completion statuses first
+        ChallengeManager.getInstance().clearAllCompletionStatus();
+
+        logger.info("DEV: AFTER clear, completed count: " +
+                ChallengeManager.getInstance().completedChallenges.size());
+
+        // Then generate new daily and weekly challenges
         Spirepass.generateDailyChallenges();
         Spirepass.generateWeeklyChallenges();
 
+        logger.info("DEV: AFTER generating challenges, completed count: " +
+                ChallengeManager.getInstance().completedChallenges.size());
+
         // Play a sound to indicate success
         CardCrawlGame.sound.play("POWER_INTANGIBLE");
-
-        // Display a confirmation message
     }
 
 

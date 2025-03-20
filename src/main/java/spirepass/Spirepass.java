@@ -9,6 +9,7 @@ import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import spirepass.challengeutil.Challenge;
 import spirepass.challengeutil.ChallengeDefinitions;
 import spirepass.challengeutil.ChallengeManager;
+import spirepass.spirepassutil.SkinManager;
 import spirepass.util.GeneralUtils;
 import spirepass.util.KeywordInfo;
 import spirepass.util.TextureLoader;
@@ -34,6 +35,9 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static spirepass.challengeutil.ChallengeManager.LAST_DAILY_REFRESH;
+import static spirepass.challengeutil.ChallengeManager.LAST_WEEKLY_REFRESH;
+
 @SpireInitializer
 public class Spirepass implements
         EditStringsSubscriber,
@@ -46,59 +50,22 @@ public class Spirepass implements
     private static final String resourcesFolder = checkResourcesPath();
     public static final Logger logger = LogManager.getLogger(modID);
     private float saveTimer = 0f;
-    private static final float SAVE_INTERVAL = 10f; // Save every 60 seconds
-    // Replace single skin string with a map of entity IDs to skin IDs
-    public static Map<String, String> appliedSkins = new HashMap<>();
-    public static Map<String, String> appliedCardbacks = new HashMap<>();
-    // Define constants for entity IDs
-    public static final String ENTITY_IRONCLAD = "ironclad";
-    public static final String ENTITY_SILENT = "silent";
-    public static final String ENTITY_DEFECT = "defect";
-    public static final String ENTITY_WATCHER = "watcher";
-    public static final String ENTITY_JAW_WORM = "jaw_worm";
-    public static final String ENTITY_CULTIST = "cultist";
-    public static final String ENTITY_BLUE_SLAVER = "blue_slaver";
-    public static final String ENTITY_RED_SLAVER = "red_slaver";
-    public static final String ENTITY_SENTRY = "sentry";
-    public static final String ENTITY_GREMLIN_NOB = "gremlin_nob";
-    public static final String ENTITY_BEAR = "bear";
-    public static final String ENTITY_CENTURION = "centurion";
-    public static final String ENTITY_SNECKO = "snecko";
-    public static final String ENTITY_WRITHING_MASS = "writhing_mass";
-    public static final String ENTITY_GIANT_HEAD = "giant_head";
-    public static final String ENTITY_AWAKENED_ONE = "awakened_one";
-    public static final String CARDBACK_COLORLESS = "colorless";
-    public static final String CARDBACK_CURSE = "curse";
+    private static final float SAVE_INTERVAL = 10f; // Save every 10 seconds
 
-    // Challenge system related properties
+    // Challenge system related constants
     private static final int NUM_DAILY_CHALLENGES = 3;
     private static final int NUM_WEEKLY_CHALLENGES = 3;
-    private static final String LAST_DAILY_REFRESH = "lastDailyRefresh";
-    private static final String LAST_WEEKLY_REFRESH = "lastWeeklyRefresh";
     private static final int REFRESH_HOUR_EST = 12; // 12 PM EST
 
+    // XP and level system constants
+    private static final String TOTAL_XP_KEY = "totalXP";
+    private static final int XP_PER_LEVEL = 50;
+    public static final int DAILY_CHALLENGE_XP = 25;
+    public static final int WEEKLY_CHALLENGE_XP = 75;
+    public static final int MAX_LEVEL = 30;
+    private static int totalXP = 0;
+
     public static SpireConfig config;
-
-    // Helper method to get the applied skin for an entity
-    public static String getAppliedSkin(String entityId) {
-        return appliedSkins.getOrDefault(entityId, "");
-    }
-
-    // Helper method to set an applied skin for an entity
-    public static void setAppliedSkin(String entityId, String skinId) {
-        appliedSkins.put(entityId, skinId);
-        saveConfig();
-    }
-
-    public static String getAppliedCardback(String cardbackType) {
-        return appliedCardbacks.getOrDefault(cardbackType, "");
-    }
-
-    // Helper method to set an applied cardback
-    public static void setAppliedCardback(String cardbackType, String cardbackId) {
-        appliedCardbacks.put(cardbackType, cardbackId);
-        saveConfig();
-    }
 
     public static String makeID(String id) {
         return modID + ":" + id;
@@ -108,113 +75,66 @@ public class Spirepass implements
         try {
             // Simple config to store skin and cardback preferences
             Properties defaults = new Properties();
-            // Existing entity defaults
-            defaults.setProperty(ENTITY_IRONCLAD, "");
-            defaults.setProperty(ENTITY_SILENT, "");
-            defaults.setProperty(ENTITY_DEFECT, "");
-            defaults.setProperty(ENTITY_WATCHER, "");
-            defaults.setProperty(ENTITY_JAW_WORM, "");
-            defaults.setProperty(ENTITY_CULTIST, "");
-            defaults.setProperty(ENTITY_BLUE_SLAVER, "");
-            defaults.setProperty(ENTITY_RED_SLAVER, "");
-            defaults.setProperty(ENTITY_SENTRY, "");
-            defaults.setProperty(ENTITY_GREMLIN_NOB, "");
-            defaults.setProperty(ENTITY_BEAR, "");
-            defaults.setProperty(ENTITY_CENTURION, "");
-            defaults.setProperty(ENTITY_SNECKO, "");
-            defaults.setProperty(ENTITY_WRITHING_MASS, "");
-            defaults.setProperty(ENTITY_GIANT_HEAD, "");
-            defaults.setProperty(ENTITY_AWAKENED_ONE, "");
-            // Add cardback defaults
-            defaults.setProperty(CARDBACK_COLORLESS, "");
-            defaults.setProperty(CARDBACK_CURSE, "");
+
+            // Get manager instances
+            SkinManager skinManager = SkinManager.getInstance();
+
+            // Add default properties for skins
+            skinManager.addDefaultProperties(defaults);
+
             // Challenge system default timestamps
             defaults.setProperty(LAST_DAILY_REFRESH, String.valueOf(0));
             defaults.setProperty(LAST_WEEKLY_REFRESH, String.valueOf(0));
 
+            // Add XP default
+            defaults.setProperty(TOTAL_XP_KEY, "0");
+
+            // Initialize config with defaults
             config = new SpireConfig(modID, "config", defaults);
+
+            // Load XP data after config is initialized
+            if (config.has(TOTAL_XP_KEY)) {
+                totalXP = config.getInt(TOTAL_XP_KEY);
+                logger.info("Loaded battle pass XP: " + totalXP);
+            }
+
+            // Load skin data
+            skinManager.loadData(config);
+
+            // Initialize challenge manager and load challenge data
+            ChallengeManager challengeManager = ChallengeManager.getInstance();
+
+            // Load challenge data
+            challengeManager.loadData(config);
+
+            // Check if we need to generate/refresh challenges
+            checkAndRefreshChallenges();
+
         } catch (Exception e) {
             logger.error("Failed to load config: " + e.getMessage());
-        }
-
-        // Load the saved preferences
-        try {
-            if (config != null) {
-                // Add each entity type to the map
-                appliedSkins.put(ENTITY_IRONCLAD, config.getString(ENTITY_IRONCLAD));
-                appliedSkins.put(ENTITY_SILENT, config.getString(ENTITY_SILENT));
-                appliedSkins.put(ENTITY_DEFECT, config.getString(ENTITY_DEFECT));
-                appliedSkins.put(ENTITY_WATCHER, config.getString(ENTITY_WATCHER));
-                appliedSkins.put(ENTITY_JAW_WORM, config.getString(ENTITY_JAW_WORM));
-                appliedSkins.put(ENTITY_CULTIST, config.getString(ENTITY_CULTIST));
-                appliedSkins.put(ENTITY_BLUE_SLAVER, config.getString(ENTITY_BLUE_SLAVER));
-                appliedSkins.put(ENTITY_RED_SLAVER, config.getString(ENTITY_RED_SLAVER));
-                appliedSkins.put(ENTITY_SENTRY, config.getString(ENTITY_SENTRY));
-                appliedSkins.put(ENTITY_GREMLIN_NOB, config.getString(ENTITY_GREMLIN_NOB));
-                appliedSkins.put(ENTITY_BEAR, config.getString(ENTITY_BEAR));
-                appliedSkins.put(ENTITY_CENTURION, config.getString(ENTITY_CENTURION));
-                appliedSkins.put(ENTITY_SNECKO, config.getString(ENTITY_SNECKO));
-                appliedSkins.put(ENTITY_WRITHING_MASS, config.getString(ENTITY_WRITHING_MASS));
-                appliedSkins.put(ENTITY_GIANT_HEAD, config.getString(ENTITY_GIANT_HEAD));
-                appliedSkins.put(ENTITY_AWAKENED_ONE, config.getString(ENTITY_AWAKENED_ONE));
-                // Load cardback preferences
-                appliedCardbacks.put(CARDBACK_COLORLESS, config.getString(CARDBACK_COLORLESS));
-                appliedCardbacks.put(CARDBACK_CURSE, config.getString(CARDBACK_CURSE));
-                logger.info("Loaded skin preferences: " + appliedSkins);
-                logger.info("Loaded cardback preferences: " + appliedCardbacks);
-
-                // Initialize challenge manager and load challenge data
-                ChallengeManager challengeManager = ChallengeManager.getInstance();
-
-                // Load challenge data first
-                challengeManager.loadData(config);
-
-                // Then load refresh times
-                String dailyRefresh = config.getString(LAST_DAILY_REFRESH);
-                String weeklyRefresh = config.getString(LAST_WEEKLY_REFRESH);
-                if (dailyRefresh != null && !dailyRefresh.isEmpty()) {
-                    challengeManager.setLastDailyRefreshTime(Long.parseLong(dailyRefresh));
-                }
-                if (weeklyRefresh != null && !weeklyRefresh.isEmpty()) {
-                    challengeManager.setLastWeeklyRefreshTime(Long.parseLong(weeklyRefresh));
-                }
-
-                // Check if we need to generate/refresh challenges
-                checkAndRefreshChallenges();
-
-                logger.info("Loaded " + challengeManager.getDailyChallenges().size() + " daily challenges");
-                logger.info("Loaded " + challengeManager.getWeeklyChallenges().size() + " weekly challenges");
-            }
-        } catch (Exception e) {
-            logger.error("Failed to load preferences or challenges: " + e.getMessage());
             e.printStackTrace();
         }
 
         new Spirepass();
     }
 
-    // Update saveConfig method to save cardback preferences
+    // Update saveConfig method to use SkinManager
     public static void saveConfig() {
         try {
-            for (Map.Entry<String, String> entry : appliedSkins.entrySet()) {
-                config.setString(entry.getKey(), entry.getValue());
-            }
-            for (Map.Entry<String, String> entry : appliedCardbacks.entrySet()) {
-                config.setString(entry.getKey(), entry.getValue());
-            }
+            // Save skin data
+            SkinManager.getInstance().saveData(config);
 
             // Save challenge data and timestamps
             ChallengeManager manager = ChallengeManager.getInstance();
             manager.saveData(config);
-            config.setString(LAST_DAILY_REFRESH, String.valueOf(manager.getLastDailyRefreshTime()));
-            config.setString(LAST_WEEKLY_REFRESH, String.valueOf(manager.getLastWeeklyRefreshTime()));
-            logger.info("Saved challenge data");
+
+            // Save XP data
+            config.setInt(TOTAL_XP_KEY, totalXP);
 
             config.save();
-            logger.info("Saved skin preferences: " + appliedSkins);
-            logger.info("Saved cardback preferences: " + appliedCardbacks);
+            logger.info("Saved all config data");
         } catch (Exception e) {
-            logger.error("Failed to save preferences: " + e.getMessage());
+            logger.error("Failed to save config: " + e.getMessage());
         }
     }
 
@@ -227,8 +147,6 @@ public class Spirepass implements
     public void receivePostInitialize() {
         Texture badgeTexture = TextureLoader.getTexture(imagePath("badge.png"));
         BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors), info.Description, null);
-
-        // No need to initialize challenge manager here - it's already done in initialize()
     }
 
     /**
@@ -237,38 +155,50 @@ public class Spirepass implements
     private static void checkAndRefreshChallenges() {
         ChallengeManager manager = ChallengeManager.getInstance();
 
-        // If no challenges exist, generate initial set
-        if (manager.getDailyChallenges().isEmpty() && manager.getWeeklyChallenges().isEmpty()) {
-            generateInitialChallenges();
-            return;
-        }
-
         // Get current time in EST timezone
         ZoneId estZone = ZoneId.of("America/New_York");
         ZonedDateTime now = ZonedDateTime.now(estZone);
 
-        // Check if we need to refresh daily challenges (after 12 PM EST on a new day)
-        long lastDailyRefresh = manager.getLastDailyRefreshTime();
-        ZonedDateTime lastDailyRefreshDate = Instant.ofEpochMilli(lastDailyRefresh)
-                .atZone(estZone);
+        // Check if any challenges exist
+        boolean needInitialChallenges = manager.getDailyChallenges().isEmpty() ||
+                manager.getWeeklyChallenges().isEmpty();
 
-        if (lastDailyRefresh == 0 ||
-                (now.getHour() >= REFRESH_HOUR_EST &&
-                        (now.toLocalDate().isAfter(lastDailyRefreshDate.toLocalDate())))) {
-            generateDailyChallenges();
+        if (needInitialChallenges) {
+            logger.info("No challenges found, generating initial set");
+            generateInitialChallenges();
+            return;
         }
 
-        // Check if we need to refresh weekly challenges (after 12 PM EST on Monday)
-        long lastWeeklyRefresh = manager.getLastWeeklyRefreshTime();
-        ZonedDateTime lastWeeklyRefreshDate = Instant.ofEpochMilli(lastWeeklyRefresh)
-                .atZone(estZone);
+        // Check daily challenge refresh
+        long lastDailyRefresh = manager.getLastDailyRefreshTime();
+        if (lastDailyRefresh > 0) {  // Only check if we have a valid timestamp
+            ZonedDateTime lastDailyRefreshDate = Instant.ofEpochMilli(lastDailyRefresh)
+                    .atZone(estZone);
 
-        if (lastWeeklyRefresh == 0 ||
-                (now.getHour() >= REFRESH_HOUR_EST &&
-                        now.getDayOfWeek() == DayOfWeek.MONDAY &&
-                        (now.toLocalDate().isAfter(lastWeeklyRefreshDate.toLocalDate()) ||
-                                lastWeeklyRefreshDate.getDayOfWeek() != DayOfWeek.MONDAY))) {
-            generateWeeklyChallenges();
+            boolean needsDailyRefresh = now.getHour() >= REFRESH_HOUR_EST &&
+                    now.toLocalDate().isAfter(lastDailyRefreshDate.toLocalDate());
+
+            if (needsDailyRefresh) {
+                logger.info("Daily challenges need refresh");
+                generateDailyChallenges();
+            }
+        }
+
+        // Check weekly challenge refresh
+        long lastWeeklyRefresh = manager.getLastWeeklyRefreshTime();
+        if (lastWeeklyRefresh > 0) {  // Only check if we have a valid timestamp
+            ZonedDateTime lastWeeklyRefreshDate = Instant.ofEpochMilli(lastWeeklyRefresh)
+                    .atZone(estZone);
+
+            boolean needsWeeklyRefresh = now.getHour() >= REFRESH_HOUR_EST &&
+                    now.getDayOfWeek() == DayOfWeek.MONDAY &&
+                    (now.toLocalDate().isAfter(lastWeeklyRefreshDate.toLocalDate()) ||
+                            lastWeeklyRefreshDate.getDayOfWeek() != DayOfWeek.MONDAY);
+
+            if (needsWeeklyRefresh) {
+                logger.info("Weekly challenges need refresh");
+                generateWeeklyChallenges();
+            }
         }
 
         // Save the updated timestamps
@@ -312,13 +242,7 @@ public class Spirepass implements
         manager.setLastDailyRefreshTime(System.currentTimeMillis());
 
         // Save data after generating new challenges
-        manager.saveData(config);
-        try {
-            config.save();
-            logger.info("Saved config after generating daily challenges");
-        } catch (Exception e) {
-            logger.error("Error saving config after generating daily challenges: " + e.getMessage());
-        }
+        saveConfig();
 
         logger.info("Generated " + selectedChallenges.size() + " new daily challenges");
     }
@@ -346,13 +270,7 @@ public class Spirepass implements
         manager.setLastWeeklyRefreshTime(System.currentTimeMillis());
 
         // Save data after generating new challenges
-        manager.saveData(config);
-        try {
-            config.save();
-            logger.info("Saved config after generating weekly challenges");
-        } catch (Exception e) {
-            logger.error("Error saving config after generating weekly challenges: " + e.getMessage());
-        }
+        saveConfig();
 
         logger.info("Generated " + selectedChallenges.size() + " new weekly challenges");
     }
@@ -377,6 +295,42 @@ public class Spirepass implements
         }
 
         return result;
+    }
+
+    // Get current level based on XP
+    public static int getCurrentLevel() {
+        int level = totalXP / XP_PER_LEVEL;
+        return Math.min(level, MAX_LEVEL);
+    }
+
+    // Get XP needed for next level
+    public static int getXPForNextLevel() {
+        if (getCurrentLevel() >= MAX_LEVEL) {
+            return 0; // At max level
+        }
+        return ((getCurrentLevel() + 1) * XP_PER_LEVEL) - totalXP;
+    }
+
+    // Add XP and save
+    public static void addXP(int amount) {
+        int oldLevel = getCurrentLevel();
+        totalXP += amount;
+
+        // Add null check to prevent NPE
+        if (config != null) {
+            config.setInt(TOTAL_XP_KEY, totalXP);
+            saveConfig();
+        } else {
+            logger.error("Cannot save XP: config is null");
+        }
+
+        // Log level up events
+        int newLevel = getCurrentLevel();
+        if (newLevel > oldLevel) {
+            logger.info("Level up! " + oldLevel + " -> " + newLevel);
+        }
+
+        logger.info("Added " + amount + " XP. Total: " + totalXP + ", Level: " + getCurrentLevel());
     }
 
     /*----------Localization----------*/

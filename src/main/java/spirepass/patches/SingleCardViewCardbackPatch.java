@@ -10,6 +10,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.screens.SingleCardViewPopup;
 import spirepass.Spirepass;
+import spirepass.spirepassutil.SkinManager;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -32,8 +33,8 @@ public class SingleCardViewCardbackPatch {
         if ((card.color == AbstractCard.CardColor.COLORLESS && card.type != AbstractCard.CardType.STATUS) ||
                 card.color == AbstractCard.CardColor.CURSE) {
             String cardbackType = card.color == AbstractCard.CardColor.COLORLESS ?
-                    Spirepass.CARDBACK_COLORLESS : Spirepass.CARDBACK_CURSE;
-            String cardbackId = Spirepass.getAppliedCardback(cardbackType);
+                    SkinManager.CARDBACK_COLORLESS : SkinManager.CARDBACK_CURSE;
+            String cardbackId = SkinManager.getInstance().getAppliedCardback(cardbackType);
             if (cardbackId != null && !cardbackId.isEmpty()) {
                 try {
                     // Get the path for the large cardback texture
@@ -55,7 +56,7 @@ public class SingleCardViewCardbackPatch {
     }
 
     private static String getLargeCardbackTexturePath(String cardbackType, String cardbackId, AbstractCard card) {
-        if (cardbackType.equals(Spirepass.CARDBACK_COLORLESS)) {
+        if (cardbackType.equals(SkinManager.CARDBACK_COLORLESS)) {
             String cardType = "";
 
             // Determine card type
@@ -78,7 +79,7 @@ public class SingleCardViewCardbackPatch {
                 return "spirepass/images/rewards/cardbacks/colorless/favoritecustomer/FavoriteCustomer" + cardType + "Large.png";
             }
             // Add other colorless cardbacks here
-        } else if (cardbackType.equals(Spirepass.CARDBACK_CURSE)) {
+        } else if (cardbackType.equals(SkinManager.CARDBACK_CURSE)) {
             if (cardbackId.equals("CURSE_HAROLD")) {
                 return "spirepass/images/rewards/cardbacks/curse/HaroldLarge.png";
             }

@@ -9,6 +9,7 @@ import com.megacrit.cardcrawl.helpers.MathHelper;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
+import spirepass.Spirepass;
 import spirepass.challengeutil.ChallengeHelper;
 import spirepass.elements.SpirepassLevelBox;
 import spirepass.spirepassutil.SpirepassPositionSettings;
@@ -20,35 +21,29 @@ public class SpirepassScreen {
     // UI components
     public MenuCancelButton cancelButton;
     private SpirepassScreenRenderer renderer;
-
     // State variables
     public boolean isScreenOpened;
     private int selectedLevel = -1;
-
     // Scrolling variables
     private float scrollX = 0f;
     private float targetScrollX = 0f;
     private float minScrollX = 0f;
     private float maxScrollX = 0f;
-
     // Drag handling
     private boolean isDragging = false;
     private float dragStartX = 0f;
     private float lastMouseX = 0f;
     private boolean hasDraggedSignificantly = false;
     private static final float DRAG_THRESHOLD = 5.0f * Settings.scale;
-
     // Configuration
     private int maxLevel = 30; // Default max level
-    private int currentLevel = 30; // Player's current level
+    private int currentLevel = 0; // Will be set from XP system
     private float levelBoxSpacing = 150f * Settings.scale;
     public float edgePadding = 100f * Settings.scale;
-
     // Level boxes
     private ArrayList<SpirepassLevelBox> levelBoxes;
 
     // ==================== LIFECYCLE METHODS ====================
-
     public SpirepassScreen() {
         this.cancelButton = new MenuCancelButton();
         this.isScreenOpened = false;
@@ -60,6 +55,10 @@ public class SpirepassScreen {
         this.cancelButton.show(CardCrawlGame.languagePack.getUIString("DungeonMapScreen").TEXT[1]);
         this.isScreenOpened = true;
 
+        // Update max level and current level from Spirepass
+        this.maxLevel = Spirepass.MAX_LEVEL;
+        this.currentLevel = Spirepass.getCurrentLevel();
+
         // Setup level boxes and scrolling
         initializeLevelBoxes();
         calculateScrollBounds();
@@ -69,7 +68,9 @@ public class SpirepassScreen {
         // Ignore clicks for a brief moment
         InputHelper.justClickedLeft = false;
         InputHelper.justReleasedClickLeft = false;
-        ChallengeHelper.completeChallenge("weekly_hoarder");
+
+
+         ChallengeHelper.completeChallenge("weekly_hoarder");
     }
 
     public void close() {

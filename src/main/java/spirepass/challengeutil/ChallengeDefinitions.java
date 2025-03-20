@@ -17,7 +17,7 @@ public class ChallengeDefinitions {
                 "Setup",
                 "Play two Power cards on turn 1 of combat.",
                 Challenge.ChallengeType.DAILY,
-                2
+                1
         ));
 
         challenges.add(new Challenge(
@@ -38,36 +38,6 @@ public class ChallengeDefinitions {
                 "daily_purification",
                 "Purification",
                 "Remove a Curse at a Merchant.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        // Add more daily challenges here
-        challenges.add(new Challenge(
-                "daily_perfectionist",
-                "Perfectionist",
-                "Defeat an Elite without taking damage.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_overkill",
-                "Overkill",
-                "Deal 50+ damage in a single attack.",
-                Challenge.ChallengeType.DAILY,
-                1
-        ));
-
-        challenges.add(new Challenge(
-                "daily_hoarder",
-                "Card Collector",
-                "Add 3 cards to your deck in a single combat reward.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_impervious",
-                "Impervious",
-                "Gain 30 or more Block in a single turn.",
                 Challenge.ChallengeType.DAILY
         ));
 
@@ -101,48 +71,6 @@ public class ChallengeDefinitions {
                 "Have at least 500 Gold at once.",
                 Challenge.ChallengeType.WEEKLY
         ));
-
-        /*
-
-
-        challenges.add(new Challenge(
-                "weekly_boss",
-                "You Are Probably Nothing",
-                "Defeat a Boss within three turns.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        // Add more weekly challenges here
-        challenges.add(new Challenge(
-                "weekly_collector",
-                "Relic Collector",
-                "Obtain 5 relics in a single run.",
-                Challenge.ChallengeType.WEEKLY,
-                5
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_ascension",
-                "Ascension Climber",
-                "Win a run at Ascension 5 or higher.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_minimalist",
-                "Minimalist",
-                "Have 15 or fewer cards in your deck by the end of Act 2.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_highlander",
-                "Highlander",
-                "Win a combat with no duplicate cards in your deck.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-        
-         */
 
         return challenges;
     }
