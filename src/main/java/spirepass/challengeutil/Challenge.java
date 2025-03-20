@@ -95,10 +95,22 @@ public class Challenge {
             currentProgress = maxProgress;
         }
 
-        // Auto-check completion
-        if (isCompleted()) {
+        // Auto-check completion - but only if not already tracked as completed
+        if (isCompleted() && !ChallengeManager.getInstance().isCompleted(this.getId())) {
             ChallengeManager.getInstance().onComplete(this);
         }
+    }
+
+    /**
+     * Set progress without triggering completion check
+     * Used when loading already-completed challenges
+     */
+    public void setProgressSilently(int progress) {
+        this.currentProgress = progress;
+        if (currentProgress > maxProgress) {
+            currentProgress = maxProgress;
+        }
+        // No completion check here
     }
 
     /**

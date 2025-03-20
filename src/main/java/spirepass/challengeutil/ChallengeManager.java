@@ -210,6 +210,13 @@ public class ChallengeManager {
             weeklyChallenges.clear();
             completedChallenges.clear();
 
+            // We need to approach this differently since SpireConfig doesn't have getKeys()
+            // First load the challenges and then check completions during the challenge loading
+            // We'll check completions in the loadChallenge method
+
+            // Now load challenges with completion status already populated
+            // Rest of your existing loading code...
+
             // Check if daily_count key exists before trying to load
             if (config.has("daily_count")) {
                 // Load daily challenges
@@ -231,23 +238,6 @@ public class ChallengeManager {
                     if (challenge != null) {
                         weeklyChallenges.add(challenge);
                     }
-                }
-            }
-
-            // Load challenge completion statuses
-            for (Challenge challenge : dailyChallenges) {
-                String challengeId = challenge.getId();
-                if (config.has("completed_" + challengeId)) {
-                    boolean completed = config.getBool("completed_" + challengeId);
-                    completedChallenges.put(challengeId, completed);
-                }
-            }
-
-            for (Challenge challenge : weeklyChallenges) {
-                String challengeId = challenge.getId();
-                if (config.has("completed_" + challengeId)) {
-                    boolean completed = config.getBool("completed_" + challengeId);
-                    completedChallenges.put(challengeId, completed);
                 }
             }
 
@@ -292,9 +282,24 @@ public class ChallengeManager {
             int currentProgress = config.getInt(baseKey + "currentProgress");
             int maxProgress = config.getInt(baseKey + "maxProgress");
 
+            // First check if this challenge is already tracked as completed
+            boolean isAlreadyCompleted = false;
+            String completionKey = "completed_" + id;
+            if (config.has(completionKey)) {
+                isAlreadyCompleted = config.getBool(completionKey);
+                completedChallenges.put(id, isAlreadyCompleted);
+                logger.info("Challenge " + id + " loaded with completion status: " + isAlreadyCompleted);
+            }
+
             // Create the challenge with all properties
             Challenge challenge = new Challenge(id, name, description, type, maxProgress);
-            challenge.setProgress(currentProgress);
+
+            // Safely set progress without triggering onComplete if already completed
+            if (isAlreadyCompleted) {
+                challenge.setProgressSilently(currentProgress);
+            } else {
+                challenge.setProgress(currentProgress);
+            }
 
             return challenge;
         } catch (Exception e) {
@@ -302,4 +307,5 @@ public class ChallengeManager {
             return null;
         }
     }
+
 }

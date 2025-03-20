@@ -1,10 +1,16 @@
 package spirepass;
 
 import basemod.BaseMod;
+import basemod.IUIElement;
+import basemod.ModLabeledButton;
+import basemod.ModPanel;
 import basemod.interfaces.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.helpers.FontHelper;
+import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import spirepass.challengeutil.Challenge;
 import spirepass.challengeutil.ChallengeDefinitions;
@@ -28,6 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.scannotation.AnnotationDB;
 
+import java.lang.reflect.Field;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -59,7 +66,7 @@ public class Spirepass implements
 
     // XP and level system constants
     private static final String TOTAL_XP_KEY = "totalXP";
-    private static final int XP_PER_LEVEL = 50;
+    public static final int XP_PER_LEVEL = 50;
     public static final int DAILY_CHALLENGE_XP = 25;
     public static final int WEEKLY_CHALLENGE_XP = 75;
     public static final int MAX_LEVEL = 30;
@@ -145,8 +152,116 @@ public class Spirepass implements
 
     @Override
     public void receivePostInitialize() {
+        // Create the settings panel
+        ModPanel settingsPanel = new ModPanel();
+
+        // Create the XP button - initially positioned off-screen
+        ModLabeledButton xpButton = new ModLabeledButton(
+                "Add 10,000 XP",
+                9999.0f, // Off-screen X position
+                9999.0f, // Off-screen Y position
+                Settings.GOLD_COLOR,
+                Settings.CREAM_COLOR,
+                FontHelper.buttonLabelFont,
+                settingsPanel,
+                (button) -> {
+                    // When clicked, add 10,000 XP
+                    addXP(10000);
+                    logger.info("Added 10,000 XP via secret button");
+
+                    // Keep the button visible (don't move off-screen)
+                    // This allows for multiple clicks
+                }
+        );
+
+        // Create the Reset XP button - initially positioned off-screen
+        ModLabeledButton resetXpButton = new ModLabeledButton(
+                "Reset XP to 0",
+                9999.0f, // Off-screen X position
+                9999.0f, // Off-screen Y position
+                Settings.RED_TEXT_COLOR,
+                Settings.CREAM_COLOR,
+                FontHelper.buttonLabelFont,
+                settingsPanel,
+                (button) -> {
+                    // Reset XP to 0
+                    totalXP = 0;
+                    config.setInt(TOTAL_XP_KEY, 0);
+                    saveConfig();
+                    logger.info("Reset XP to 0 via secret button");
+
+                    // Keep the button visible (don't move off-screen)
+                    // This allows for multiple clicks
+                }
+        );
+
+        // Add both buttons to the panel
+        settingsPanel.addUIElement(xpButton);
+        settingsPanel.addUIElement(resetXpButton);
+
+        // Create a simple secret area detector
+        class SecretAreaElement implements IUIElement {
+            // Define the secret area in the exact center of the screen
+            private final float AREA_WIDTH = 200.0f;
+            private final float AREA_HEIGHT = 150.0f;
+            private final float AREA_X = Settings.WIDTH / 2.0f - AREA_WIDTH / 2.0f;
+            private final float AREA_Y = Settings.HEIGHT / 2.0f - AREA_HEIGHT / 2.0f;
+
+            // For centering the buttons
+            private final float BUTTON_X = Settings.WIDTH / 2.0f / Settings.scale - 75.0f;
+            private final float BUTTON_Y_TOP = Settings.HEIGHT / 2.0f / Settings.scale - 10.0f;
+            private final float BUTTON_Y_BOTTOM = BUTTON_Y_TOP - 150.0f; // 150 units below the top button
+
+            private boolean wasInArea = false;
+
+            @Override
+            public void render(SpriteBatch sb) {
+                // No rendering needed
+            }
+
+            @Override
+            public void update() {
+                // Check if the mouse is in the secret area (center of screen)
+                boolean isInArea = (InputHelper.mX >= AREA_X &&
+                        InputHelper.mX <= AREA_X + AREA_WIDTH &&
+                        InputHelper.mY >= AREA_Y &&
+                        InputHelper.mY <= AREA_Y + AREA_HEIGHT);
+
+                // Only take action when the hover state changes
+                if (isInArea != wasInArea) {
+                    wasInArea = isInArea;
+
+                    if (isInArea) {
+                        // Position buttons
+                        xpButton.set(BUTTON_X, BUTTON_Y_TOP);
+                        resetXpButton.set(BUTTON_X, BUTTON_Y_BOTTOM);
+                    } else {
+                        // Move buttons off-screen
+                        xpButton.set(9999.0f, 9999.0f);
+                        resetXpButton.set(9999.0f, 9999.0f);
+                    }
+                }
+            }
+
+            // Implementing required methods from IUIElement
+            @Override
+            public int renderLayer() {
+                return 0;
+            }
+
+            @Override
+            public int updateOrder() {
+                return 0;
+            }
+        }
+
+        // Add the secret area detector
+        settingsPanel.addUIElement(new SecretAreaElement());
+
+        // Register the mod badge with the settings panel
         Texture badgeTexture = TextureLoader.getTexture(imagePath("badge.png"));
-        BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors), info.Description, null);
+        BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors),
+                info.Description, settingsPanel);
     }
 
     /**
