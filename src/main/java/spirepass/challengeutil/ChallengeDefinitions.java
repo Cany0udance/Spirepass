@@ -153,14 +153,14 @@ public class ChallengeDefinitions {
         challenges.add(new Challenge(
                 "weekly_strong_start",
                 "Strong Start",
-                "Defeat an Emerald Elite in Act 1.",
+                "Collect the Emerald Key in Exordium.",
                 Challenge.ChallengeType.WEEKLY
         ));
 
         challenges.add(new Challenge(
                 "weekly_hoarder",
                 "Hoarder",
-                "Have at least 500 Gold at once.",
+                "Have at least 600 Gold at once.",
                 Challenge.ChallengeType.WEEKLY
         ));
 

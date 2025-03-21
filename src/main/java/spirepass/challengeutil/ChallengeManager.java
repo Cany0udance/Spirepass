@@ -86,10 +86,8 @@ public class ChallengeManager {
         if (completedChallenges.containsKey(challenge.getId()) && completedChallenges.get(challenge.getId())) {
             return;
         }
-
         // Mark the challenge as completed
         completedChallenges.put(challenge.getId(), true);
-
         // Award XP based on challenge type
         if (challenge.getType() == Challenge.ChallengeType.DAILY) {
             Spirepass.addXP(Spirepass.DAILY_CHALLENGE_XP);
@@ -108,7 +106,6 @@ public class ChallengeManager {
                     completedDailies++;
                 }
             }
-
             // If 2 daily challenges are completed (excluding Tagalong itself), complete the Tagalong challenge
             if (completedDailies >= 2) {
                 // Find and complete the Tagalong challenge if it exists and isn't already completed
@@ -116,6 +113,54 @@ public class ChallengeManager {
                     if (dailyChallenge.getId().equals("daily_tagalong") && !isCompleted("daily_tagalong")) {
                         logger.info("Completing Tagalong challenge as other daily challenges are complete");
                         dailyChallenge.complete();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Check if this completion should trigger the Freeloader weekly challenge
+        if (challenge.getType() == Challenge.ChallengeType.WEEKLY && !challenge.getId().equals("weekly_freeloader")) {
+            // Count how many weekly challenges are completed (excluding Freeloader itself)
+            int completedWeeklies = 0;
+            for (Challenge weeklyChallenge : weeklyChallenges) {
+                if (isCompleted(weeklyChallenge.getId()) &&
+                        !weeklyChallenge.getId().equals("weekly_freeloader") &&
+                        !weeklyChallenge.getId().equals("weekly_dailymaster")) {
+                    completedWeeklies++;
+                }
+            }
+
+            // If at least 2 weekly challenges are completed, complete the Freeloader challenge
+            if (completedWeeklies >= 2) {
+                // Find and complete the Freeloader challenge if it exists and isn't already completed
+                for (Challenge weeklyChallenge : weeklyChallenges) {
+                    if (weeklyChallenge.getId().equals("weekly_freeloader") && !isCompleted("weekly_freeloader")) {
+                        logger.info("Completing Freeloader challenge as 2+ other weekly challenges are complete");
+                        weeklyChallenge.complete();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Check if this completion should trigger the Daily Master weekly challenge
+        if (challenge.getType() == Challenge.ChallengeType.DAILY) {
+            // Count how many daily challenges are completed (including all daily challenges)
+            int completedDailies = 0;
+            for (Challenge dailyChallenge : dailyChallenges) {
+                if (isCompleted(dailyChallenge.getId())) {
+                    completedDailies++;
+                }
+            }
+
+            // If all daily challenges are completed, complete the Daily Master challenge
+            if (completedDailies >= dailyChallenges.size()) {
+                // Find and complete the Daily Master challenge if it exists and isn't already completed
+                for (Challenge weeklyChallenge : weeklyChallenges) {
+                    if (weeklyChallenge.getId().equals("weekly_dailymaster") && !isCompleted("weekly_dailymaster")) {
+                        logger.info("Completing Daily Master challenge as all daily challenges are complete");
+                        weeklyChallenge.complete();
                         break;
                     }
                 }

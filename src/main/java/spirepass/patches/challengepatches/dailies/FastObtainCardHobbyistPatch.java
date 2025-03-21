@@ -20,11 +20,18 @@ public class FastObtainCardHobbyistPatch {
             localvars = {"r"}
     )
     public static void onCardObtain(FastCardObtainEffect __instance, AbstractRelic r) {
-        // Check if the Hobbyist challenge is active and incomplete
+        // Check for daily_hobbyist challenge
         if (ChallengeHelper.isActiveChallengeIncomplete("daily_hobbyist")) {
             // Update the progress for the Hobbyist challenge
             ChallengeHelper.updateChallengeProgress("daily_hobbyist", 1);
             logger.info("Daily Hobbyist challenge progress incremented!");
+        }
+
+        // Check for weekly_collector challenge
+        if (ChallengeHelper.isActiveChallengeIncomplete("weekly_collector")) {
+            // Update the progress for the Collector challenge
+            ChallengeHelper.updateChallengeProgress("weekly_collector", 1);
+            logger.info("Weekly Card Collector challenge progress incremented!");
         }
     }
 

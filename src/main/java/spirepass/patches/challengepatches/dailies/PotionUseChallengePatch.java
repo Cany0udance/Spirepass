@@ -10,7 +10,7 @@ import spirepass.Spirepass;
 import spirepass.challengeutil.ChallengeHelper;
 
 @SpirePatch(clz = PotionPopUp.class, method = "updateInput")
-public class RarePotionPatch {
+public class PotionUseChallengePatch {
     private static final Logger logger = LogManager.getLogger(Spirepass.modID);
 
     @SpireInsertPatch(
@@ -18,6 +18,13 @@ public class RarePotionPatch {
             localvars = {"potion"}
     )
     public static void onPotionUse(PotionPopUp __instance, AbstractPotion potion) {
+        // Check for the weekly chugger challenge
+        if (ChallengeHelper.isActiveChallengeIncomplete("weekly_chugger")) {
+            // Increment the challenge progress for any potion use
+            ChallengeHelper.updateChallengeProgress("weekly_chugger", 1);
+            logger.info("Weekly Chugger challenge progress incremented! Used potion: " + potion.name);
+        }
+
         // Check if the exquisite challenge is active and incomplete
         if (ChallengeHelper.isActiveChallengeIncomplete("daily_exquisite")) {
             // Check if the used potion is rare
