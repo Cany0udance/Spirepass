@@ -98,6 +98,29 @@ public class ChallengeManager {
             Spirepass.addXP(Spirepass.WEEKLY_CHALLENGE_XP);
             logger.info("Awarded " + Spirepass.WEEKLY_CHALLENGE_XP + " XP for completing weekly challenge: " + challenge.getName());
         }
+
+        // Check if this completion should trigger the Tagalong challenge
+        if (!challenge.getId().equals("daily_tagalong") && challenge.getType() == Challenge.ChallengeType.DAILY) {
+            // Count how many daily challenges are completed
+            int completedDailies = 0;
+            for (Challenge dailyChallenge : dailyChallenges) {
+                if (isCompleted(dailyChallenge.getId()) && !dailyChallenge.getId().equals("daily_tagalong")) {
+                    completedDailies++;
+                }
+            }
+
+            // If 2 daily challenges are completed (excluding Tagalong itself), complete the Tagalong challenge
+            if (completedDailies >= 2) {
+                // Find and complete the Tagalong challenge if it exists and isn't already completed
+                for (Challenge dailyChallenge : dailyChallenges) {
+                    if (dailyChallenge.getId().equals("daily_tagalong") && !isCompleted("daily_tagalong")) {
+                        logger.info("Completing Tagalong challenge as other daily challenges are complete");
+                        dailyChallenge.complete();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     // Check if a challenge is completed

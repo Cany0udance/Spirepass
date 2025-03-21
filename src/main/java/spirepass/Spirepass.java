@@ -5,36 +5,33 @@ import basemod.IUIElement;
 import basemod.ModLabeledButton;
 import basemod.ModPanel;
 import basemod.interfaces.*;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
-import com.megacrit.cardcrawl.cards.AbstractCard;
-import com.megacrit.cardcrawl.helpers.FontHelper;
-import com.megacrit.cardcrawl.helpers.input.InputHelper;
-import com.megacrit.cardcrawl.rooms.AbstractRoom;
-import spirepass.challengeutil.Challenge;
-import spirepass.challengeutil.ChallengeDefinitions;
-import spirepass.challengeutil.ChallengeManager;
-import spirepass.spirepassutil.SkinManager;
-import spirepass.util.GeneralUtils;
-import spirepass.util.KeywordInfo;
-import spirepass.util.TextureLoader;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.evacipated.cardcrawl.modthespire.Loader;
 import com.evacipated.cardcrawl.modthespire.ModInfo;
 import com.evacipated.cardcrawl.modthespire.Patcher;
+import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
+import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.helpers.FontHelper;
+import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.localization.*;
+import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.scannotation.AnnotationDB;
+import spirepass.challengeutil.*;
+import spirepass.spirepassutil.SkinManager;
+import spirepass.util.GeneralUtils;
+import spirepass.util.KeywordInfo;
+import spirepass.util.TextureLoader;
 
-import java.lang.reflect.Field;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -50,7 +47,8 @@ public class Spirepass implements
         EditStringsSubscriber,
         PostInitializeSubscriber,
         OnCardUseSubscriber,
-        OnStartBattleSubscriber {
+        OnStartBattleSubscriber,
+        OnPlayerTurnStartSubscriber {
     public static ModInfo info;
     public static String modID;
     static { loadModInfo(); }
@@ -549,7 +547,28 @@ public class Spirepass implements
 
     @Override
     public void receiveCardUsed(AbstractCard abstractCard) {
+        // First check if the challenge is active and incomplete
+        if (!ChallengeHelper.isActiveChallengeIncomplete("daily_setup")) {
+            return; // Skip all processing if challenge is inactive or already completed
+        }
 
+        // Check if the card is a Power card
+        if (abstractCard.type == AbstractCard.CardType.POWER) {
+            // Check if we're in turn 1
+            if (AbstractDungeon.actionManager.turn == 1) {
+                // Increment the counter for power cards played on turn 1
+                ChallengeVariables.dailySetupPowersPlayed++;
+
+                // If we've played 2 or more power cards
+                if (ChallengeVariables.dailySetupPowersPlayed >= 2) {
+                    // Complete the challenge
+                    ChallengeHelper.completeChallenge("daily_setup");
+
+                    // Optional: Log the completion
+                    logger.info("Daily Setup challenge completed! Played 2 power cards on turn 1.");
+                }
+            }
+        }
     }
 
     @Override
@@ -557,4 +576,9 @@ public class Spirepass implements
 
     }
 
+    @Override
+    public void receiveOnPlayerTurnStart() {
+        // Reset the variables at the start of each turn
+        ChallengeVariables.resetVariablesEveryTurn();
+    }
 }

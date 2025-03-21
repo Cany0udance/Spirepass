@@ -69,6 +69,11 @@ public class Challenge {
      */
     public void incrementProgress() {
         incrementProgress(1);
+
+        if (isCompleted()) {
+            ChallengeManager.getInstance().onComplete(this);
+        }
+
     }
 
     /**

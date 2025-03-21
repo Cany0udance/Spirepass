@@ -115,7 +115,7 @@ public class SpirepassScreenRenderer {
         // Level 2: Weaponized 115 Ironclad skin
         rewardData.put(2, new SpirepassRewardData(
                 2,
-                "Weaponized 115 from the hit game Call of Duty®: Black Ops II",
+                "Weaponized 115 from the hit first person shooter game Call of Duty®: Black Ops II, part of the Call of Duty® series",
                 "The Weaponized 115 Personalization Pack brings out the power of Zombies to any Multiplayer match. Pack your weapons with an all-new Call of Duty: Black Ops II Origins-inspired camo, set of reticles, and undead animated calling card.",
                 SpirepassRewardData.RewardRarity.RARE,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
