@@ -89,10 +89,22 @@ public class CardbackPatch {
             if (cardbackId.equals("COLORLESS_FAVORITECUSTOMER")) {
                 return "spirepass/images/rewards/cardbacks/colorless/favoritecustomer/FavoriteCustomer" + cardType + ".png";
             }
+
+            if (cardbackId.equals("COLORLESS_BLISSFUL")) {
+                return "spirepass/images/rewards/cardbacks/colorless/blissful/Bliss" + cardType + ".png";
+            }
+
+            if (cardbackId.equals("COLORLESS_JIMBO")) {
+                return "spirepass/images/rewards/cardbacks/colorless/jimbo/Jimbo" + cardType + ".png";
+            }
             // Add other colorless cardbacks here
         } else if (cardbackType.equals(SkinManager.CARDBACK_CURSE)) {
             if (cardbackId.equals("CURSE_HAROLD")) {
                 return "spirepass/images/rewards/cardbacks/curse/Harold.png";
+            }
+
+            if (cardbackId.equals("CURSE_NOTSTONKS")) {
+                return "spirepass/images/rewards/cardbacks/curse/NotStonks.png";
             }
             // Add other curse cardbacks here
         }

@@ -78,10 +78,22 @@ public class SingleCardViewCardbackPatch {
             if (cardbackId.equals("COLORLESS_FAVORITECUSTOMER")) {
                 return "spirepass/images/rewards/cardbacks/colorless/favoritecustomer/FavoriteCustomer" + cardType + "Large.png";
             }
+
+            if (cardbackId.equals("COLORLESS_BLISSFUL")) {
+                return "spirepass/images/rewards/cardbacks/colorless/blissful/Bliss" + cardType + "Large.png";
+            }
+
+            if (cardbackId.equals("COLORLESS_JIMBO")) {
+                return "spirepass/images/rewards/cardbacks/colorless/jimbo/Jimbo" + cardType + "Large.png";
+            }
             // Add other colorless cardbacks here
         } else if (cardbackType.equals(SkinManager.CARDBACK_CURSE)) {
             if (cardbackId.equals("CURSE_HAROLD")) {
                 return "spirepass/images/rewards/cardbacks/curse/HaroldLarge.png";
+            }
+
+            if (cardbackId.equals("CURSE_NOTSTONKS")) {
+                return "spirepass/images/rewards/cardbacks/curse/NotStonksLarge.png";
             }
             // Add other curse cardbacks here
         }

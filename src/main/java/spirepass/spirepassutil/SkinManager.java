@@ -27,11 +27,14 @@ public class SkinManager {
     public static final String ENTITY_RED_SLAVER = "red_slaver";
     public static final String ENTITY_SENTRY = "sentry";
     public static final String ENTITY_GREMLIN_NOB = "gremlin_nob";
+    public static final String ENTITY_ROMEO = "romeo";
     public static final String ENTITY_BEAR = "bear";
     public static final String ENTITY_CENTURION = "centurion";
     public static final String ENTITY_SNECKO = "snecko";
     public static final String ENTITY_WRITHING_MASS = "writhing_mass";
     public static final String ENTITY_GIANT_HEAD = "giant_head";
+    public static final String ENTITY_DONU = "donu";
+    public static final String ENTITY_DECA = "deca";
     public static final String ENTITY_AWAKENED_ONE = "awakened_one";
 
     // Constants for cardback types
@@ -97,11 +100,14 @@ public class SkinManager {
             appliedSkins.put(ENTITY_RED_SLAVER, config.getString(ENTITY_RED_SLAVER));
             appliedSkins.put(ENTITY_SENTRY, config.getString(ENTITY_SENTRY));
             appliedSkins.put(ENTITY_GREMLIN_NOB, config.getString(ENTITY_GREMLIN_NOB));
+            appliedSkins.put(ENTITY_ROMEO, config.getString(ENTITY_ROMEO));
             appliedSkins.put(ENTITY_BEAR, config.getString(ENTITY_BEAR));
             appliedSkins.put(ENTITY_CENTURION, config.getString(ENTITY_CENTURION));
             appliedSkins.put(ENTITY_SNECKO, config.getString(ENTITY_SNECKO));
             appliedSkins.put(ENTITY_WRITHING_MASS, config.getString(ENTITY_WRITHING_MASS));
             appliedSkins.put(ENTITY_GIANT_HEAD, config.getString(ENTITY_GIANT_HEAD));
+            appliedSkins.put(ENTITY_DONU, config.getString(ENTITY_DONU));
+            appliedSkins.put(ENTITY_DECA, config.getString(ENTITY_DECA));
             appliedSkins.put(ENTITY_AWAKENED_ONE, config.getString(ENTITY_AWAKENED_ONE));
 
             // Load cardback preferences
@@ -150,11 +156,14 @@ public class SkinManager {
         defaults.setProperty(ENTITY_RED_SLAVER, "");
         defaults.setProperty(ENTITY_SENTRY, "");
         defaults.setProperty(ENTITY_GREMLIN_NOB, "");
+        defaults.setProperty(ENTITY_ROMEO, "");
         defaults.setProperty(ENTITY_BEAR, "");
         defaults.setProperty(ENTITY_CENTURION, "");
         defaults.setProperty(ENTITY_SNECKO, "");
         defaults.setProperty(ENTITY_WRITHING_MASS, "");
         defaults.setProperty(ENTITY_GIANT_HEAD, "");
+        defaults.setProperty(ENTITY_DONU, "");
+        defaults.setProperty(ENTITY_DECA, "");
         defaults.setProperty(ENTITY_AWAKENED_ONE, "");
 
         // Cardback defaults
