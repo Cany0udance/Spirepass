@@ -6,6 +6,7 @@ import basemod.ModLabeledButton;
 import basemod.ModPanel;
 import basemod.interfaces.*;
 import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -48,7 +49,8 @@ public class Spirepass implements
         PostInitializeSubscriber,
         OnCardUseSubscriber,
         OnStartBattleSubscriber,
-        OnPlayerTurnStartSubscriber {
+        OnPlayerTurnStartSubscriber,
+        PostUpdateSubscriber {
     public static ModInfo info;
     public static String modID;
     static { loadModInfo(); }
@@ -69,7 +71,8 @@ public class Spirepass implements
     public static final int WEEKLY_CHALLENGE_XP = 75;
     public static final int MAX_LEVEL = 30;
     private static int totalXP = 0;
-
+    public static final int REFRESH_HOUR_LOCAL = 2;
+    public static final int REFRESH_MINUTE_LOCAL = 41;
     public static SpireConfig config;
 
     public static String makeID(String id) {
@@ -264,14 +267,11 @@ public class Spirepass implements
     /**
      * Check if challenge lists need to be generated or refreshed based on time
      */
+    // Replace the existing checkAndRefreshChallenges method with this one
     private static void checkAndRefreshChallenges() {
         ChallengeManager manager = ChallengeManager.getInstance();
 
-        // Get current time in EST timezone
-        ZoneId estZone = ZoneId.of("America/New_York");
-        ZonedDateTime now = ZonedDateTime.now(estZone);
-
-        // Check if any challenges exist
+        // Check if any challenges exist - if not, generate initial set
         boolean needInitialChallenges = manager.getDailyChallenges().isEmpty() ||
                 manager.getWeeklyChallenges().isEmpty();
 
@@ -281,40 +281,76 @@ public class Spirepass implements
             return;
         }
 
-        // Check daily challenge refresh
+        // Use local Calendar instance
+        Calendar now = Calendar.getInstance();
+        int currentHour = now.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = now.get(Calendar.MINUTE);
+        int currentDayOfWeek = now.get(Calendar.DAY_OF_WEEK);
+
+        // Check if current time has passed the refresh time
+        boolean passedRefreshTime = (currentHour > REFRESH_HOUR_LOCAL ||
+                (currentHour == REFRESH_HOUR_LOCAL && currentMinute >= REFRESH_MINUTE_LOCAL));
+
+        // Get the last refresh timestamps
         long lastDailyRefresh = manager.getLastDailyRefreshTime();
-        if (lastDailyRefresh > 0) {  // Only check if we have a valid timestamp
-            ZonedDateTime lastDailyRefreshDate = Instant.ofEpochMilli(lastDailyRefresh)
-                    .atZone(estZone);
+        long lastWeeklyRefresh = manager.getLastWeeklyRefreshTime();
 
-            boolean needsDailyRefresh = now.getHour() >= REFRESH_HOUR_EST &&
-                    now.toLocalDate().isAfter(lastDailyRefreshDate.toLocalDate());
+        // Convert timestamps to Calendar objects
+        Calendar lastDailyRefreshDate = Calendar.getInstance();
+        lastDailyRefreshDate.setTimeInMillis(lastDailyRefresh);
 
-            if (needsDailyRefresh) {
-                logger.info("Daily challenges need refresh");
-                generateDailyChallenges();
-            }
+        Calendar lastWeeklyRefreshDate = Calendar.getInstance();
+        lastWeeklyRefreshDate.setTimeInMillis(lastWeeklyRefresh);
+
+        // Check if we need to refresh daily challenges
+        // This happens if we've passed the refresh time today AND
+        // the last refresh was before today or before today's refresh time
+        boolean needsDailyRefresh = passedRefreshTime &&
+                (isSameDay(now, lastDailyRefreshDate) ?
+                        (lastDailyRefreshDate.get(Calendar.HOUR_OF_DAY) < REFRESH_HOUR_LOCAL ||
+                                (lastDailyRefreshDate.get(Calendar.HOUR_OF_DAY) == REFRESH_HOUR_LOCAL &&
+                                        lastDailyRefreshDate.get(Calendar.MINUTE) < REFRESH_MINUTE_LOCAL)) :
+                        true);
+
+        if (needsDailyRefresh) {
+            logger.info("Daily challenges need refresh");
+            generateDailyChallenges();
         }
 
-        // Check weekly challenge refresh
-        long lastWeeklyRefresh = manager.getLastWeeklyRefreshTime();
-        if (lastWeeklyRefresh > 0) {  // Only check if we have a valid timestamp
-            ZonedDateTime lastWeeklyRefreshDate = Instant.ofEpochMilli(lastWeeklyRefresh)
-                    .atZone(estZone);
+        // Check if we need to refresh weekly challenges
+        // This happens if it's Monday, we've passed the refresh time,
+        // and the last refresh was earlier this Monday or before this Monday
+        boolean isMonday = currentDayOfWeek == Calendar.MONDAY;
+        boolean needsWeeklyRefresh = isMonday && passedRefreshTime &&
+                (isSameDay(now, lastWeeklyRefreshDate) ?
+                        (lastWeeklyRefreshDate.get(Calendar.HOUR_OF_DAY) < REFRESH_HOUR_LOCAL ||
+                                (lastWeeklyRefreshDate.get(Calendar.HOUR_OF_DAY) == REFRESH_HOUR_LOCAL &&
+                                        lastWeeklyRefreshDate.get(Calendar.MINUTE) < REFRESH_MINUTE_LOCAL)) :
+                        !isMonday(lastWeeklyRefreshDate) || !isSameWeek(now, lastWeeklyRefreshDate));
 
-            boolean needsWeeklyRefresh = now.getHour() >= REFRESH_HOUR_EST &&
-                    now.getDayOfWeek() == DayOfWeek.MONDAY &&
-                    (now.toLocalDate().isAfter(lastWeeklyRefreshDate.toLocalDate()) ||
-                            lastWeeklyRefreshDate.getDayOfWeek() != DayOfWeek.MONDAY);
-
-            if (needsWeeklyRefresh) {
-                logger.info("Weekly challenges need refresh");
-                generateWeeklyChallenges();
-            }
+        if (needsWeeklyRefresh) {
+            logger.info("Weekly challenges need refresh");
+            generateWeeklyChallenges();
         }
 
         // Save the updated timestamps
         saveConfig();
+    }
+
+    // Helper methods for date comparison
+    private static boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private static boolean isMonday(Calendar cal) {
+        return cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY;
+    }
+
+    private static boolean isSameWeek(Calendar cal1, Calendar cal2) {
+        // Check if same year and week
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR);
     }
 
     /**
@@ -580,5 +616,21 @@ public class Spirepass implements
     public void receiveOnPlayerTurnStart() {
         // Reset the variables at the start of each turn
         ChallengeVariables.resetVariablesEveryTurn();
+    }
+
+    @Override
+    public void receivePostUpdate() {
+        // Update timer
+        this.saveTimer += Gdx.graphics.getDeltaTime();
+
+        // Check if it's time to check for challenge refreshes
+        if (this.saveTimer >= SAVE_INTERVAL) {
+            this.saveTimer = 0f;
+
+            // Check if challenges need to be refreshed
+            checkAndRefreshChallenges();
+
+            // No need to call saveConfig() here as it's already called in checkAndRefreshChallenges()
+        }
     }
 }

@@ -26,6 +26,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainMenuChallengePatch {
@@ -402,39 +403,61 @@ public class MainMenuChallengePatch {
      * Calculate time until daily challenge reset
      */
     private static String getTimeUntilDailyReset() {
-        // Get 12 PM EST today or tomorrow
-        ZoneId estZone = ZoneId.of("America/New_York");
-        ZonedDateTime now = ZonedDateTime.now(estZone);
-        ZonedDateTime resetTime = now.withHour(12).withMinute(0).withSecond(0).withNano(0);
+        // Get local time and set it to next reset time
+        Calendar now = Calendar.getInstance();
+        Calendar resetTime = (Calendar) now.clone();
+        resetTime.set(Calendar.HOUR_OF_DAY, Spirepass.REFRESH_HOUR_LOCAL);
+        resetTime.set(Calendar.MINUTE, Spirepass.REFRESH_MINUTE_LOCAL);
+        resetTime.set(Calendar.SECOND, 0);
+        resetTime.set(Calendar.MILLISECOND, 0);
 
-        // If it's already past noon, use tomorrow
-        if (now.isAfter(resetTime)) {
-            resetTime = resetTime.plusDays(1);
+        // If it's already past reset time, use tomorrow
+        if (now.after(resetTime)) {
+            resetTime.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        // Calculate duration
-        Duration duration = Duration.between(now, resetTime);
-        return formatDuration(duration);
+        // Calculate duration in milliseconds
+        long diffMs = resetTime.getTimeInMillis() - now.getTimeInMillis();
+        return formatDurationFromMillis(diffMs);
     }
 
     /**
      * Calculate time until weekly challenge reset
      */
     private static String getTimeUntilWeeklyReset() {
-        // Get 12 PM EST next Monday (or today if it's Monday before noon)
-        ZoneId estZone = ZoneId.of("America/New_York");
-        ZonedDateTime now = ZonedDateTime.now(estZone);
-        ZonedDateTime nextMonday = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY))
-                .withHour(12).withMinute(0).withSecond(0).withNano(0);
+        // Get local time and figure out next Monday
+        Calendar now = Calendar.getInstance();
+        Calendar nextMonday = (Calendar) now.clone();
 
-        // If it's Monday after noon, go to next Monday
-        if (now.getDayOfWeek() == DayOfWeek.MONDAY && now.isAfter(nextMonday)) {
-            nextMonday = nextMonday.plusWeeks(1);
+        nextMonday.set(Calendar.HOUR_OF_DAY, Spirepass.REFRESH_HOUR_LOCAL);
+        nextMonday.set(Calendar.MINUTE, Spirepass.REFRESH_MINUTE_LOCAL);
+        nextMonday.set(Calendar.SECOND, 0);
+        nextMonday.set(Calendar.MILLISECOND, 0);
+
+        // If not Monday, go to next Monday
+        if (nextMonday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+            nextMonday.add(Calendar.DAY_OF_WEEK,
+                    (Calendar.MONDAY + 7 - nextMonday.get(Calendar.DAY_OF_WEEK)) % 7);
+        }
+        // If it's Monday but after reset time, go to next Monday
+        else if (now.after(nextMonday)) {
+            nextMonday.add(Calendar.DAY_OF_YEAR, 7);
         }
 
-        // Calculate duration
-        Duration duration = Duration.between(now, nextMonday);
-        return formatDuration(duration);
+        // Calculate duration in milliseconds
+        long diffMs = nextMonday.getTimeInMillis() - now.getTimeInMillis();
+        return formatDurationFromMillis(diffMs);
+    }
+
+    /**
+     * Format duration from milliseconds as hours:minutes:seconds
+     */
+    private static String formatDurationFromMillis(long millis) {
+        long hours = millis / (1000 * 60 * 60);
+        long minutes = (millis % (1000 * 60 * 60)) / (1000 * 60);
+        long seconds = (millis % (1000 * 60)) / 1000;
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
     /**

@@ -232,6 +232,10 @@ public class ChallengeManager {
                 config.setBool("completed_" + challengeId, completedChallenges.get(challengeId));
             }
 
+            // Save refresh timestamps
+            config.setString(LAST_DAILY_REFRESH, String.valueOf(lastDailyRefreshTime));
+            config.setString(LAST_WEEKLY_REFRESH, String.valueOf(lastWeeklyRefreshTime));
+
             logger.info("Saved " + dailyChallenges.size() + " daily challenges and " +
                     weeklyChallenges.size() + " weekly challenges");
             logger.info("Saved " + completedCount + " completed challenges");

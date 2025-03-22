@@ -113,6 +113,13 @@ public class ChallengeDefinitions {
         ));
 
         challenges.add(new Challenge(
+                "daily_unbeatable",
+                "You Drew Poorly",
+                "Oh no!! This challenge is unwinnable! Better luck tomorrow :)",
+                Challenge.ChallengeType.DAILY
+        ));
+
+        challenges.add(new Challenge(
                 "daily_youarewinner",
                 "Victorious",
                 "Win a run.",
@@ -225,6 +232,13 @@ public class ChallengeDefinitions {
                 "Rest 25 times at Rest Sites.",
                 Challenge.ChallengeType.WEEKLY,
                 25
+        ));
+
+        challenges.add(new Challenge(
+                "weekly_ghostbuster",
+                "Ghostbuster",
+                "Defeat Hexaghost between the hours of midnight and 6 AM.",
+                Challenge.ChallengeType.WEEKLY
         ));
 
         challenges.add(new Challenge(

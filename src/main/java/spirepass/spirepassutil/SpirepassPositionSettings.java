@@ -36,7 +36,6 @@ public class SpirepassPositionSettings {
     public static final float CHARACTER_MODEL_Y_OFFSET = 125.0f * Settings.scale;
     public static final float MONSTER_MODEL_Y_OFFSET = 50.0f * Settings.scale; // Adjust as needed
     // Progress bar settings
-    // Progress bar settings
     public static final float PROGRESS_BAR_HEIGHT = 8.0f * Settings.scale;
     public static final float PROGRESS_BAR_Y_OFFSET = -55.0f * Settings.scale; // Offset from the level box bottom
     public static final float PROGRESS_BAR_X_OFFSET = 5.0f * Settings.scale; // Horizontal offset
