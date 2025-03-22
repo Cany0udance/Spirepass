@@ -21,33 +21,46 @@ public class SpirepassScreen {
     // UI components
     public MenuCancelButton cancelButton;
     private SpirepassScreenRenderer renderer;
+    private SpirepassRewardManager rewardManager;
+    private SpirepassAnimationManager animationManager;
+
     // State variables
     public boolean isScreenOpened;
     private int selectedLevel = -1;
+
     // Scrolling variables
     private float scrollX = 0f;
     private float targetScrollX = 0f;
     private float minScrollX = 0f;
     private float maxScrollX = 0f;
+
     // Drag handling
     private boolean isDragging = false;
     private float dragStartX = 0f;
     private float lastMouseX = 0f;
     private boolean hasDraggedSignificantly = false;
     private static final float DRAG_THRESHOLD = 5.0f * Settings.scale;
+
     // Configuration
     private int maxLevel = 30; // Default max level
     private int currentLevel = 0; // Will be set from XP system
     private float levelBoxSpacing = 150f * Settings.scale;
     public float edgePadding = 100f * Settings.scale;
+
     // Level boxes
     private ArrayList<SpirepassLevelBox> levelBoxes;
 
     // ==================== LIFECYCLE METHODS ====================
+
     public SpirepassScreen() {
         this.cancelButton = new MenuCancelButton();
         this.isScreenOpened = false;
+
+        // Initialize the renderer and managers
         this.renderer = new SpirepassScreenRenderer();
+        this.rewardManager = this.renderer.getRewardManager();
+        this.animationManager = this.renderer.getAnimationManager();
+
         this.levelBoxes = new ArrayList<>();
     }
 
@@ -69,8 +82,7 @@ public class SpirepassScreen {
         InputHelper.justClickedLeft = false;
         InputHelper.justReleasedClickLeft = false;
 
-
-         ChallengeHelper.completeChallenge("weekly_hoarder");
+        ChallengeHelper.completeChallenge("weekly_hoarder");
     }
 
     public void close() {
@@ -134,7 +146,7 @@ public class SpirepassScreen {
             }
 
             // Get reward texture for this level
-            Texture rewardTexture = renderer.getRewardTexture(i);
+            Texture rewardTexture = rewardManager.getRewardTexture(i);
 
             // Create the level box with initial position
             float boxX = (i * levelBoxSpacing) + edgePadding - scrollX;
@@ -144,7 +156,7 @@ public class SpirepassScreen {
             SpirepassLevelBox levelBox = new SpirepassLevelBox(i, boxX, boxY, isUnlocked, boxTexture, rewardTexture);
 
             // Set the reward data if available
-            SpirepassRewardData rewardData = renderer.getRewardData(i);
+            SpirepassRewardData rewardData = rewardManager.getRewardData(i);
             if (rewardData != null) {
                 levelBox.setRewardData(rewardData);
             }
@@ -254,5 +266,13 @@ public class SpirepassScreen {
 
     public float getLevelBoxSpacing() {
         return levelBoxSpacing;
+    }
+
+    // ==================== CLEANUP ====================
+
+    public void dispose() {
+        if (renderer != null) {
+            renderer.dispose();
+        }
     }
 }

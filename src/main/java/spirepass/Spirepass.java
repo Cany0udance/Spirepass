@@ -361,6 +361,7 @@ public class Spirepass implements
         generateWeeklyChallenges();
     }
 
+    // Fix the generateDailyChallenges method in Spirepass
     public static void generateDailyChallenges() {
         ChallengeManager manager = ChallengeManager.getInstance();
 
@@ -378,12 +379,14 @@ public class Spirepass implements
         // Randomly select NUM_DAILY_CHALLENGES from the list
         List<Challenge> selectedChallenges = selectRandomChallenges(allDailyChallenges, NUM_DAILY_CHALLENGES);
 
+        // Clear completion status for old challenges that are no longer active
+        for (String oldId : oldChallengeIds) {
+            manager.clearCompletionStatus(oldId);
+        }
+
         // Add the selected challenges to the manager
         for (Challenge challenge : selectedChallenges) {
             manager.addDailyChallenge(challenge);
-
-            // Clear completion status for this challenge if it was previously completed
-            manager.clearCompletionStatus(challenge.getId());
         }
 
         // Update the last refresh time
@@ -395,8 +398,14 @@ public class Spirepass implements
         logger.info("Generated " + selectedChallenges.size() + " new daily challenges");
     }
 
+    // Similarly fix the generateWeeklyChallenges method in Spirepass
     public static void generateWeeklyChallenges() {
         ChallengeManager manager = ChallengeManager.getInstance();
+
+        // Save IDs of existing challenges to clear their completion status
+        Set<String> oldChallengeIds = manager.getWeeklyChallenges().stream()
+                .map(Challenge::getId)
+                .collect(Collectors.toSet());
 
         // Clear existing weekly challenges
         manager.getWeeklyChallenges().clear();
@@ -407,11 +416,14 @@ public class Spirepass implements
         // Randomly select NUM_WEEKLY_CHALLENGES from the list
         List<Challenge> selectedChallenges = selectRandomChallenges(allWeeklyChallenges, NUM_WEEKLY_CHALLENGES);
 
+        // Clear completion status for old challenges that are no longer active
+        for (String oldId : oldChallengeIds) {
+            manager.clearCompletionStatus(oldId);
+        }
+
         // Add the selected challenges to the manager
         for (Challenge challenge : selectedChallenges) {
             manager.addWeeklyChallenge(challenge);
-
-            manager.clearCompletionStatus(challenge.getId());
         }
 
         // Update the last refresh time
@@ -628,7 +640,7 @@ public class Spirepass implements
             this.saveTimer = 0f;
 
             // Check if challenges need to be refreshed
-            checkAndRefreshChallenges();
+           // checkAndRefreshChallenges();
 
             // No need to call saveConfig() here as it's already called in checkAndRefreshChallenges()
         }

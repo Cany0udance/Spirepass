@@ -48,6 +48,15 @@ public class ChallengeManager {
     public void clearCompletionStatus(String challengeId) {
         if (completedChallenges.containsKey(challengeId)) {
             completedChallenges.remove(challengeId);
+
+            // Also remove from the config file
+            try {
+                if (Spirepass.config.has("completed_" + challengeId)) {
+                    Spirepass.config.remove("completed_" + challengeId);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to remove completion status from config: " + e.getMessage());
+            }
         }
     }
 
