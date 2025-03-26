@@ -11,6 +11,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.evacipated.cardcrawl.modthespire.Loader;
 import com.evacipated.cardcrawl.modthespire.ModInfo;
@@ -21,6 +22,8 @@ import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.FontHelper;
+import com.megacrit.cardcrawl.helpers.Hitbox;
+import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.localization.*;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
@@ -83,20 +86,15 @@ public class Spirepass implements
         try {
             // Simple config to store skin and cardback preferences
             Properties defaults = new Properties();
-
             // Get manager instances
             SkinManager skinManager = SkinManager.getInstance();
-
             // Add default properties for skins
             skinManager.addDefaultProperties(defaults);
-
             // Challenge system default timestamps
             defaults.setProperty(LAST_DAILY_REFRESH, String.valueOf(0));
             defaults.setProperty(LAST_WEEKLY_REFRESH, String.valueOf(0));
-
             // Add XP default
             defaults.setProperty(TOTAL_XP_KEY, "0");
-
             // Initialize config with defaults
             config = new SpireConfig(modID, "config", defaults);
 
@@ -106,23 +104,24 @@ public class Spirepass implements
                 logger.info("Loaded battle pass XP: " + totalXP);
             }
 
-            // Load skin data
+            // Load skin data AFTER config is fully initialized
             skinManager.loadData(config);
 
             // Initialize challenge manager and load challenge data
             ChallengeManager challengeManager = ChallengeManager.getInstance();
-
             // Load challenge data
             challengeManager.loadData(config);
-
             // Check if we need to generate/refresh challenges
             checkAndRefreshChallenges();
+
+            // Important: Save the config after everything is loaded
+            // This ensures any missing properties get saved with defaults
+            config.save();
 
         } catch (Exception e) {
             logger.error("Failed to load config: " + e.getMessage());
             e.printStackTrace();
         }
-
         new Spirepass();
     }
 
@@ -155,32 +154,30 @@ public class Spirepass implements
         // Create the settings panel
         ModPanel settingsPanel = new ModPanel();
 
-        // Create the XP button - initially positioned off-screen
+// Create the XP button - initially positioned off-screen
         ModLabeledButton xpButton = new ModLabeledButton(
                 "Add 10,000 XP",
                 9999.0f, // Off-screen X position
                 9999.0f, // Off-screen Y position
-                Settings.GOLD_COLOR,
-                Settings.CREAM_COLOR,
+                Settings.GOLD_COLOR, // Normal color - gold
+                Settings.GOLD_COLOR, // Hover color - SAME as normal color
                 FontHelper.buttonLabelFont,
                 settingsPanel,
                 (button) -> {
                     // When clicked, add 10,000 XP
                     addXP(10000);
                     logger.info("Added 10,000 XP via secret button");
-
                     // Keep the button visible (don't move off-screen)
-                    // This allows for multiple clicks
                 }
         );
 
-        // Create the Reset XP button - initially positioned off-screen
+// Create the Reset XP button - initially positioned off-screen
         ModLabeledButton resetXpButton = new ModLabeledButton(
                 "Reset XP to 0",
                 9999.0f, // Off-screen X position
                 9999.0f, // Off-screen Y position
-                Settings.RED_TEXT_COLOR,
-                Settings.CREAM_COLOR,
+                Settings.RED_TEXT_COLOR, // Normal color - red
+                Settings.RED_TEXT_COLOR, // Hover color - SAME as normal color
                 FontHelper.buttonLabelFont,
                 settingsPanel,
                 (button) -> {
@@ -189,9 +186,7 @@ public class Spirepass implements
                     config.setInt(TOTAL_XP_KEY, 0);
                     saveConfig();
                     logger.info("Reset XP to 0 via secret button");
-
                     // Keep the button visible (don't move off-screen)
-                    // This allows for multiple clicks
                 }
         );
 
@@ -199,44 +194,93 @@ public class Spirepass implements
         settingsPanel.addUIElement(xpButton);
         settingsPanel.addUIElement(resetXpButton);
 
-        // Create a simple secret area detector
+        // Create a secret area detector that exactly matches button hitboxes
         class SecretAreaElement implements IUIElement {
-            // Define the secret area in the exact center of the screen
-            private final float AREA_WIDTH = 200.0f;
-            private final float AREA_HEIGHT = 150.0f;
-            private final float AREA_X = Settings.WIDTH / 2.0f - AREA_WIDTH / 2.0f;
-            private final float AREA_Y = Settings.HEIGHT / 2.0f - AREA_HEIGHT / 2.0f;
-
-            // For centering the buttons
+            // Position values for our buttons - easy to adjust
             private final float BUTTON_X = Settings.WIDTH / 2.0f / Settings.scale - 75.0f;
             private final float BUTTON_Y_TOP = Settings.HEIGHT / 2.0f / Settings.scale - 10.0f;
-            private final float BUTTON_Y_BOTTOM = BUTTON_Y_TOP - 50.0f; // 50 units below the top button
+            private final float BUTTON_Y_SPACING = 70.0f; // Increased spacing between buttons
+            private final float BUTTON_Y_BOTTOM = BUTTON_Y_TOP - BUTTON_Y_SPACING;
 
-            private boolean wasInArea = false;
+            // Track when buttons become visible
+            private boolean areButtonsVisible = false;
+
+            // Holds hitbox references that match exactly where the buttons would be
+            private Hitbox topButtonHitbox;
+            private Hitbox bottomButtonHitbox;
+
+            public SecretAreaElement() {
+                // Create invisible hitboxes to match exactly where buttons would appear
+                // We use the same hitbox size logic as ModLabeledButton
+
+                // For Add XP button
+                float topTextWidth = FontHelper.getSmartWidth(
+                        FontHelper.buttonLabelFont,
+                        "Add 10,000 XP",
+                        9999.0f,
+                        0.0f
+                );
+                float topMiddleWidth = Math.max(0.0f, topTextWidth - 18.0f * Settings.scale);
+                // Use the same textures as the ModLabeledButton class
+                Texture textureLeft = ImageMaster.loadImage("img/ButtonLeft.png");
+                Texture textureRight = ImageMaster.loadImage("img/ButtonRight.png");
+
+                float topButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + topMiddleWidth;
+                float buttonHeight = textureLeft.getHeight() * Settings.scale;
+
+                // Hitbox for top button - use exact same offsets as ModLabeledButton
+                topButtonHitbox = new Hitbox(
+                        BUTTON_X * Settings.scale + 1.0f * Settings.scale,
+                        BUTTON_Y_TOP * Settings.scale + 1.0f * Settings.scale,
+                        topButtonWidth - 2.0f * Settings.scale,
+                        buttonHeight - 2.0f * Settings.scale
+                );
+
+                // For Reset XP button
+                float bottomTextWidth = FontHelper.getSmartWidth(
+                        FontHelper.buttonLabelFont,
+                        "Reset XP to 0",
+                        9999.0f,
+                        0.0f
+                );
+                float bottomMiddleWidth = Math.max(0.0f, bottomTextWidth - 18.0f * Settings.scale);
+                float bottomButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + bottomMiddleWidth;
+
+                // Hitbox for bottom button
+                bottomButtonHitbox = new Hitbox(
+                        BUTTON_X * Settings.scale + 1.0f * Settings.scale,
+                        BUTTON_Y_BOTTOM * Settings.scale + 1.0f * Settings.scale,
+                        bottomButtonWidth - 2.0f * Settings.scale,
+                        buttonHeight - 2.0f * Settings.scale
+                );
+            }
 
             @Override
             public void render(SpriteBatch sb) {
-                // No rendering needed
+                // Optional debugging - uncomment to see hitboxes
+                // topButtonHitbox.render(sb);
+                // bottomButtonHitbox.render(sb);
             }
 
             @Override
             public void update() {
-                // Check if the mouse is in the secret area (center of screen)
-                boolean isInArea = (InputHelper.mX >= AREA_X &&
-                        InputHelper.mX <= AREA_X + AREA_WIDTH &&
-                        InputHelper.mY >= AREA_Y &&
-                        InputHelper.mY <= AREA_Y + AREA_HEIGHT);
+                // Update our invisible hitboxes
+                topButtonHitbox.update();
+                bottomButtonHitbox.update();
 
-                // Only take action when the hover state changes
-                if (isInArea != wasInArea) {
-                    wasInArea = isInArea;
+                // Check if mouse is hovering over either hitbox
+                boolean isHoveringOverButtonArea = topButtonHitbox.hovered || bottomButtonHitbox.hovered;
 
-                    if (isInArea) {
-                        // Position buttons
+                // Only take action if the state changes
+                if (isHoveringOverButtonArea != areButtonsVisible) {
+                    areButtonsVisible = isHoveringOverButtonArea;
+
+                    if (isHoveringOverButtonArea) {
+                        // Show buttons in their proper positions
                         xpButton.set(BUTTON_X, BUTTON_Y_TOP);
                         resetXpButton.set(BUTTON_X, BUTTON_Y_BOTTOM);
                     } else {
-                        // Move buttons off-screen
+                        // Hide buttons
                         xpButton.set(9999.0f, 9999.0f);
                         resetXpButton.set(9999.0f, 9999.0f);
                     }

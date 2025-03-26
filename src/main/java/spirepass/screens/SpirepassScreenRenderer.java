@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.esotericsoftware.spine.*;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
@@ -171,17 +172,71 @@ public class SpirepassScreenRenderer {
         int level = selectedBox.getLevel();
         boolean isUnlocked = selectedBox.isUnlocked();
 
-        // Delegate to reward manager
+        // Delegate to reward manager with unlock status
         rewardManager.renderReward(sb, level, isUnlocked);
 
-        // Update and render the equip button
-        updateEquipButton(sb, selectedBox);
+        // Only update and render the equip button if the reward is unlocked
+        if (isUnlocked) {
+            updateEquipButton(sb, selectedBox);
+        } else {
+            // If reward is locked, hide the equip button or update it to show "LOCKED"
+            updateLockedEquipButton(sb);
+        }
     }
 
+    private void updateLockedEquipButton(SpriteBatch sb) {
+        // Button properties for locked state
+        String buttonText = "LOCKED";
+        Color buttonColor = Color.GRAY;
+        Color hoverColor = Color.DARK_GRAY;
+        float buttonX = Settings.WIDTH / 2.0f - 80.0f;
+        float buttonY = SpirepassPositionSettings.REWARD_BUTTON_Y - 25.0f;
+
+        // Create consumer for button click - should do nothing for locked rewards
+        Consumer<ModLabeledButton> clickConsumer = (button) -> {
+            // Play a "can't do that" sound when clicked
+            CardCrawlGame.sound.play("UI_CLICK_2");
+        };
+
+        // Create or update button
+        if (equipButton == null) {
+            equipButton = new ModLabeledButton(buttonText, buttonX / Settings.scale, buttonY / Settings.scale,
+                    buttonColor, hoverColor, null, clickConsumer);
+        } else {
+            equipButton.label = buttonText;
+            equipButton.color = buttonColor;
+            equipButton.colorHover = hoverColor;
+            equipButton.set(buttonX / Settings.scale, buttonY / Settings.scale);
+
+            // Update click handler using reflection
+            try {
+                Field clickField = ModLabeledButton.class.getDeclaredField("click");
+                clickField.setAccessible(true);
+                clickField.set(equipButton, clickConsumer);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                BaseMod.logger.error("Failed to update button click handler: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        // Render the button
+        if (equipButton != null) {
+            equipButton.render(sb);
+        }
+    }
+
+    // Modify updateEquipButton in SpirepassScreenRenderer to hide for TEXT rewards
     private void updateEquipButton(SpriteBatch sb, SpirepassLevelBox selectedBox) {
         boolean isUnlocked = selectedBox.isUnlocked();
         int level = selectedBox.getLevel();
         SpirepassRewardData reward = rewardManager.getRewardData(level);
+
+        // Don't show the button for TEXT rewards
+        if (reward != null && reward.getType() == SpirepassRewardData.RewardType.TEXT) {
+            // Hide the button by setting it to null
+            equipButton = null;
+            return;
+        }
 
         // Button properties
         boolean isEquipped = rewardManager.isRewardEquipped(reward);

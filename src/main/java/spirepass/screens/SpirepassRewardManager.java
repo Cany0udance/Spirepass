@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
+import spirepass.Spirepass;
 import spirepass.spirepassutil.SkinManager;
 import spirepass.spirepassutil.SpirepassPositionSettings;
 import spirepass.spirepassutil.SpirepassRewardData;
@@ -41,7 +42,8 @@ public class SpirepassRewardManager {
         String[] paths = {
                 "spirepass/images/screen/CommonRewardBackground.png",
                 "spirepass/images/screen/UncommonRewardBackground.png",
-                "spirepass/images/screen/RareRewardBackground.png"
+                "spirepass/images/screen/RareRewardBackground.png",
+                "spirepass/images/screen/LockedRewardBackground.png"
         };
 
         for (String path : paths) {
@@ -54,6 +56,16 @@ public class SpirepassRewardManager {
     }
 
     private void initializeRewardData() {
+
+        // Level 0: Welcome message with common border
+        rewardData.put(0, new SpirepassRewardData(
+                0,
+                "", // Empty title
+                "", // Empty description
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.TEXT
+        ));
+
         // Level 1: Defect skin
         rewardData.put(1, new SpirepassRewardData(
                 1,
@@ -357,6 +369,15 @@ public class SpirepassRewardManager {
                 "spirepass/images/rewards/cardbacks/colorless/jimbo/JimboSkillLarge.png"
         ));
 
+        // Level 30: Final reward with rare border
+        rewardData.put(30, new SpirepassRewardData(
+                30,
+                "", // Empty title
+                "", // Empty description
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.TEXT
+        ));
+
         // Default reward for all other levels (badge image)
         Texture badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
 
@@ -381,6 +402,13 @@ public class SpirepassRewardManager {
     }
 
     public void renderReward(SpriteBatch sb, int level, boolean isUnlocked) {
+        // If the reward is locked, show the locked view
+        if (!isUnlocked) {
+            renderLockedReward(sb);
+            return;
+        }
+
+        // Original code for unlocked rewards
         SpirepassRewardData reward = getRewardData(level);
 
         // If we have specific reward data, use it
@@ -391,10 +419,131 @@ public class SpirepassRewardManager {
         }
     }
 
+    private void renderTextReward(SpriteBatch sb, SpirepassRewardData reward) {
+        // Get the appropriate background texture based on the reward's rarity
+        String backgroundPath = reward.getBackgroundTexturePath();
+        Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
+
+        // Render the background
+        if (backgroundTexture != null) {
+            float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
+            float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float) backgroundTexture.getHeight());
+
+            sb.setColor(Color.WHITE);
+            sb.draw(
+                    backgroundTexture,
+                    Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                    previewWidth,
+                    previewHeight
+            );
+        }
+
+        // Different message text and style based on level
+        if (reward.getLevel() == 0) {
+            // Level 0 message - single line
+            String messageText = "Welcome to Spirepass! Go complete some challenges and level up!";
+            FontHelper.renderFontCentered(
+                    sb,
+                    FontHelper.tipBodyFont,
+                    messageText,
+                    Settings.WIDTH / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y,
+                    Color.WHITE
+            );
+        } else if (reward.getLevel() == 30) {
+            // Level 30 message - split into two lines
+            String line1 = "MAX LEVEL REACHED!";
+            String line2 = "You've unlocked...A SENSE OF PRIDE AND ACCOMPLISHMENT!!!";
+
+            // Render first line
+            FontHelper.renderFontCentered(
+                    sb,
+                    FontHelper.tipBodyFont,
+                    line1,
+                    Settings.WIDTH / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y + 15.0f * Settings.scale,
+                    Color.GOLD
+            );
+
+            // Render second line
+            FontHelper.renderFontCentered(
+                    sb,
+                    FontHelper.tipBodyFont,
+                    line2,
+                    Settings.WIDTH / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - 15.0f * Settings.scale,
+                    Color.GOLD
+            );
+        } else {
+            // Fallback for any other levels
+            String messageText = "Level " + reward.getLevel() + " Reward";
+            FontHelper.renderFontCentered(
+                    sb,
+                    FontHelper.tipBodyFont,
+                    messageText,
+                    Settings.WIDTH / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y,
+                    Color.WHITE
+            );
+        }
+    }
+
+    private void renderLockedReward(SpriteBatch sb) {
+        // Get the locked background texture
+        Texture lockedBackgroundTexture = backgroundTextures.get("spirepass/images/screen/LockedRewardBackground.png");
+
+        // Render the locked background
+        if (lockedBackgroundTexture != null) {
+            float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
+            float previewWidth = previewHeight * (lockedBackgroundTexture.getWidth() / (float) lockedBackgroundTexture.getHeight());
+
+            sb.setColor(Color.WHITE);
+            sb.draw(
+                    lockedBackgroundTexture,
+                    Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                    previewWidth,
+                    previewHeight
+            );
+        }
+
+        // Render the lock image
+        Texture lockTexture = ImageMaster.loadImage("spirepass/images/screen/lock.png");
+        if (lockTexture != null) {
+            // Adjustable size for the lock image - you can modify these values as needed
+            float lockSize = 120.0f * Settings.scale; // Size of the lock image
+
+            sb.setColor(Color.WHITE);
+            sb.draw(
+                    lockTexture,
+                    Settings.WIDTH / 2.0f - lockSize / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - lockSize / 4.0f, // Positioned slightly above center
+                    lockSize,
+                    lockSize
+            );
+        }
+
+        // Render the locked message (moved down to make room for the lock)
+        FontHelper.renderFontCentered(
+                sb,
+                FontHelper.tipBodyFont,
+                "Reward locked. Go complete some challenges!",
+                Settings.WIDTH / 2.0f,
+                SpirepassPositionSettings.REWARD_PREVIEW_Y - 80.0f * Settings.scale, // Moved down to be below the lock
+                Color.WHITE
+        );
+    }
+
     private void renderRewardWithData(SpriteBatch sb, int level, boolean isUnlocked, SpirepassRewardData reward) {
         // Get the background texture path
         String backgroundPath = reward.getBackgroundTexturePath();
         Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
+
+        if (reward.getType() == SpirepassRewardData.RewardType.TEXT) {
+            renderTextReward(sb, reward);
+            return;
+        }
 
         // Render the background if available
         if (backgroundTexture != null) {
@@ -442,14 +591,29 @@ public class SpirepassRewardManager {
             }
         }
 
-        // Render reward title
+        // Get the color based on rarity
+        Color titleColor;
+        switch (reward.getRarity()) {
+            case UNCOMMON:
+                titleColor = new Color(0.5058f, 0.8862f, 0.9098f, 1.0f); // #81e2e8
+                break;
+            case RARE:
+                titleColor = new Color(0.9804f, 0.7333f, 0.2627f, 1.0f); // #fabb43
+                break;
+            case COMMON:
+            default:
+                titleColor = Color.WHITE;
+                break;
+        }
+
+        // Render reward title with the appropriate color
         FontHelper.renderFontCentered(
                 sb,
                 FontHelper.tipBodyFont,
                 reward.getName(),
                 Settings.WIDTH / 2.0f,
                 SpirepassPositionSettings.REWARD_NAME_Y,
-                Color.WHITE
+                titleColor
         );
 
         // Render description
@@ -461,24 +625,6 @@ public class SpirepassRewardManager {
                 SpirepassPositionSettings.REWARD_DESCRIPTION_Y,
                 Color.LIGHT_GRAY
         );
-
-        // For cardbacks, show the current status
-        if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
-            String cardbackType = reward.getCardbackType();
-            String cardbackId = reward.getCardbackId();
-            String currentCardback = SkinManager.getInstance().getAppliedCardback(cardbackType);
-            boolean isEquipped = cardbackId.equals(currentCardback);
-
-            // Show equipped status beneath the description
-            FontHelper.renderFontCentered(
-                    sb,
-                    FontHelper.tipBodyFont,
-                    isEquipped ? "Currently Equipped" : "Not Equipped",
-                    Settings.WIDTH / 2.0f,
-                    SpirepassPositionSettings.REWARD_DESCRIPTION_Y - 30.0f * Settings.scale,
-                    isEquipped ? Color.GREEN : Color.GRAY
-            );
-        }
     }
 
     private void renderDefaultReward(SpriteBatch sb, int level) {
@@ -567,6 +713,9 @@ public class SpirepassRewardManager {
             System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
                     cardbackType + " cardback: " + cardbackId);
         }
+
+        // Save the config immediately after changing the reward state
+        Spirepass.saveConfig();
     }
 
     // Getters

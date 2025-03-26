@@ -89,35 +89,39 @@ public class SkinManager {
      */
     public void loadData(SpireConfig config) {
         try {
-            // Add each entity type to the map
-            appliedSkins.put(ENTITY_IRONCLAD, config.getString(ENTITY_IRONCLAD));
-            appliedSkins.put(ENTITY_SILENT, config.getString(ENTITY_SILENT));
-            appliedSkins.put(ENTITY_DEFECT, config.getString(ENTITY_DEFECT));
-            appliedSkins.put(ENTITY_WATCHER, config.getString(ENTITY_WATCHER));
-            appliedSkins.put(ENTITY_JAW_WORM, config.getString(ENTITY_JAW_WORM));
-            appliedSkins.put(ENTITY_CULTIST, config.getString(ENTITY_CULTIST));
-            appliedSkins.put(ENTITY_BLUE_SLAVER, config.getString(ENTITY_BLUE_SLAVER));
-            appliedSkins.put(ENTITY_RED_SLAVER, config.getString(ENTITY_RED_SLAVER));
-            appliedSkins.put(ENTITY_SENTRY, config.getString(ENTITY_SENTRY));
-            appliedSkins.put(ENTITY_GREMLIN_NOB, config.getString(ENTITY_GREMLIN_NOB));
-            appliedSkins.put(ENTITY_ROMEO, config.getString(ENTITY_ROMEO));
-            appliedSkins.put(ENTITY_BEAR, config.getString(ENTITY_BEAR));
-            appliedSkins.put(ENTITY_CENTURION, config.getString(ENTITY_CENTURION));
-            appliedSkins.put(ENTITY_SNECKO, config.getString(ENTITY_SNECKO));
-            appliedSkins.put(ENTITY_WRITHING_MASS, config.getString(ENTITY_WRITHING_MASS));
-            appliedSkins.put(ENTITY_GIANT_HEAD, config.getString(ENTITY_GIANT_HEAD));
-            appliedSkins.put(ENTITY_DONU, config.getString(ENTITY_DONU));
-            appliedSkins.put(ENTITY_DECA, config.getString(ENTITY_DECA));
-            appliedSkins.put(ENTITY_AWAKENED_ONE, config.getString(ENTITY_AWAKENED_ONE));
+            // Add each entity type to the map with proper null checking
+            // Character skins
+            appliedSkins.put(ENTITY_IRONCLAD, config.has(ENTITY_IRONCLAD) ? config.getString(ENTITY_IRONCLAD) : "");
+            appliedSkins.put(ENTITY_SILENT, config.has(ENTITY_SILENT) ? config.getString(ENTITY_SILENT) : "");
+            appliedSkins.put(ENTITY_DEFECT, config.has(ENTITY_DEFECT) ? config.getString(ENTITY_DEFECT) : "");
+            appliedSkins.put(ENTITY_WATCHER, config.has(ENTITY_WATCHER) ? config.getString(ENTITY_WATCHER) : "");
 
-            // Load cardback preferences
-            appliedCardbacks.put(CARDBACK_COLORLESS, config.getString(CARDBACK_COLORLESS));
-            appliedCardbacks.put(CARDBACK_CURSE, config.getString(CARDBACK_CURSE));
+            // Monster skins
+            appliedSkins.put(ENTITY_JAW_WORM, config.has(ENTITY_JAW_WORM) ? config.getString(ENTITY_JAW_WORM) : "");
+            appliedSkins.put(ENTITY_CULTIST, config.has(ENTITY_CULTIST) ? config.getString(ENTITY_CULTIST) : "");
+            appliedSkins.put(ENTITY_BLUE_SLAVER, config.has(ENTITY_BLUE_SLAVER) ? config.getString(ENTITY_BLUE_SLAVER) : "");
+            appliedSkins.put(ENTITY_RED_SLAVER, config.has(ENTITY_RED_SLAVER) ? config.getString(ENTITY_RED_SLAVER) : "");
+            appliedSkins.put(ENTITY_SENTRY, config.has(ENTITY_SENTRY) ? config.getString(ENTITY_SENTRY) : "");
+            appliedSkins.put(ENTITY_GREMLIN_NOB, config.has(ENTITY_GREMLIN_NOB) ? config.getString(ENTITY_GREMLIN_NOB) : "");
+            appliedSkins.put(ENTITY_ROMEO, config.has(ENTITY_ROMEO) ? config.getString(ENTITY_ROMEO) : "");
+            appliedSkins.put(ENTITY_BEAR, config.has(ENTITY_BEAR) ? config.getString(ENTITY_BEAR) : "");
+            appliedSkins.put(ENTITY_CENTURION, config.has(ENTITY_CENTURION) ? config.getString(ENTITY_CENTURION) : "");
+            appliedSkins.put(ENTITY_SNECKO, config.has(ENTITY_SNECKO) ? config.getString(ENTITY_SNECKO) : "");
+            appliedSkins.put(ENTITY_WRITHING_MASS, config.has(ENTITY_WRITHING_MASS) ? config.getString(ENTITY_WRITHING_MASS) : "");
+            appliedSkins.put(ENTITY_GIANT_HEAD, config.has(ENTITY_GIANT_HEAD) ? config.getString(ENTITY_GIANT_HEAD) : "");
+            appliedSkins.put(ENTITY_DONU, config.has(ENTITY_DONU) ? config.getString(ENTITY_DONU) : "");
+            appliedSkins.put(ENTITY_DECA, config.has(ENTITY_DECA) ? config.getString(ENTITY_DECA) : "");
+            appliedSkins.put(ENTITY_AWAKENED_ONE, config.has(ENTITY_AWAKENED_ONE) ? config.getString(ENTITY_AWAKENED_ONE) : "");
+
+            // Load cardback preferences - FIXED with proper null checking
+            appliedCardbacks.put(CARDBACK_COLORLESS, config.has(CARDBACK_COLORLESS) ? config.getString(CARDBACK_COLORLESS) : "");
+            appliedCardbacks.put(CARDBACK_CURSE, config.has(CARDBACK_CURSE) ? config.getString(CARDBACK_CURSE) : "");
 
             logger.info("Loaded skin preferences: " + appliedSkins);
             logger.info("Loaded cardback preferences: " + appliedCardbacks);
         } catch (Exception e) {
             logger.error("Failed to load skin preferences: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

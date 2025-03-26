@@ -11,7 +11,8 @@ public class SpirepassRewardData {
     public enum RewardType {
         IMAGE,
         CHARACTER_MODEL,
-        CARDBACK // New type for cardbacks
+        CARDBACK,
+        TEXT
     }
 
     private int level;
@@ -42,6 +43,26 @@ public class SpirepassRewardData {
             this.cardbackId = null;
         } else {
             throw new IllegalArgumentException("This constructor should only be used for CHARACTER_MODEL type");
+        }
+    }
+
+    // New constructor for TEXT type
+    public SpirepassRewardData(int level, String name, String description,
+                               RewardRarity rarity, RewardType type) {
+        this.level = level;
+        this.name = name;
+        this.description = description;
+        this.rarity = rarity;
+        this.type = type;
+        if (type == RewardType.TEXT) {
+            // For text-only rewards, we don't need paths or IDs
+            this.imagePath = null;
+            this.modelId = null;
+            this.entityId = null;
+            this.cardbackType = null;
+            this.cardbackId = null;
+        } else {
+            throw new IllegalArgumentException("This constructor should only be used for TEXT type");
         }
     }
 
