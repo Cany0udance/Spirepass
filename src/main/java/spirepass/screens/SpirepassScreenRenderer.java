@@ -2,14 +2,10 @@ package spirepass.screens;
 
 import basemod.BaseMod;
 import basemod.ModLabeledButton;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
-import com.esotericsoftware.spine.*;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
@@ -23,6 +19,7 @@ import spirepass.spirepassutil.SpirepassRewardData;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class SpirepassScreenRenderer {
@@ -31,6 +28,8 @@ public class SpirepassScreenRenderer {
     private Texture levelBoxTexture;
     private Texture currentLevelBoxTexture;
     private Texture lockedLevelBoxTexture;
+    // Add a map to cache custom background textures
+    private Map<String, Texture> customBackgroundTextures = new HashMap<>();
 
     // UI elements
     private ModLabeledButton equipButton;
@@ -59,18 +58,42 @@ public class SpirepassScreenRenderer {
     }
 
     public void render(SpriteBatch sb, SpirepassScreen screen, float scrollX, float edgePadding, ArrayList<SpirepassLevelBox> levelBoxes) {
-        // Render the background image
-        if (this.backgroundTexture != null) {
+        // Get the current background texture
+        String backgroundId = SkinManager.getInstance().getAppliedSkin(SkinManager.BACKGROUND_SCREEN);
+        Texture currentBackground = this.backgroundTexture;
+
+        // If a custom background is applied, get it from cache or load it
+        if (backgroundId != null && !backgroundId.isEmpty()) {
+            // Check if we already have this texture cached
+            if (!customBackgroundTextures.containsKey(backgroundId)) {
+                try {
+                    // Load and cache the texture
+                    Texture customTexture = ImageMaster.loadImage(backgroundId);
+                    customBackgroundTextures.put(backgroundId, customTexture);
+                } catch (Exception e) {
+                    System.err.println("Failed to load custom background: " + backgroundId);
+                    e.printStackTrace();
+                }
+            }
+
+            // Get from cache if available
+            if (customBackgroundTextures.containsKey(backgroundId)) {
+                currentBackground = customBackgroundTextures.get(backgroundId);
+            }
+        }
+
+        // Draw the background texture - THIS WAS MISSING
+        if (currentBackground != null) {
             sb.setColor(Color.WHITE);
             sb.draw(
-                    this.backgroundTexture,
+                    currentBackground,
                     0, 0,
                     0, 0,
                     Settings.WIDTH, Settings.HEIGHT,
                     1, 1,
                     0,
                     0, 0,
-                    this.backgroundTexture.getWidth(), this.backgroundTexture.getHeight(),
+                    currentBackground.getWidth(), currentBackground.getHeight(),
                     false, false
             );
         }
@@ -305,7 +328,19 @@ public class SpirepassScreenRenderer {
         return rewardManager;
     }
 
+    // Add a method to dispose of all textures
     public void dispose() {
-        animationManager.dispose();
+        // Dispose any existing animation manager resources
+        if (animationManager != null) {
+            animationManager.dispose();
+        }
+
+        // Dispose of all cached background textures
+        for (Texture texture : customBackgroundTextures.values()) {
+            if (texture != null) {
+                texture.dispose();
+            }
+        }
+        customBackgroundTextures.clear();
     }
 }

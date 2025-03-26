@@ -41,6 +41,8 @@ public class SkinManager {
     public static final String CARDBACK_COLORLESS = "colorless";
     public static final String CARDBACK_CURSE = "curse";
 
+    public static final String BACKGROUND_SCREEN = "screen_background";
+
     // Private constructor for singleton pattern
     private SkinManager() {
         // Initialize empty maps
@@ -113,6 +115,8 @@ public class SkinManager {
             appliedSkins.put(ENTITY_DECA, config.has(ENTITY_DECA) ? config.getString(ENTITY_DECA) : "");
             appliedSkins.put(ENTITY_AWAKENED_ONE, config.has(ENTITY_AWAKENED_ONE) ? config.getString(ENTITY_AWAKENED_ONE) : "");
 
+            appliedSkins.put(BACKGROUND_SCREEN, config.has(BACKGROUND_SCREEN) ? config.getString(BACKGROUND_SCREEN) : "");
+
             // Load cardback preferences - FIXED with proper null checking
             appliedCardbacks.put(CARDBACK_COLORLESS, config.has(CARDBACK_COLORLESS) ? config.getString(CARDBACK_COLORLESS) : "");
             appliedCardbacks.put(CARDBACK_CURSE, config.has(CARDBACK_CURSE) ? config.getString(CARDBACK_CURSE) : "");
@@ -169,6 +173,7 @@ public class SkinManager {
         defaults.setProperty(ENTITY_DONU, "");
         defaults.setProperty(ENTITY_DECA, "");
         defaults.setProperty(ENTITY_AWAKENED_ONE, "");
+        defaults.setProperty(BACKGROUND_SCREEN, "");
 
         // Cardback defaults
         defaults.setProperty(CARDBACK_COLORLESS, "");

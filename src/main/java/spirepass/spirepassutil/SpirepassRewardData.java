@@ -117,6 +117,12 @@ public class SpirepassRewardData {
     public String getCardbackType() { return cardbackType; }
     public String getCardbackId() { return cardbackId; }
 
+    public boolean isBackgroundReward() {
+        // Return true if this is one of our background rewards
+        return this.getType() == RewardType.IMAGE &&
+                (this.getLevel() == 4);
+    }
+
     // Helper method to get the appropriate background texture based on rarity (unchanged)
     public String getBackgroundTexturePath() {
         switch (rarity) {
