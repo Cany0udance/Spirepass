@@ -24,14 +24,12 @@ public class FastObtainCardHobbyistPatch {
         if (ChallengeHelper.isActiveChallengeIncomplete("daily_hobbyist")) {
             // Update the progress for the Hobbyist challenge
             ChallengeHelper.updateChallengeProgress("daily_hobbyist", 1);
-            logger.info("Daily Hobbyist challenge progress incremented!");
         }
 
         // Check for weekly_collector challenge
         if (ChallengeHelper.isActiveChallengeIncomplete("weekly_collector")) {
             // Update the progress for the Collector challenge
             ChallengeHelper.updateChallengeProgress("weekly_collector", 1);
-            logger.info("Weekly Card Collector challenge progress incremented!");
         }
     }
 

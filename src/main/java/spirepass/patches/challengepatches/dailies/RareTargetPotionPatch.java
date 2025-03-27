@@ -24,7 +24,6 @@ public class RareTargetPotionPatch {
             if (potion.rarity == AbstractPotion.PotionRarity.RARE) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("daily_exquisite");
-                logger.info("Daily Exquisite challenge completed! Used rare target potion: " + potion.name);
             }
         }
     }

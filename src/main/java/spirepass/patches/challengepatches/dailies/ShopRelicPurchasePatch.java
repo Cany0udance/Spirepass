@@ -24,7 +24,6 @@ public class ShopRelicPurchasePatch {
             if (ChallengeHelper.isActiveChallengeIncomplete("daily_thanks")) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("daily_thanks");
-                logger.info("Daily Thanks challenge completed! Purchased shop relic: " + __instance.relic.name);
             }
         }
     }

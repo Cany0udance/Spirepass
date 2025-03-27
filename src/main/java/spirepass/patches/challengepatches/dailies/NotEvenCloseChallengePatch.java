@@ -20,14 +20,11 @@ public class NotEvenCloseChallengePatch {
     public static void onBattleVictory(AbstractRoom __instance) {
         // Check if player has 10 HP or less
         if (AbstractDungeon.player.currentHealth <= 10) {
-            logger.info("Player won battle with " + AbstractDungeon.player.currentHealth + " HP remaining");
 
             // Check if the Not Even Close challenge is active and incomplete
             if (ChallengeHelper.isActiveChallengeIncomplete("daily_notevenclose")) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("daily_notevenclose");
-                logger.info("Daily Not Even Close challenge completed! Won with " +
-                        AbstractDungeon.player.currentHealth + " HP remaining.");
             }
         }
     }

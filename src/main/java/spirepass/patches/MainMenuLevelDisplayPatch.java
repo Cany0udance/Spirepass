@@ -15,13 +15,13 @@ import com.megacrit.cardcrawl.helpers.TipHelper;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+// import org.apache.logging.log4j.Logger;
 import spirepass.Spirepass;
 
 import java.lang.reflect.Field;
 
 public class MainMenuLevelDisplayPatch {
-    private static final Logger logger = LogManager.getLogger(Spirepass.modID);
+//     private static final Logger logger = LogManager.getLogger(Spirepass.modID);
     private static BitmapFont levelFont;
     private static ModPanel levelPanel;
     private static boolean initialized = false;
@@ -69,7 +69,7 @@ public class MainMenuLevelDisplayPatch {
         // Setup font for rendering
         levelFont = FontHelper.buttonLabelFont;
 
-        logger.info("Initialized level display at X: " + levelX + ", Y: " + levelY);
+//         logger.info("Initialized level display at X: " + levelX + ", Y: " + levelY);
     }
 
     /**
@@ -121,7 +121,7 @@ public class MainMenuLevelDisplayPatch {
                     panelHeight);
 
         } catch (Exception e) {
-            logger.error("Failed to render level panel: " + e.getMessage());
+//             logger.error("Failed to render level panel: " + e.getMessage());
         }
     }
 

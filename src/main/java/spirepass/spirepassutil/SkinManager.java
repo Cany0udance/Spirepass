@@ -2,7 +2,7 @@ package spirepass.spirepassutil;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+// import org.apache.logging.log4j.Logger;
 import spirepass.Spirepass;
 
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class SkinManager {
     private static SkinManager instance;
-    private static final Logger logger = LogManager.getLogger(Spirepass.modID);
+//     private static final Logger logger = LogManager.getLogger(Spirepass.modID);
 
     // Maps to store skin and cardback preferences
     private Map<String, String> appliedSkins = new HashMap<>();
@@ -121,10 +121,10 @@ public class SkinManager {
             appliedCardbacks.put(CARDBACK_COLORLESS, config.has(CARDBACK_COLORLESS) ? config.getString(CARDBACK_COLORLESS) : "");
             appliedCardbacks.put(CARDBACK_CURSE, config.has(CARDBACK_CURSE) ? config.getString(CARDBACK_CURSE) : "");
 
-            logger.info("Loaded skin preferences: " + appliedSkins);
-            logger.info("Loaded cardback preferences: " + appliedCardbacks);
+//             logger.info("Loaded skin preferences: " + appliedSkins);
+//             logger.info("Loaded cardback preferences: " + appliedCardbacks);
         } catch (Exception e) {
-            logger.error("Failed to load skin preferences: " + e.getMessage());
+//             logger.error("Failed to load skin preferences: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -142,10 +142,10 @@ public class SkinManager {
                 config.setString(entry.getKey(), entry.getValue());
             }
 
-            logger.info("Saved skin preferences: " + appliedSkins);
-            logger.info("Saved cardback preferences: " + appliedCardbacks);
+//             logger.info("Saved skin preferences: " + appliedSkins);
+//             logger.info("Saved cardback preferences: " + appliedCardbacks);
         } catch (Exception e) {
-            logger.error("Failed to save skin preferences: " + e.getMessage());
+//             logger.error("Failed to save skin preferences: " + e.getMessage());
         }
     }
 

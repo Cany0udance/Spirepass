@@ -25,7 +25,6 @@ public class ChonkyChallengePatch {
                 if (__instance.maxHealth >= 100) {
                     // Complete the challenge
                     ChallengeHelper.completeChallenge("weekly_chonky");
-                    logger.info("Weekly Chonky challenge completed! Current max HP: " + __instance.maxHealth);
                 }
             }
         }

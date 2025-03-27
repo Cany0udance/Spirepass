@@ -27,14 +27,11 @@ public class RiskTakerChallengePatch {
 
         // If it's a boss fight and the player has 20 or less HP
         if (isBossFight && __instance.currentHealth <= 20) {
-            logger.info("Player entered boss fight with " + __instance.currentHealth + " HP");
 
             // Check if the Risk Taker challenge is active and incomplete
             if (ChallengeHelper.isActiveChallengeIncomplete("daily_risktaker")) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("daily_risktaker");
-                logger.info("Daily Risk Taker challenge completed! Entered boss fight with " +
-                        __instance.currentHealth + " HP.");
             }
         }
     }

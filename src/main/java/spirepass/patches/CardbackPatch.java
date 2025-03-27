@@ -118,11 +118,11 @@ public class CardbackPatch {
                 if (fileHandle.exists()) {
                     cardbackTextureCache.put(path, new Texture(fileHandle));
                 } else {
-                    Spirepass.logger.error("Cardback texture not found: " + path);
+//                     Spirepass.logger.error("Cardback texture not found: " + path);
                     return null;
                 }
             } catch (Exception e) {
-                Spirepass.logger.error("Failed to load cardback texture: " + path);
+//                 Spirepass.logger.error("Failed to load cardback texture: " + path);
                 e.printStackTrace();
                 return null;
             }
@@ -131,10 +131,10 @@ public class CardbackPatch {
     }
 
     private static void logError(Exception e, String cardbackType, String cardbackId) {
-        Spirepass.logger.error("ERROR APPLYING CARDBACK " + cardbackId + " TO " + cardbackType + ": " + e.getMessage());
+//         Spirepass.logger.error("ERROR APPLYING CARDBACK " + cardbackId + " TO " + cardbackType + ": " + e.getMessage());
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        Spirepass.logger.error(sw.toString());
+//         Spirepass.logger.error(sw.toString());
     }
 }

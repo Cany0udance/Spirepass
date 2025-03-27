@@ -15,13 +15,11 @@ public class VictoriousChallengePatch {
     @SpirePostfixPatch
     public static void onRunVictory(AbstractMonster __instance) {
         // This method is called when the player defeats the final boss
-        logger.info("Player has won the run!");
 
         // Check if the Victorious challenge is active and incomplete
         if (ChallengeHelper.isActiveChallengeIncomplete("daily_youarewinner")) {
             // Complete the challenge
             ChallengeHelper.completeChallenge("daily_youarewinner");
-            logger.info("Daily Victorious challenge completed! Player has won the run.");
         }
     }
 }

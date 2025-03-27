@@ -70,9 +70,9 @@ public class ChallengeHelper {
             manager.saveData(Spirepass.config);
             try {
                 Spirepass.config.save();
-                Spirepass.logger.info("Saved config after updating challenge progress: " + challengeId);
+//                 Spirepass.logger.info("Saved config after updating challenge progress: " + challengeId);
             } catch (Exception e) {
-                Spirepass.logger.error("Error saving config after updating challenge progress: " + e.getMessage());
+//                 Spirepass.logger.error("Error saving config after updating challenge progress: " + e.getMessage());
             }
         }
 
@@ -118,9 +118,9 @@ public class ChallengeHelper {
             manager.saveData(Spirepass.config);
             try {
                 Spirepass.config.save();
-                Spirepass.logger.info("Saved config after completing challenge: " + challengeId);
+//                 Spirepass.logger.info("Saved config after completing challenge: " + challengeId);
             } catch (Exception e) {
-                Spirepass.logger.error("Error saving config after completing challenge: " + e.getMessage());
+//                 Spirepass.logger.error("Error saving config after completing challenge: " + e.getMessage());
             }
         }
 

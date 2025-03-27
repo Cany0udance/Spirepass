@@ -24,7 +24,6 @@ public class ComboChallengePatch {
             if (ChallengeHelper.isActiveChallengeIncomplete("daily_combo")) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("daily_combo");
-                logger.info("Daily Combo challenge completed! Played 10 cards in a single turn.");
             }
         }
     }

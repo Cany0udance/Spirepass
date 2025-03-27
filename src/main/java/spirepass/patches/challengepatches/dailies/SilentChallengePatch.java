@@ -42,7 +42,6 @@ public class SilentChallengePatch {
 
             // Check if this is the master volume slider and it's set to 0
             if (sliderType == Slider.SliderType.MASTER && sliderVolume == 0.0f) {
-                logger.info("Master volume set to 0 - experiencing silence");
 
                 // Prevent multiple triggers if player sets volume to 0 repeatedly
                 if (!hasBeenSilent) {
@@ -52,7 +51,6 @@ public class SilentChallengePatch {
                     if (ChallengeHelper.isActiveChallengeIncomplete("daily_silent")) {
                         // Complete the challenge
                         ChallengeHelper.completeChallenge("daily_silent");
-                        logger.info("Daily The Silent challenge completed! Player has experienced silence.");
                     }
                 }
             } else if (sliderType == Slider.SliderType.MASTER && sliderVolume > 0.0f) {
@@ -60,7 +58,6 @@ public class SilentChallengePatch {
                 hasBeenSilent = false;
             }
         } catch (Exception e) {
-            logger.error("Error in SilentChallengePatch.onVolumeChange", e);
         }
     }
 

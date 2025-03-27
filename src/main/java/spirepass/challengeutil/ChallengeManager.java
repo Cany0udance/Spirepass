@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static basemod.BaseMod.logger;
+// import static basemod.BaseMod.logger;
 
 public class ChallengeManager {
     private static ChallengeManager instance = null;
@@ -55,7 +55,7 @@ public class ChallengeManager {
                     Spirepass.config.remove("completed_" + challengeId);
                 }
             } catch (Exception e) {
-                logger.error("Failed to remove completion status from config: " + e.getMessage());
+//                 logger.error("Failed to remove completion status from config: " + e.getMessage());
             }
         }
     }
@@ -71,7 +71,7 @@ public class ChallengeManager {
             try {
                 Spirepass.config.remove("completed_" + challengeId);
             } catch (Exception e) {
-                logger.error("Failed to remove completion status from config: " + e.getMessage());
+//                 logger.error("Failed to remove completion status from config: " + e.getMessage());
             }
         }
 
@@ -82,10 +82,10 @@ public class ChallengeManager {
         try {
             Spirepass.config.save();
         } catch (Exception e) {
-            logger.error("Failed to save config after clearing completion statuses: " + e.getMessage());
+//             logger.error("Failed to save config after clearing completion statuses: " + e.getMessage());
         }
 
-        logger.info("clearAllCompletionStatus: Cleared " + beforeCount + " completion entries, map now has " + completedChallenges.size() + " entries");
+//         logger.info("clearAllCompletionStatus: Cleared " + beforeCount + " completion entries, map now has " + completedChallenges.size() + " entries");
     }
 
 
@@ -100,10 +100,10 @@ public class ChallengeManager {
         // Award XP based on challenge type
         if (challenge.getType() == Challenge.ChallengeType.DAILY) {
             Spirepass.addXP(Spirepass.DAILY_CHALLENGE_XP);
-            logger.info("Awarded " + Spirepass.DAILY_CHALLENGE_XP + " XP for completing daily challenge: " + challenge.getName());
+//             logger.info("Awarded " + Spirepass.DAILY_CHALLENGE_XP + " XP for completing daily challenge: " + challenge.getName());
         } else if (challenge.getType() == Challenge.ChallengeType.WEEKLY) {
             Spirepass.addXP(Spirepass.WEEKLY_CHALLENGE_XP);
-            logger.info("Awarded " + Spirepass.WEEKLY_CHALLENGE_XP + " XP for completing weekly challenge: " + challenge.getName());
+//             logger.info("Awarded " + Spirepass.WEEKLY_CHALLENGE_XP + " XP for completing weekly challenge: " + challenge.getName());
         }
 
         // Check if this completion should trigger the Tagalong challenge
@@ -120,7 +120,7 @@ public class ChallengeManager {
                 // Find and complete the Tagalong challenge if it exists and isn't already completed
                 for (Challenge dailyChallenge : dailyChallenges) {
                     if (dailyChallenge.getId().equals("daily_tagalong") && !isCompleted("daily_tagalong")) {
-                        logger.info("Completing Tagalong challenge as other daily challenges are complete");
+//                         logger.info("Completing Tagalong challenge as other daily challenges are complete");
                         dailyChallenge.complete();
                         break;
                     }
@@ -145,7 +145,7 @@ public class ChallengeManager {
                 // Find and complete the Freeloader challenge if it exists and isn't already completed
                 for (Challenge weeklyChallenge : weeklyChallenges) {
                     if (weeklyChallenge.getId().equals("weekly_freeloader") && !isCompleted("weekly_freeloader")) {
-                        logger.info("Completing Freeloader challenge as 2+ other weekly challenges are complete");
+//                         logger.info("Completing Freeloader challenge as 2+ other weekly challenges are complete");
                         weeklyChallenge.complete();
                         break;
                     }
@@ -168,7 +168,7 @@ public class ChallengeManager {
                 // Find and complete the Daily Master challenge if it exists and isn't already completed
                 for (Challenge weeklyChallenge : weeklyChallenges) {
                     if (weeklyChallenge.getId().equals("weekly_dailymaster") && !isCompleted("weekly_dailymaster")) {
-                        logger.info("Completing Daily Master challenge as all daily challenges are complete");
+//                         logger.info("Completing Daily Master challenge as all daily challenges are complete");
                         weeklyChallenge.complete();
                         break;
                     }
@@ -222,9 +222,9 @@ public class ChallengeManager {
     // Save all challenge data to config
     public void saveData(SpireConfig config) {
         try {
-            logger.info("Saving challenge data to config...");
-            logger.info("Daily challenges to save: " + dailyChallenges.size());
-            logger.info("Weekly challenges to save: " + weeklyChallenges.size());
+//             logger.info("Saving challenge data to config...");
+//             logger.info("Daily challenges to save: " + dailyChallenges.size());
+//             logger.info("Weekly challenges to save: " + weeklyChallenges.size());
 
             // Save the list of daily challenges
             saveChallengeList(config, dailyChallenges, "daily");
@@ -245,23 +245,23 @@ public class ChallengeManager {
             config.setString(LAST_DAILY_REFRESH, String.valueOf(lastDailyRefreshTime));
             config.setString(LAST_WEEKLY_REFRESH, String.valueOf(lastWeeklyRefreshTime));
 
-            logger.info("Saved " + dailyChallenges.size() + " daily challenges and " +
-                    weeklyChallenges.size() + " weekly challenges");
-            logger.info("Saved " + completedCount + " completed challenges");
+//             logger.info("Saved " + dailyChallenges.size() + " daily challenges and " +
+//                    weeklyChallenges.size() + " weekly challenges");
+//             logger.info("Saved " + completedCount + " completed challenges");
 
             // Force saving the config file immediately
             try {
                 config.save();
-                logger.info("Config file saved successfully");
+//                 logger.info("Config file saved successfully");
             } catch (Exception e) {
-                logger.error("Error saving config file: " + e.getMessage());
+//                 logger.error("Error saving config file: " + e.getMessage());
             }
         } catch (Exception e) {
-            logger.error("Failed to save challenge data: " + e.getMessage());
+//             logger.error("Failed to save challenge data: " + e.getMessage());
             e.printStackTrace();
         }
-        logger.info("saveData: Completed challenges map contains " + completedChallenges.size() +
-                " entries after saving");
+//         logger.info("saveData: Completed challenges map contains " + completedChallenges.size() +
+//                " entries after saving");
     }
 
     // Helper method to save a list of challenges
@@ -337,15 +337,15 @@ public class ChallengeManager {
                 }
             }
 
-            logger.info("Loaded " + dailyChallenges.size() + " daily challenges and " +
-                    weeklyChallenges.size() + " weekly challenges");
-            logger.info("Last daily refresh: " + new java.util.Date(lastDailyRefreshTime));
-            logger.info("Last weekly refresh: " + new java.util.Date(lastWeeklyRefreshTime));
+//             logger.info("Loaded " + dailyChallenges.size() + " daily challenges and " +
+//                    weeklyChallenges.size() + " weekly challenges");
+//             logger.info("Last daily refresh: " + new java.util.Date(lastDailyRefreshTime));
+//             logger.info("Last weekly refresh: " + new java.util.Date(lastWeeklyRefreshTime));
         } catch (Exception e) {
-            logger.error("Failed to load challenge data: " + e.getMessage());
+//             logger.error("Failed to load challenge data: " + e.getMessage());
             e.printStackTrace();
         }
-        logger.info("loadData: Loaded " + completedChallenges.size() + " challenge completion statuses");
+//         logger.info("loadData: Loaded " + completedChallenges.size() + " challenge completion statuses");
     }
 
     // Helper method to load a single challenge
@@ -369,7 +369,7 @@ public class ChallengeManager {
             if (config.has(completionKey)) {
                 isAlreadyCompleted = config.getBool(completionKey);
                 completedChallenges.put(id, isAlreadyCompleted);
-                logger.info("Challenge " + id + " loaded with completion status: " + isAlreadyCompleted);
+//                 logger.info("Challenge " + id + " loaded with completion status: " + isAlreadyCompleted);
             }
 
             // Create the challenge with all properties
@@ -384,7 +384,7 @@ public class ChallengeManager {
 
             return challenge;
         } catch (Exception e) {
-            logger.error("Failed to load challenge: " + e.getMessage());
+//             logger.error("Failed to load challenge: " + e.getMessage());
             return null;
         }
     }

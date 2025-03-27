@@ -29,16 +29,13 @@ public class HairComplimentPatch {
 
             // Check if this is the hair compliment message
             if (msg.equals(hairComplimentText)) {
-                logger.info("Merchant complimented your haircut!");
 
                 // Complete the challenge if it's active and incomplete
                 if (ChallengeHelper.isActiveChallengeIncomplete("weekly_hair")) {
                     ChallengeHelper.completeChallenge("weekly_hair");
-                    logger.info("Weekly Nice Hair challenge completed!");
                 }
             }
         } catch (Exception e) {
-            logger.error("Error in HairComplimentPatch: " + e.getMessage(), e);
         }
     }
 

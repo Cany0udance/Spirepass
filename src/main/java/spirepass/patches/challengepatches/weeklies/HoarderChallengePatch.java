@@ -23,7 +23,6 @@ public class HoarderChallengePatch {
             if (__instance.gold >= 600) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("weekly_hoarder");
-                logger.info("Weekly Hoarder challenge completed! Current gold: " + __instance.gold);
             }
         }
     }

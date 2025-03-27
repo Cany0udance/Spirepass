@@ -17,14 +17,10 @@ public class BossSwapRelicPatch {
             locator = BossRelicSwapLocator.class
     )
     public static void onBossRelicSwap(NeowReward __instance) {
-        // We've found the boss relic swap case
-        logger.info("Player swapped starter relic for a boss relic");
-
         // Check if the Boss Swap challenge is active and incomplete
         if (ChallengeHelper.isActiveChallengeIncomplete("daily_bossswap")) {
             // Complete the challenge
             ChallengeHelper.completeChallenge("daily_bossswap");
-            logger.info("Daily Snecko? Pyramid?? challenge completed! Swapped starter relic for a boss relic.");
         }
     }
 

@@ -237,7 +237,7 @@ public class SpirepassScreenRenderer {
                 clickField.setAccessible(true);
                 clickField.set(equipButton, clickConsumer);
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                BaseMod.logger.error("Failed to update button click handler: " + e.getMessage());
+//                 BaseMod.logger.error("Failed to update button click handler: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -292,7 +292,7 @@ public class SpirepassScreenRenderer {
                 clickField.setAccessible(true);
                 clickField.set(equipButton, clickConsumer);
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                BaseMod.logger.error("Failed to update button click handler: " + e.getMessage());
+//                 BaseMod.logger.error("Failed to update button click handler: " + e.getMessage());
                 e.printStackTrace();
             }
         }

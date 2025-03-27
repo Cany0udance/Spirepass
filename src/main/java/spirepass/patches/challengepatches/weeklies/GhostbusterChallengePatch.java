@@ -26,7 +26,6 @@ public class GhostbusterChallengePatch {
             if (currentHour >= 0 && currentHour < 6) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("weekly_ghostbuster");
-                logger.info("Weekly Ghostbuster challenge completed! Defeated Hexaghost at hour: " + currentHour);
             }
         }
     }

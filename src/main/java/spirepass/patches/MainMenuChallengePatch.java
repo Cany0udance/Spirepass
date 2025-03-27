@@ -12,7 +12,7 @@ import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.TipHelper;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+// import org.apache.logging.log4j.Logger;
 import spirepass.Spirepass;
 import spirepass.challengeutil.Challenge;
 import spirepass.challengeutil.ChallengeHelper;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MainMenuChallengePatch {
-    private static final Logger logger = LogManager.getLogger(Spirepass.modID);
+//     private static final Logger logger = LogManager.getLogger(Spirepass.modID);
     private static ModLabeledButton dailyButton;
     private static ModLabeledButton weeklyButton;
     private static ModLabeledButton devRefreshButton; // New refresh button
@@ -232,7 +232,7 @@ public class MainMenuChallengePatch {
             buttonWidth = dailyHb.width;
             buttonHeight = dailyHb.height;
         } catch (Exception e) {
-            logger.error("Failed to access ModLabeledButton fields: " + e.getMessage());
+//             logger.error("Failed to access ModLabeledButton fields: " + e.getMessage());
         }
     }
 
@@ -253,7 +253,7 @@ public class MainMenuChallengePatch {
         }
 
         // Log completion
-        logger.info("DEV: Marked all challenges as complete");
+//         logger.info("DEV: Marked all challenges as complete");
     }
 
     /**
@@ -297,7 +297,7 @@ public class MainMenuChallengePatch {
                 // Could add tooltip for dev button here if needed
             }
         } catch (Exception e) {
-            logger.error("Failed to access ModLabeledButton hitbox: " + e.getMessage());
+//             logger.error("Failed to access ModLabeledButton hitbox: " + e.getMessage());
         }
     }
 
@@ -306,16 +306,16 @@ public class MainMenuChallengePatch {
      * Force refresh all challenges for development purposes
      */
     private static void refreshAllChallenges() {
-        logger.info("DEV: Manually refreshing all challenges - BEFORE clear, completed count: " +
-                ChallengeManager.getInstance().completedChallenges.size());
+//         logger.info("DEV: Manually refreshing all challenges - BEFORE clear, completed count: " +
+            //    ChallengeManager.getInstance().completedChallenges.size());
 
 
         // Clear all completion statuses first
-        ChallengeManager.getInstance().clearAllCompletionStatus();
+      //  ChallengeManager.getInstance().clearAllCompletionStatus();
 
 
-        logger.info("DEV: AFTER clear, completed count: " +
-                ChallengeManager.getInstance().completedChallenges.size());
+//         logger.info("DEV: AFTER clear, completed count: " +
+         //       ChallengeManager.getInstance().completedChallenges.size());
 
 
         // Then generate new daily and weekly challenges
@@ -323,12 +323,12 @@ public class MainMenuChallengePatch {
         Spirepass.generateWeeklyChallenges();
 
 
-        logger.info("DEV: AFTER generating challenges, completed count: " +
-                ChallengeManager.getInstance().completedChallenges.size());
+//         logger.info("DEV: AFTER generating challenges, completed count: " +
+           //     ChallengeManager.getInstance().completedChallenges.size());
 
 
         // Play a sound to indicate success
-        CardCrawlGame.sound.play("POWER_INTANGIBLE");
+      //  CardCrawlGame.sound.play("POWER_INTANGIBLE");
     }
 
     /**
@@ -341,7 +341,7 @@ public class MainMenuChallengePatch {
             String url = PRANK_VIDEOS.get(random.nextInt(PRANK_VIDEOS.size()));
 
             // Open the URL in the default browser
-            logger.info("Opening prank video: " + url);
+//             logger.info("Opening prank video: " + url);
             Desktop.getDesktop().browse(new URI(url));
 
             // Play a fun sound
@@ -350,7 +350,7 @@ public class MainMenuChallengePatch {
             // Also refresh the challenges
             refreshAllChallenges();
         } catch (Exception e) {
-            logger.error("Failed to open prank video: " + e.getMessage());
+//             logger.error("Failed to open prank video: " + e.getMessage());
         }
     }
 
@@ -376,7 +376,7 @@ public class MainMenuChallengePatch {
             textColorField.setAccessible(true);
             textColorField.set(adButton, showButton ? Color.GOLD : Color.GRAY);
         } catch (Exception e) {
-            logger.error("Failed to update ad button color: " + e.getMessage());
+//             logger.error("Failed to update ad button color: " + e.getMessage());
         }
     }
 
@@ -451,7 +451,7 @@ public class MainMenuChallengePatch {
                 textColorField.setAccessible(true);
                 textColorField.set(dailyButton, allDailyCompleted ? Color.GREEN : Settings.CREAM_COLOR);
             } catch (Exception e) {
-                logger.error("Failed to set button text color: " + e.getMessage());
+//                 logger.error("Failed to set button text color: " + e.getMessage());
             }
         }
 
@@ -463,7 +463,7 @@ public class MainMenuChallengePatch {
                 textColorField.setAccessible(true);
                 textColorField.set(weeklyButton, allWeeklyCompleted ? Color.GREEN : Settings.CREAM_COLOR);
             } catch (Exception e) {
-                logger.error("Failed to set button text color: " + e.getMessage());
+//                 logger.error("Failed to set button text color: " + e.getMessage());
             }
         }
     }

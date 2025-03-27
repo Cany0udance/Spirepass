@@ -68,7 +68,7 @@ public class SpirepassAnimationManager {
             return;
         }
         try {
-            BaseMod.logger.info("Creating animation preview for " + entityId + " variant: " + variant);
+//             BaseMod.logger.info("Creating animation preview for " + entityId + " variant: " + variant);
             // Define animation paths based on variant and entity
             String atlasUrl, skeletonUrl;
 
@@ -96,9 +96,9 @@ public class SpirepassAnimationManager {
             // Check available animations and determine the correct idle animation name
             String idleAnimation = null;
             String idle1Animation = null;
-            BaseMod.logger.info("Available animations for " + entityId + ":");
+//             BaseMod.logger.info("Available animations for " + entityId + ":");
             for (Animation anim : skeletonData.getAnimations()) {
-                BaseMod.logger.info(" - " + anim.getName() + " (duration: " + anim.getDuration() + ")");
+//                 BaseMod.logger.info(" - " + anim.getName() + " (duration: " + anim.getDuration() + ")");
                 // Look for idle animation with case-insensitive comparison
                 if (anim.getName().equalsIgnoreCase("idle")) {
                     idleAnimation = anim.getName();
@@ -110,16 +110,16 @@ public class SpirepassAnimationManager {
             // Set appropriate idle animation if found
             if (idleAnimation != null) {
                 state.setAnimation(0, idleAnimation, true);
-                BaseMod.logger.info(entityId + " using 'idle' animation: " + idleAnimation);
+//                 BaseMod.logger.info(entityId + " using 'idle' animation: " + idleAnimation);
             } else if (idle1Animation != null) {
                 state.setAnimation(0, idle1Animation, true);
-                BaseMod.logger.info(entityId + " using 'idle_1' animation: " + idle1Animation);
+//                 BaseMod.logger.info(entityId + " using 'idle_1' animation: " + idle1Animation);
             } else {
                 // If no idle animation was found, try to use the first available animation
                 if (skeletonData.getAnimations().size > 0) {
                     String firstAnim = skeletonData.getAnimations().get(0).getName();
                     state.setAnimation(0, firstAnim, true);
-                    BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized with fallback animation: " + firstAnim);
+//                     BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized with fallback animation: " + firstAnim);
                 } else {
                     throw new Exception("No animations found in skeleton data");
                 }
@@ -133,9 +133,9 @@ public class SpirepassAnimationManager {
             previewAnimations.get(entityId).put(variant, state);
             previewSkeletons.get(entityId).put(variant, skeleton);
             animationInitialized.get(entityId).put(variant, true);
-            BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized successfully");
+//             BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized successfully");
         } catch (Exception e) {
-            BaseMod.logger.error("Error initializing animation for " + entityId + "/" + variant + ": " + e.getMessage());
+//             BaseMod.logger.error("Error initializing animation for " + entityId + "/" + variant + ": " + e.getMessage());
             e.printStackTrace();
             // Don't store anything for failed animations - let it fail properly
         }
@@ -239,7 +239,7 @@ public class SpirepassAnimationManager {
                     sb.begin();
                 }
             } catch (Exception e) {
-                BaseMod.logger.error("Error rendering animation for " + entityId + "/" + variant + ": " + e.getMessage());
+//                 BaseMod.logger.error("Error rendering animation for " + entityId + "/" + variant + ": " + e.getMessage());
                 e.printStackTrace();
                 // Make sure we restart the main batch if there was an error
                 if (!sb.isDrawing()) {

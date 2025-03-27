@@ -111,11 +111,11 @@ public class SingleCardViewCardbackPatch {
                             texture, 0, 0, texture.getWidth(), texture.getHeight());
                     cardbackRegionCache.put(path, region);
                 } else {
-                    Spirepass.logger.error("Large cardback texture not found: " + path);
+//                     Spirepass.logger.error("Large cardback texture not found: " + path);
                     return null;
                 }
             } catch (Exception e) {
-                Spirepass.logger.error("Failed to load large cardback texture: " + path);
+//                 Spirepass.logger.error("Failed to load large cardback texture: " + path);
                 e.printStackTrace();
                 return null;
             }
@@ -124,10 +124,10 @@ public class SingleCardViewCardbackPatch {
     }
 
     private static void logError(Exception e, String cardbackType, String cardbackId) {
-        Spirepass.logger.error("ERROR APPLYING LARGE CARDBACK " + cardbackId + " TO " + cardbackType + ": " + e.getMessage());
+//         Spirepass.logger.error("ERROR APPLYING LARGE CARDBACK " + cardbackId + " TO " + cardbackType + ": " + e.getMessage());
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        Spirepass.logger.error(sw.toString());
+//         Spirepass.logger.error(sw.toString());
     }
 }

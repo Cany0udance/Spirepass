@@ -22,7 +22,6 @@ public class SmithChallengesPatch {
         if (ChallengeHelper.isActiveChallengeIncomplete("weekly_smith")) {
             // Update the progress for the Smith challenge
             ChallengeHelper.updateChallengeProgress("weekly_smith", 1);
-            logger.info("Weekly Smith challenge progress incremented!");
         }
 
         // Daily Best of the Best challenge - rare card smithing
@@ -31,7 +30,6 @@ public class SmithChallengesPatch {
             if (c.rarity == AbstractCard.CardRarity.RARE) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("daily_best");
-                logger.info("Daily Best of the Best challenge completed! Upgraded rare card: " + c.name);
             }
         }
 
@@ -41,7 +39,6 @@ public class SmithChallengesPatch {
             if (c.rarity == AbstractCard.CardRarity.BASIC) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("daily_backtobasics");
-                logger.info("Daily Back to Basics challenge completed! Upgraded basic card: " + c.name);
             }
         }
     }

@@ -41,9 +41,9 @@ public class EntitySkinPatch {
                                            String skeletonUrl,
                                            float scale) {
         // Log every character that tries to load animation
-        BaseMod.logger.info("loadAnimation called for: " + __instance.getClass().getSimpleName()
-                + ", atlas: " + atlasUrl
-                + ", skeleton: " + skeletonUrl);
+//         BaseMod.logger.info("loadAnimation called for: " + __instance.getClass().getSimpleName()
+          //      + ", atlas: " + atlasUrl
+        //        + ", skeleton: " + skeletonUrl);
 
         // Only apply if:
         // 1. We're in a dungeon OR loading a save
@@ -110,13 +110,13 @@ public class EntitySkinPatch {
                 String skinId = SkinManager.getInstance().getAppliedSkin(entityId);
 
                 if (skinId != null && !skinId.isEmpty()) {
-                    BaseMod.logger.info("Applying skin " + skinId + " to " + entityId);
+//                     BaseMod.logger.info("Applying skin " + skinId + " to " + entityId);
 
                     try {
                         // Get the path for this entity's skin
                         String basePath = getSkinPath(entityId, skinId);
                         if (basePath == null) {
-                            BaseMod.logger.info("Using default skin for " + entityId);
+//                             BaseMod.logger.info("Using default skin for " + entityId);
                             return SpireReturn.Continue();
                         }
 
@@ -125,22 +125,22 @@ public class EntitySkinPatch {
                         String customSkeletonUrl = basePath + "skeleton.json";
 
                         // Log the skin application
-                        Spirepass.logger.info("Applying skin from " + customAtlasUrl);
+//                         Spirepass.logger.info("Applying skin from " + customAtlasUrl);
 
                         // Check if files exist
                         FileHandle atlasFile = Gdx.files.internal(customAtlasUrl);
                         FileHandle skeletonFile = Gdx.files.internal(customSkeletonUrl);
 
-                        BaseMod.logger.info("Atlas file exists: " + atlasFile.exists() + ", path: " + customAtlasUrl);
-                        BaseMod.logger.info("Skeleton file exists: " + skeletonFile.exists() + ", path: " + customSkeletonUrl);
+//                         BaseMod.logger.info("Atlas file exists: " + atlasFile.exists() + ", path: " + customAtlasUrl);
+//                         BaseMod.logger.info("Skeleton file exists: " + skeletonFile.exists() + ", path: " + customSkeletonUrl);
 
                         if (!atlasFile.exists() || !skeletonFile.exists()) {
-                            BaseMod.logger.error("Skin files not found! Falling back to default");
+//                             BaseMod.logger.error("Skin files not found! Falling back to default");
                             return SpireReturn.Continue();
                         }
 
                         // Load the atlas data
-                        BaseMod.logger.info("Loading texture atlas data from: " + customAtlasUrl);
+//                         BaseMod.logger.info("Loading texture atlas data from: " + customAtlasUrl);
                         TextureAtlas.TextureAtlasData data = new TextureAtlas.TextureAtlasData(
                                 atlasFile,
                                 Gdx.files.internal(basePath),
@@ -148,44 +148,44 @@ public class EntitySkinPatch {
                         );
 
                         // Pre-load textures
-                        BaseMod.logger.info("Pre-loading textures for skin...");
+//                         BaseMod.logger.info("Pre-loading textures for skin...");
                         for (TextureAtlas.TextureAtlasData.Page page : data.getPages()) {
                             String texturePath = basePath + page.textureFile.name();
-                            BaseMod.logger.info("Loading texture: " + texturePath);
+//                             BaseMod.logger.info("Loading texture: " + texturePath);
                             getOrLoadTexture(texturePath);
                         }
-                        BaseMod.logger.info("Finished pre-loading textures");
+//                         BaseMod.logger.info("Finished pre-loading textures");
 
                         // Create the texture atlas
-                        BaseMod.logger.info("Creating texture atlas");
+//                         BaseMod.logger.info("Creating texture atlas");
                         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(customAtlasUrl));
                         ReflectionHacks.setPrivate(__instance, AbstractCreature.class, "atlas", atlas);
 
                         // Load the skeleton data
-                        BaseMod.logger.info("Loading skeleton data");
+//                         BaseMod.logger.info("Loading skeleton data");
                         SkeletonJson json = new SkeletonJson(atlas);
                         json.setScale(Settings.renderScale / scale);
                         SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal(customSkeletonUrl));
 
                         // Check available animations
-                        BaseMod.logger.info("Available animations:");
+//                         BaseMod.logger.info("Available animations:");
                         for (Animation anim : skeletonData.getAnimations()) {
-                            BaseMod.logger.info(" - " + anim.getName() + " (duration: " + anim.getDuration() + ")");
+//                             BaseMod.logger.info(" - " + anim.getName() + " (duration: " + anim.getDuration() + ")");
                         }
 
                         // Create and configure the skeleton
-                        BaseMod.logger.info("Creating skeleton");
+//                         BaseMod.logger.info("Creating skeleton");
                         Skeleton skeleton = new Skeleton(skeletonData);
                         skeleton.setColor(Color.WHITE);
                         ReflectionHacks.setPrivate(__instance, AbstractCreature.class, "skeleton", skeleton);
 
                         // Set up the animation state
-                        BaseMod.logger.info("Setting up animation state");
+//                         BaseMod.logger.info("Setting up animation state");
                         AnimationStateData stateData = new AnimationStateData(skeletonData);
                         ReflectionHacks.setPrivate(__instance, AbstractCreature.class, "stateData", stateData);
                         __instance.state = new AnimationState(stateData);
 
-                        BaseMod.logger.info("Skin " + skinId + " successfully applied to " + entityId);
+//                         BaseMod.logger.info("Skin " + skinId + " successfully applied to " + entityId);
                         return SpireReturn.Return();
                     } catch (Exception e) {
                         logError(e, entityId, skinId);
@@ -347,10 +347,10 @@ public class EntitySkinPatch {
     }
 
     private static void logError(Exception e, String entityId, String skinId) {
-        BaseMod.logger.error("ERROR APPLYING SKIN " + skinId + " TO " + entityId + ": " + e.getMessage());
+//         BaseMod.logger.error("ERROR APPLYING SKIN " + skinId + " TO " + entityId + ": " + e.getMessage());
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        BaseMod.logger.error(sw.toString());
+//         BaseMod.logger.error(sw.toString());
     }
 }

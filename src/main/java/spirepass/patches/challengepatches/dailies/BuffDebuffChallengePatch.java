@@ -11,8 +11,6 @@ import spirepass.challengeutil.ChallengeHelper;
 
 @SpirePatch(clz = AbstractCreature.class, method = "addPower")
 public class BuffDebuffChallengePatch {
-    private static final Logger logger = LogManager.getLogger(Spirepass.modID);
-
     @SpireInsertPatch(
             locator = AfterPowerAddLocator.class
     )
@@ -34,12 +32,9 @@ public class BuffDebuffChallengePatch {
             }
         }
 
-        logger.info("Player has " + buffCount + " buffs and " + debuffCount + " debuffs active");
-
         // Check buff challenge
         if (buffCount >= 5) {
             if (ChallengeHelper.isActiveChallengeIncomplete("daily_buff")) {
-                logger.info("Completing Enjoyer of Buffs challenge with " + buffCount + " buffs");
                 ChallengeHelper.completeChallenge("daily_buff");
             }
         }
@@ -47,7 +42,6 @@ public class BuffDebuffChallengePatch {
         // Check debuff challenge
         if (debuffCount >= 4) {
             if (ChallengeHelper.isActiveChallengeIncomplete("daily_debuff")) {
-                logger.info("Completing Enjoyer of Debuffs challenge with " + debuffCount + " debuffs");
                 ChallengeHelper.completeChallenge("daily_debuff");
             }
         }

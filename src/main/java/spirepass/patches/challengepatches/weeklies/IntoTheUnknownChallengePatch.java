@@ -25,7 +25,6 @@ public class IntoTheUnknownChallengePatch {
         if (ChallengeHelper.isActiveChallengeIncomplete("weekly_unknown")) {
             // Update the progress for the Into the Unknown challenge
             ChallengeHelper.updateChallengeProgress("weekly_unknown", 1);
-            logger.info("Weekly Into the Unknown challenge progress incremented! Visited unknown node.");
         }
     }
 

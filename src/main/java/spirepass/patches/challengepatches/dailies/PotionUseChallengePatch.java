@@ -22,7 +22,6 @@ public class PotionUseChallengePatch {
         if (ChallengeHelper.isActiveChallengeIncomplete("weekly_chugger")) {
             // Increment the challenge progress for any potion use
             ChallengeHelper.updateChallengeProgress("weekly_chugger", 1);
-            logger.info("Weekly Chugger challenge progress incremented! Used potion: " + potion.name);
         }
 
         // Check if the exquisite challenge is active and incomplete
@@ -31,7 +30,6 @@ public class PotionUseChallengePatch {
             if (potion.rarity == AbstractPotion.PotionRarity.RARE) {
                 // Complete the challenge
                 ChallengeHelper.completeChallenge("daily_exquisite");
-                logger.info("Daily Exquisite challenge completed! Used rare potion: " + potion.name);
             }
         }
     }

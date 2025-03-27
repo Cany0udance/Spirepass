@@ -35,7 +35,6 @@ public class PurgeCursePatch {
                 if (c.type == AbstractCard.CardType.CURSE) {
                     // Complete the challenge
                     ChallengeHelper.completeChallenge("daily_purification");
-                    logger.info("Daily Purification challenge completed! Removed curse: " + c.name);
                 }
             }
         }

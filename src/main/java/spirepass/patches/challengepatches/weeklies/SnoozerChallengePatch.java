@@ -18,7 +18,6 @@ public class SnoozerChallengePatch {
         if (ChallengeHelper.isActiveChallengeIncomplete("weekly_snooze")) {
             // Update the progress for the Snoozer challenge
             ChallengeHelper.updateChallengeProgress("weekly_snooze", 1);
-            logger.info("Weekly Snoozer challenge progress incremented!");
         }
     }
 }

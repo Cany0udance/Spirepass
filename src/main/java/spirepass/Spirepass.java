@@ -28,7 +28,7 @@ import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.localization.*;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+// import org.apache.logging.log4j.Logger;
 import org.scannotation.AnnotationDB;
 import spirepass.challengeutil.*;
 import spirepass.spirepassutil.SkinManager;
@@ -58,7 +58,7 @@ public class Spirepass implements
     public static String modID;
     static { loadModInfo(); }
     private static final String resourcesFolder = checkResourcesPath();
-    public static final Logger logger = LogManager.getLogger(modID);
+//     public static final Logger logger = LogManager.getLogger(modID);
     private float saveTimer = 0f;
     private static final float SAVE_INTERVAL = 10f; // Save every 10 seconds
 
@@ -101,7 +101,7 @@ public class Spirepass implements
             // Load XP data after config is initialized
             if (config.has(TOTAL_XP_KEY)) {
                 totalXP = config.getInt(TOTAL_XP_KEY);
-                logger.info("Loaded battle pass XP: " + totalXP);
+//                 logger.info("Loaded battle pass XP: " + totalXP);
             }
 
             // Load skin data AFTER config is fully initialized
@@ -119,7 +119,7 @@ public class Spirepass implements
             config.save();
 
         } catch (Exception e) {
-            logger.error("Failed to load config: " + e.getMessage());
+//             logger.error("Failed to load config: " + e.getMessage());
             e.printStackTrace();
         }
         new Spirepass();
@@ -139,9 +139,9 @@ public class Spirepass implements
             config.setInt(TOTAL_XP_KEY, totalXP);
 
             config.save();
-            logger.info("Saved all config data");
+//             logger.info("Saved all config data");
         } catch (Exception e) {
-            logger.error("Failed to save config: " + e.getMessage());
+//             logger.error("Failed to save config: " + e.getMessage());
         }
     }
 
@@ -166,7 +166,7 @@ public class Spirepass implements
                 (button) -> {
                     // When clicked, add 10,000 XP
                     addXP(10000);
-                    logger.info("Added 10,000 XP via secret button");
+//                     logger.info("Added 10,000 XP via secret button");
                     // Keep the button visible (don't move off-screen)
                 }
         );
@@ -185,7 +185,7 @@ public class Spirepass implements
                     totalXP = 0;
                     config.setInt(TOTAL_XP_KEY, 0);
                     saveConfig();
-                    logger.info("Reset XP to 0 via secret button");
+//                     logger.info("Reset XP to 0 via secret button");
                     // Keep the button visible (don't move off-screen)
                 }
         );
@@ -320,7 +320,7 @@ public class Spirepass implements
                 manager.getWeeklyChallenges().isEmpty();
 
         if (needInitialChallenges) {
-            logger.info("No challenges found, generating initial set");
+//             logger.info("No challenges found, generating initial set");
             generateInitialChallenges();
             return;
         }
@@ -357,7 +357,7 @@ public class Spirepass implements
                         true);
 
         if (needsDailyRefresh) {
-            logger.info("Daily challenges need refresh");
+//             logger.info("Daily challenges need refresh");
             generateDailyChallenges();
         }
 
@@ -373,7 +373,7 @@ public class Spirepass implements
                         !isMonday(lastWeeklyRefreshDate) || !isSameWeek(now, lastWeeklyRefreshDate));
 
         if (needsWeeklyRefresh) {
-            logger.info("Weekly challenges need refresh");
+//             logger.info("Weekly challenges need refresh");
             generateWeeklyChallenges();
         }
 
@@ -439,7 +439,7 @@ public class Spirepass implements
         // Save data after generating new challenges
         saveConfig();
 
-        logger.info("Generated " + selectedChallenges.size() + " new daily challenges");
+//         logger.info("Generated " + selectedChallenges.size() + " new daily challenges");
     }
 
     // Similarly fix the generateWeeklyChallenges method in Spirepass
@@ -476,7 +476,7 @@ public class Spirepass implements
         // Save data after generating new challenges
         saveConfig();
 
-        logger.info("Generated " + selectedChallenges.size() + " new weekly challenges");
+//         logger.info("Generated " + selectedChallenges.size() + " new weekly challenges");
     }
 
     /**
@@ -525,16 +525,16 @@ public class Spirepass implements
             config.setInt(TOTAL_XP_KEY, totalXP);
             saveConfig();
         } else {
-            logger.error("Cannot save XP: config is null");
+//             logger.error("Cannot save XP: config is null");
         }
 
         // Log level up events
         int newLevel = getCurrentLevel();
         if (newLevel > oldLevel) {
-            logger.info("Level up! " + oldLevel + " -> " + newLevel);
+//             logger.info("Level up! " + oldLevel + " -> " + newLevel);
         }
 
-        logger.info("Added " + amount + " XP. Total: " + totalXP + ", Level: " + getCurrentLevel());
+//         logger.info("Added " + amount + " XP. Total: " + totalXP + ", Level: " + getCurrentLevel());
     }
 
     /*----------Localization----------*/
@@ -657,7 +657,7 @@ public class Spirepass implements
                     ChallengeHelper.completeChallenge("daily_setup");
 
                     // Optional: Log the completion
-                    logger.info("Daily Setup challenge completed! Played 2 power cards on turn 1.");
+//                     logger.info("Daily Setup challenge completed! Played 2 power cards on turn 1.");
                 }
             }
         }
@@ -684,7 +684,7 @@ public class Spirepass implements
             this.saveTimer = 0f;
 
             // Check if challenges need to be refreshed
-           // checkAndRefreshChallenges();
+            checkAndRefreshChallenges();
 
             // No need to call saveConfig() here as it's already called in checkAndRefreshChallenges()
         }

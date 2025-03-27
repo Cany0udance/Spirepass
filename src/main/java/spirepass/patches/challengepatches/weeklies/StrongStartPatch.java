@@ -21,16 +21,13 @@ public class StrongStartPatch {
         try {
             // Check if we're in Exordium (Act 1)
             if (AbstractDungeon.actNum == 1) {
-                logger.info("Emerald Key collected in Exordium!");
 
                 // Complete the challenge if it's active and incomplete
                 if (ChallengeHelper.isActiveChallengeIncomplete("weekly_strong_start")) {
                     ChallengeHelper.completeChallenge("weekly_strong_start");
-                    logger.info("Weekly Strong Start challenge completed!");
                 }
             }
         } catch (Exception e) {
-            logger.error("Error in StrongStartPatch: " + e.getMessage(), e);
         }
     }
 
