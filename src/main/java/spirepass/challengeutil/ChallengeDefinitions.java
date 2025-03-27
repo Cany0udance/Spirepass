@@ -1,7 +1,12 @@
 package spirepass.challengeutil;
 
+import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.localization.UIStrings;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static spirepass.Spirepass.makeID;
 
 public class ChallengeDefinitions {
 
@@ -12,133 +17,24 @@ public class ChallengeDefinitions {
         List<Challenge> challenges = new ArrayList<>();
 
         // Define all possible daily challenges here
-        challenges.add(new Challenge(
-                "daily_setup",
-                "Setup",
-                "Play two Power cards on turn 1 of combat.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_thanks",
-                "Thaaaanks",
-                "Purchase a Shop-tier Relic from the Merchant.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_best",
-                "Best of the Best",
-                "Upgrade a Rare card at a Rest Site.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_purification",
-                "Purification",
-                "Remove a Curse at a Merchant.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_exquisite",
-                "Exquisite",
-                "Use a Rare potion.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_hobbyist",
-                "Hobbyist",
-                "Add 15 cards to your deck.",
-                Challenge.ChallengeType.DAILY,
-                15
-        ));
-
-        challenges.add(new Challenge(
-                "daily_punchingup",
-                "Punching Up",
-                "Win 5 Elite combats.",
-                Challenge.ChallengeType.DAILY,
-                5
-        ));
-
-        challenges.add(new Challenge(
-                "daily_buff",
-                "Enjoyer of Buffs",
-                "Have 5 or more buffs active at once.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_debuff",
-                "Enjoyer of Debuffs",
-                "Have 4 or more debuffs active at once.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_backtobasics",
-                "Back to Basics",
-                "Smith a Basic card at a Rest Site.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_combo",
-                "Combo",
-                "Play 10 or more cards in a single turn.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_risktaker",
-                "Risk Taker",
-                "Enter a Boss fight with 20 or less HP.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_notevenclose",
-                "Not Even Close",
-                "Win a fight with 10 HP or less remaining.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_bossswap",
-                "Snecko? Pyramid??",
-                "Give up your starter Relic for a Boss Relic from Neow.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_unbeatable",
-                "You Drew Poorly",
-                "Oh no!! This challenge is unwinnable! Better luck tomorrow :)",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_youarewinner",
-                "Victorious",
-                "Win a run.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_tagalong",
-                "Tagalong",
-                "Complete the other 2 daily challenges.",
-                Challenge.ChallengeType.DAILY
-        ));
-
-        challenges.add(new Challenge(
-                "daily_silent",
-                "The Silent",
-                "Experience silence.",
-                Challenge.ChallengeType.DAILY
-        ));
+        challenges.add(createChallenge("daily_setup", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_thanks", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_best", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_purification", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_exquisite", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_hobbyist", Challenge.ChallengeType.DAILY, 15));
+        challenges.add(createChallenge("daily_punchingup", Challenge.ChallengeType.DAILY, 5));
+        challenges.add(createChallenge("daily_buff", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_debuff", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_backtobasics", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_combo", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_risktaker", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_notevenclose", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_bossswap", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_unbeatable", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_youarewinner", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_tagalong", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_silent", Challenge.ChallengeType.DAILY));
 
         return challenges;
     }
@@ -150,111 +46,37 @@ public class ChallengeDefinitions {
         List<Challenge> challenges = new ArrayList<>();
 
         // Define all possible weekly challenges here
-        challenges.add(new Challenge(
-                "weekly_hair",
-                "Nice Hair",
-                "Have the Merchant compliment your haircut.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_strong_start",
-                "Strong Start",
-                "Collect the Emerald Key in Exordium.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_hoarder",
-                "Hoarder",
-                "Have at least 600 Gold at once.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_collector",
-                "Card Collector",
-                "Add 100 cards to your deck.",
-                Challenge.ChallengeType.WEEKLY,
-                100
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_chonky",
-                "Chonky",
-                "Have at least 110 max HP during a run.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_slayer",
-                "Slayer",
-                "Defeat 150 enemies.",
-                Challenge.ChallengeType.WEEKLY,
-                150
-                ));
-
-        challenges.add(new Challenge(
-                "weekly_biggame",
-                "Big Game Hunter",
-                "Defeat 30 Elite enemies.",
-                Challenge.ChallengeType.WEEKLY,
-                30
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_chugger",
-                "Chugger",
-                "Use 75 potions.",
-                Challenge.ChallengeType.WEEKLY,
-                75
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_unknown",
-                "Into the Unknown",
-                "Visit 30 Unknown nodes.",
-                Challenge.ChallengeType.WEEKLY,
-                30
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_smith",
-                "The Smith",
-                "Smith 50 times at Rest Sites.",
-                Challenge.ChallengeType.WEEKLY,
-                50
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_snooze",
-                "The Snoozer",
-                "Rest 25 times at Rest Sites.",
-                Challenge.ChallengeType.WEEKLY,
-                25
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_ghostbuster",
-                "Ghostbuster",
-                "Defeat Hexaghost between the hours of midnight and 6 AM.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_freeloader",
-                "Freeloader",
-                "Complete the other 2 weekly challenges.",
-                Challenge.ChallengeType.WEEKLY
-        ));
-
-        challenges.add(new Challenge(
-                "weekly_dailymaster",
-                "Daily Master",
-                "Have all 3 daily challenges completed at once.",
-                Challenge.ChallengeType.WEEKLY
-        ));
+        challenges.add(createChallenge("weekly_hair", Challenge.ChallengeType.WEEKLY));
+        challenges.add(createChallenge("weekly_strong_start", Challenge.ChallengeType.WEEKLY));
+        challenges.add(createChallenge("weekly_hoarder", Challenge.ChallengeType.WEEKLY));
+        challenges.add(createChallenge("weekly_collector", Challenge.ChallengeType.WEEKLY, 100));
+        challenges.add(createChallenge("weekly_chonky", Challenge.ChallengeType.WEEKLY));
+        challenges.add(createChallenge("weekly_slayer", Challenge.ChallengeType.WEEKLY, 150));
+        challenges.add(createChallenge("weekly_biggame", Challenge.ChallengeType.WEEKLY, 30));
+        challenges.add(createChallenge("weekly_chugger", Challenge.ChallengeType.WEEKLY, 75));
+        challenges.add(createChallenge("weekly_unknown", Challenge.ChallengeType.WEEKLY, 30));
+        challenges.add(createChallenge("weekly_smith", Challenge.ChallengeType.WEEKLY, 50));
+        challenges.add(createChallenge("weekly_snooze", Challenge.ChallengeType.WEEKLY, 25));
+        challenges.add(createChallenge("weekly_ghostbuster", Challenge.ChallengeType.WEEKLY));
+        challenges.add(createChallenge("weekly_freeloader", Challenge.ChallengeType.WEEKLY));
+        challenges.add(createChallenge("weekly_dailymaster", Challenge.ChallengeType.WEEKLY));
 
         return challenges;
+    }
+
+    /**
+     * Create a challenge with localization support
+     */
+    private static Challenge createChallenge(String id, Challenge.ChallengeType type) {
+        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("Challenge" + id));
+        return new Challenge(id, strings.TEXT[0], strings.TEXT[1], type);
+    }
+
+    /**
+     * Create a challenge with localization support and a progress counter
+     */
+    private static Challenge createChallenge(String id, Challenge.ChallengeType type, int progressTarget) {
+        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("Challenge" + id));
+        return new Challenge(id, strings.TEXT[0], strings.TEXT[1], type, progressTarget);
     }
 }

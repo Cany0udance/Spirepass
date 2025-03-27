@@ -183,5 +183,197 @@
       "\"Jimbo Joker\" Colorless Cardback",
       "\"Maybe Go Fish is more our speed...\""
     ]
+  },
+  "${modID}:Challengedaily_setup": {
+    "TEXT": [
+      "Setup",
+      "Play two Power cards on turn 1 of combat."
+    ]
+  },
+  "${modID}:Challengedaily_thanks": {
+    "TEXT": [
+      "Thaaaanks",
+      "Purchase a Shop-tier Relic from the Merchant."
+    ]
+  },
+  "${modID}:Challengedaily_best": {
+    "TEXT": [
+      "Best of the Best",
+      "Upgrade a Rare card at a Rest Site."
+    ]
+  },
+  "${modID}:Challengedaily_purification": {
+    "TEXT": [
+      "Purification",
+      "Remove a Curse at a Merchant."
+    ]
+  },
+  "${modID}:Challengedaily_exquisite": {
+    "TEXT": [
+      "Exquisite",
+      "Use a Rare potion."
+    ]
+  },
+  "${modID}:Challengedaily_hobbyist": {
+    "TEXT": [
+      "Hobbyist",
+      "Add 15 cards to your deck."
+    ]
+  },
+  "${modID}:Challengedaily_punchingup": {
+    "TEXT": [
+      "Punching Up",
+      "Win 5 Elite combats."
+    ]
+  },
+  "${modID}:Challengedaily_buff": {
+    "TEXT": [
+      "Enjoyer of Buffs",
+      "Have 5 or more buffs active at once."
+    ]
+  },
+  "${modID}:Challengedaily_debuff": {
+    "TEXT": [
+      "Enjoyer of Debuffs",
+      "Have 4 or more debuffs active at once."
+    ]
+  },
+  "${modID}:Challengedaily_backtobasics": {
+    "TEXT": [
+      "Back to Basics",
+      "Smith a Basic card at a Rest Site."
+    ]
+  },
+  "${modID}:Challengedaily_combo": {
+    "TEXT": [
+      "Combo",
+      "Play 10 or more cards in a single turn."
+    ]
+  },
+  "${modID}:Challengedaily_risktaker": {
+    "TEXT": [
+      "Risk Taker",
+      "Enter a Boss fight with 20 or less HP."
+    ]
+  },
+  "${modID}:Challengedaily_notevenclose": {
+    "TEXT": [
+      "Not Even Close",
+      "Win a fight with 10 HP or less remaining."
+    ]
+  },
+  "${modID}:Challengedaily_bossswap": {
+    "TEXT": [
+      "Snecko? Pyramid??",
+      "Give up your starter Relic for a Boss Relic from Neow."
+    ]
+  },
+  "${modID}:Challengedaily_unbeatable": {
+    "TEXT": [
+      "You Drew Poorly",
+      "Oh no!! This challenge is unwinnable! Better luck tomorrow :)"
+    ]
+  },
+  "${modID}:Challengedaily_youarewinner": {
+    "TEXT": [
+      "Victorious",
+      "Win a run."
+    ]
+  },
+  "${modID}:Challengedaily_tagalong": {
+    "TEXT": [
+      "Tagalong",
+      "Complete the other 2 daily challenges."
+    ]
+  },
+  "${modID}:Challengedaily_silent": {
+    "TEXT": [
+      "The Silent",
+      "Experience silence."
+    ]
+  },
+  "${modID}:Challengeweekly_hair": {
+    "TEXT": [
+      "Nice Hair",
+      "Have the Merchant compliment your haircut."
+    ]
+  },
+  "${modID}:Challengeweekly_strong_start": {
+    "TEXT": [
+      "Strong Start",
+      "Collect the Emerald Key in Exordium."
+    ]
+  },
+  "${modID}:Challengeweekly_hoarder": {
+    "TEXT": [
+      "Hoarder",
+      "Have at least 600 Gold at once."
+    ]
+  },
+  "${modID}:Challengeweekly_collector": {
+    "TEXT": [
+      "Card Collector",
+      "Add 100 cards to your deck."
+    ]
+  },
+  "${modID}:Challengeweekly_chonky": {
+    "TEXT": [
+      "Chonky",
+      "Have at least 110 max HP during a run."
+    ]
+  },
+  "${modID}:Challengeweekly_slayer": {
+    "TEXT": [
+      "Slayer",
+      "Defeat 150 enemies."
+    ]
+  },
+  "${modID}:Challengeweekly_biggame": {
+    "TEXT": [
+      "Big Game Hunter",
+      "Defeat 30 Elite enemies."
+    ]
+  },
+  "${modID}:Challengeweekly_chugger": {
+    "TEXT": [
+      "Chugger",
+      "Use 75 potions."
+    ]
+  },
+  "${modID}:Challengeweekly_unknown": {
+    "TEXT": [
+      "Into the Unknown",
+      "Visit 30 Unknown nodes."
+    ]
+  },
+  "${modID}:Challengeweekly_smith": {
+    "TEXT": [
+      "The Smith",
+      "Smith 50 times at Rest Sites."
+    ]
+  },
+  "${modID}:Challengeweekly_snooze": {
+    "TEXT": [
+      "The Snoozer",
+      "Rest 25 times at Rest Sites."
+    ]
+  },
+  "${modID}:Challengeweekly_ghostbuster": {
+    "TEXT": [
+      "Ghostbuster",
+      "Defeat Hexaghost between the hours of midnight and 6 AM."
+    ]
+  },
+  "${modID}:Challengeweekly_freeloader": {
+    "TEXT": [
+      "Freeloader",
+      "Complete the other 2 weekly challenges."
+    ]
+  },
+  "${modID}:Challengeweekly_dailymaster": {
+    "TEXT": [
+      "Daily Master",
+      "Have all 3 daily challenges completed at once."
+    ]
   }
 }

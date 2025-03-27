@@ -705,8 +705,8 @@ public class SpirepassRewardManager {
             String currentBackground = SkinManager.getInstance().getAppliedSkin(SkinManager.BACKGROUND_SCREEN);
             boolean shouldUnequip = reward.getImagePath().equals(currentBackground);
             SkinManager.getInstance().setAppliedSkin(SkinManager.BACKGROUND_SCREEN, shouldUnequip ? "" : reward.getImagePath());
-            System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
-                    "background: " + reward.getImagePath());
+          //  System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
+         //           "background: " + reward.getImagePath());
         } else if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
             // Existing code for character models
             String entityId = reward.getEntityId();
@@ -714,8 +714,8 @@ public class SpirepassRewardManager {
             String currentSkin = SkinManager.getInstance().getAppliedSkin(entityId);
             boolean shouldUnequip = modelId.equals(currentSkin);
             SkinManager.getInstance().setAppliedSkin(entityId, shouldUnequip ? "" : modelId);
-            System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
-                    entityId + " skin: " + modelId);
+           // System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
+           //         entityId + " skin: " + modelId);
         } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
             // Existing code for cardbacks
             String cardbackType = reward.getCardbackType();
@@ -723,8 +723,8 @@ public class SpirepassRewardManager {
             String currentCardback = SkinManager.getInstance().getAppliedCardback(cardbackType);
             boolean shouldUnequip = cardbackId.equals(currentCardback);
             SkinManager.getInstance().setAppliedCardback(cardbackType, shouldUnequip ? "" : cardbackId);
-            System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
-                    cardbackType + " cardback: " + cardbackId);
+        //    System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
+          //          cardbackType + " cardback: " + cardbackId);
         }
 
         // Save the config immediately after changing the reward state
