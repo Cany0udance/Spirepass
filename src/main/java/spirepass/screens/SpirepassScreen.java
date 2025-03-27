@@ -81,8 +81,6 @@ public class SpirepassScreen {
         // Ignore clicks for a brief moment
         InputHelper.justClickedLeft = false;
         InputHelper.justReleasedClickLeft = false;
-
-        ChallengeHelper.completeChallenge("weekly_hoarder");
     }
 
     public void close() {

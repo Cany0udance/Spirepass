@@ -29,6 +29,7 @@ import com.megacrit.cardcrawl.localization.*;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import org.apache.logging.log4j.LogManager;
 // import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.scannotation.AnnotationDB;
 import spirepass.challengeutil.*;
 import spirepass.spirepassutil.SkinManager;
@@ -58,7 +59,7 @@ public class Spirepass implements
     public static String modID;
     static { loadModInfo(); }
     private static final String resourcesFolder = checkResourcesPath();
-//     public static final Logger logger = LogManager.getLogger(modID);
+     public static final Logger logger = LogManager.getLogger(modID);
     private float saveTimer = 0f;
     private static final float SAVE_INTERVAL = 10f; // Save every 10 seconds
 
@@ -74,8 +75,8 @@ public class Spirepass implements
     public static final int WEEKLY_CHALLENGE_XP = 75;
     public static final int MAX_LEVEL = 30;
     private static int totalXP = 0;
-    public static final int REFRESH_HOUR_LOCAL = 2;
-    public static final int REFRESH_MINUTE_LOCAL = 41;
+    public static final int REFRESH_HOUR_LOCAL = 12;
+    public static final int REFRESH_MINUTE_LOCAL = 00;
     public static SpireConfig config;
 
     public static String makeID(String id) {

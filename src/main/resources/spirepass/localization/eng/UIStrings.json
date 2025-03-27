@@ -1,16 +1,187 @@
 {
-  "${modID}:Example": {
+  "${modID}:SpirepassWelcomeMessage": {
     "TEXT": [
-      "This is",
-      "an array of Strings."
-    ],
-    "EXTRA_TEXT": [
-      "This is another",
-      "array of Strings."
-    ],
-    "TEXT_DICT": {
-      "This": "Contains pairs of Strings, used to get values based on keys.",
-      "This is a key": "This is a value."
-    }
+      "Welcome to Spirepass! Go complete some challenges and level up!"
+    ]
+  },
+  "${modID}:SpirepassMaxLevelMessage": {
+    "TEXT": [
+      "MAX LEVEL REACHED!",
+      "You've unlocked...A SENSE OF PRIDE AND ACCOMPLISHMENT!!!"
+    ]
+  },
+  "${modID}:SpirepassRewardLawAbidingCitizen": {
+    "TEXT": [
+      "\"Law Abiding Citizen\" Defect",
+      "Deal 3 damage. Increase the damage of ALL Claw cards by 2 this combat."
+    ]
+  },
+  "${modID}:SpirepassRewardGiantama": {
+    "TEXT": [
+      "\"Giantama\" Giant Head",
+      "\"No\""
+    ]
+  },
+  "${modID}:SpirepassRewardSpaceBlanket": {
+    "TEXT": [
+      "\"Space Blanket\" Silent",
+      "Are you telling me that my RNG just happens to be so unlucky? No! He orchestrated it! Casey!!!"
+    ]
+  },
+  "${modID}:SpirepassRewardMyCatBackground": {
+    "TEXT": [
+      "\"My Cat\" Spirepass Screen Background",
+      "You'll never guess what this is an image of."
+    ]
+  },
+  "${modID}:SpirepassRewardSponsored": {
+    "TEXT": [
+      "\"Sponsored\" Colorless Cardback",
+      "Legal note: this cardback does not represent any official affiliation with a brand."
+    ]
+  },
+  "${modID}:SpirepassRewardDonut": {
+    "TEXT": [
+      "\"Donut\" Donu",
+      "If Grand Constructs weren't meant to be eaten, then why do they look so delicious???"
+    ]
+  },
+  "${modID}:SpirepassRewardLovestruck": {
+    "TEXT": [
+      "\"Lovestruck\" Centurion",
+      "yes, my queen <3"
+    ]
+  },
+  "${modID}:SpirepassRewardBear": {
+    "TEXT": [
+      "\"Bear\" Bear",
+      "Somehow, the rest of the Red Mask Gang still haven't noticed."
+    ]
+  },
+  "${modID}:SpirepassRewardBlue": {
+    "TEXT": [
+      "\"Blue\" Red Slaver",
+      "he's blue, da ba dee da ba di"
+    ]
+  },
+  "${modID}:SpirepassRewardRed": {
+    "TEXT": [
+      "\"Red\" Blue Slaver",
+      "We have red slaver at home"
+    ]
+  },
+  "${modID}:SpirepassRewardBlissful": {
+    "TEXT": [
+      "\"Blissful\" Colorless Cardback",
+      "Congrats on earning the required XP to get this cardback"
+    ]
+  },
+  "${modID}:SpirepassRewardSlendernob": {
+    "TEXT": [
+      "\"Slendernob\" Gremlin Nob",
+      "Pages 3/8"
+    ]
+  },
+  "${modID}:SpirepassRewardColgate": {
+    "TEXT": [
+      "\"Colgate\" Snecko",
+      "The most fresh creature in the Spire."
+    ]
+  },
+  "${modID}:SpirepassRewardPurpleGuy": {
+    "TEXT": [
+      "\"Purple Guy\" Romeo",
+      "The bandit behind the slaughter"
+    ]
+  },
+  "${modID}:SpirepassRewardDowntrend": {
+    "TEXT": [
+      "\"Downtrend\" Curse Cardback",
+      "not stonks"
+    ]
+  },
+  "${modID}:SpirepassRewardInvisibleMan": {
+    "TEXT": [
+      "\"Invisible Man\" Ironclad",
+      "He's actually just standing very still"
+    ]
+  },
+  "${modID}:SpirepassRewardChalkboard": {
+    "TEXT": [
+      "\"Chalkboard\" Deca",
+      "\"Uhh, our chalkboard just sprouted legs and walked away. Class is cancelled!\""
+    ]
+  },
+  "${modID}:SpirepassRewardavwejkanaklwjve": {
+    "TEXT": [
+      "avwejkanaklwjv e",
+      "yeah"
+    ]
+  },
+  "${modID}:SpirepassRewardkrisdeltarune": {
+    "TEXT": [
+      "\"kris deltarune\" Watcher",
+      "\"W...Watcher? Are you OK? You're yelling...\""
+    ]
+  },
+  "${modID}:SpirepassRewardDisarmed": {
+    "TEXT": [
+      "\"Disarmed\" Cultist",
+      "It's like that one beta art"
+    ]
+  },
+  "${modID}:SpirepassRewardPajamaSam": {
+    "TEXT": [
+      "\"Pajama Sam\" Defect",
+      "The Darkness orbs are really starting to get to me."
+    ]
+  },
+  "${modID}:SpirepassRewardBigBird": {
+    "TEXT": [
+      "\"Big Bird\" Awakened One",
+      "he big"
+    ]
+  },
+  "${modID}:SpirepassRewardPrismatic": {
+    "TEXT": [
+      "\"Prismatic\" Sentry",
+      "Reminds me of the shard you should buy from shops, especially if you're a streamer. wink wink"
+    ]
+  },
+  "${modID}:SpirepassRewardBlurry": {
+    "TEXT": [
+      "\"Blurry\" Silent",
+      "where are my glasses??"
+    ]
+  },
+  "${modID}:SpirepassRewardHaroldCurseCardback": {
+    "TEXT": [
+      "\"Hide The Pain\" Curse Cardback",
+      ":)"
+    ]
+  },
+  "${modID}:SpirepassRewardSpaghettiMeatballs": {
+    "TEXT": [
+      "\"Spaghetti & Meatballs\" Writhing Mass",
+      "Comes with a side of Parasites."
+    ]
+  },
+  "${modID}:SpirepassRewardFavoriteCustomer": {
+    "TEXT": [
+      "\"Favorite Customer\" Colorless Cardback",
+      "Do you like this cardback? It's not for sale"
+    ]
+  },
+  "${modID}:SpirepassRewardWeaponized115": {
+    "TEXT": [
+      "\"Weaponized 115 from the hit first person shooter game Call of Duty®: Black Ops II, part of the Call of Duty® series\" Ironclad",
+      "The Weaponized 115 Personalization Pack brings out the power of Zombies to any Multiplayer match. Pack your weapons with an all-new Call of Duty: Black Ops II Origins-inspired camo, set of reticles, and undead animated calling card."
+    ]
+  },
+  "${modID}:SpirepassRewardJimboJoker": {
+    "TEXT": [
+      "\"Jimbo Joker\" Colorless Cardback",
+      "\"Maybe Go Fish is more our speed...\""
+    ]
   }
 }
