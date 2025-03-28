@@ -10,6 +10,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import spirepass.Spirepass;
 import spirepass.elements.SpirepassLevelBox;
 import spirepass.spirepassutil.SkinManager;
@@ -22,7 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static spirepass.Spirepass.makeID;
+
 public class SpirepassScreenRenderer {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassScreen"));
     // Textures for level boxes
     private Texture backgroundTexture;
     private Texture levelBoxTexture;
@@ -102,7 +106,7 @@ public class SpirepassScreenRenderer {
         FontHelper.renderFontCentered(
                 sb,
                 FontHelper.bannerNameFont,
-                "SPIREPASS",
+                uiStrings.TEXT[0],
                 Settings.WIDTH / 2.0f,
                 SpirepassPositionSettings.TITLE_Y,
                 Color.WHITE
@@ -209,7 +213,7 @@ public class SpirepassScreenRenderer {
 
     private void updateLockedEquipButton(SpriteBatch sb) {
         // Button properties for locked state
-        String buttonText = "LOCKED";
+        String buttonText = uiStrings.TEXT[3];
         Color buttonColor = Color.GRAY;
         Color hoverColor = Color.DARK_GRAY;
         float buttonX = Settings.WIDTH / 2.0f - 80.0f;
@@ -263,7 +267,7 @@ public class SpirepassScreenRenderer {
 
         // Button properties
         boolean isEquipped = rewardManager.isRewardEquipped(reward);
-        String buttonText = isUnlocked ? (isEquipped ? "UNEQUIP" : "EQUIP") : "LOCKED";
+        String buttonText = isUnlocked ? (isEquipped ? uiStrings.TEXT[2] : uiStrings.TEXT[1]) : uiStrings.TEXT[3];
         Color buttonColor = isUnlocked ? (isEquipped ? Color.ORANGE : Color.WHITE) : Color.GRAY;
         Color hoverColor = isUnlocked ? (isEquipped ? Color.YELLOW : Color.GREEN) : Color.DARK_GRAY;
         float buttonX = Settings.WIDTH / 2.0f - 80.0f;

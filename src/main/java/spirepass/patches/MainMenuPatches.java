@@ -4,13 +4,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
 import javassist.CtBehavior;
 import spirepass.screens.SpirepassScreen;
 import spirepass.spirepassutil.SpirepassManager;
 
+import static spirepass.Spirepass.makeID;
+
 public class MainMenuPatches {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("MainMenuButton"));
     // Define new enum values
     public static class Enums {
         @SpireEnum
@@ -44,7 +48,7 @@ public class MainMenuPatches {
         @SpirePostfixPatch
         public static void setLabelText(MenuButton __instance, @ByRef String[] ___label) {
             if (__instance.result == Enums.SPIREPASS_BUTTON) {
-                ___label[0] = "Spirepass";
+                ___label[0] = uiStrings.TEXT[0];
             }
         }
     }

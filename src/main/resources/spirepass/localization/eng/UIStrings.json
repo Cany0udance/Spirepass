@@ -375,5 +375,18 @@
       "Daily Master",
       "Have all 3 daily challenges completed at once."
     ]
+  },
+  "${modID}:MainMenuButton": {
+    "TEXT": [
+      "Spirepass"
+    ]
+  },
+  "${modID}:SpirepassScreen": {
+    "TEXT": [
+      "SPIREPASS",
+      "EQUIP",
+      "UNEQUIP",
+      "LOCKED"
+    ]
   }
 }
