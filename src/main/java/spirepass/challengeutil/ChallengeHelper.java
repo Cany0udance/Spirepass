@@ -1,5 +1,6 @@
 package spirepass.challengeutil;
 
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import spirepass.Spirepass;
 
 public class ChallengeHelper {
@@ -93,34 +94,43 @@ public class ChallengeHelper {
 
         boolean completed = false;
 
-        // Check and complete daily challenges
+        // Find the challenge object first to avoid duplicate checks
+        Challenge challengeToComplete = null;
         for (Challenge challenge : manager.getDailyChallenges()) {
             if (challenge.getId().equals(challengeId) && !challenge.isCompleted()) {
-                challenge.complete();
-                completed = true;
+                challengeToComplete = challenge;
                 break;
             }
         }
-
-        // Check and complete weekly challenges if not completed yet
-        if (!completed) {
+        if (challengeToComplete == null) {
             for (Challenge challenge : manager.getWeeklyChallenges()) {
                 if (challenge.getId().equals(challengeId) && !challenge.isCompleted()) {
-                    challenge.complete();
-                    completed = true;
+                    challengeToComplete = challenge;
                     break;
                 }
             }
         }
 
-        // Save data if challenge was completed
+        // Complete the challenge if found
+        if (challengeToComplete != null) {
+            challengeToComplete.complete();
+            completed = true;
+        }
+
         if (completed) {
+            // --- Add sound logic here ---
+            if (Spirepass.enableMainMenuElements && Spirepass.playChallengeCompleteSound) {
+                CardCrawlGame.sound.play("UNLOCK_PING");
+                // Spirepass.logger.info("Played challenge complete sound for: " + challengeId);
+            }
+            // --- End sound logic ---
+
             manager.saveData(Spirepass.config);
             try {
                 Spirepass.config.save();
-//                 Spirepass.logger.info("Saved config after completing challenge: " + challengeId);
+                // Spirepass.logger.info("Saved config after completing challenge: " + challengeId);
             } catch (Exception e) {
-//                 Spirepass.logger.error("Error saving config after completing challenge: " + e.getMessage());
+                // Spirepass.logger.error("Error saving config after completing challenge: " + e.getMessage());
             }
         }
 

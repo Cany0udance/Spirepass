@@ -123,15 +123,4 @@ public class TextureLoader {
         logger.info("Loaded texture " + textureString);
         textures.put(textureString, texture);
     }
-
-    public static Texture getPowerTexture(final String powerName)
-    {
-        String textureString = powerPath(powerName + ".png");
-        return getTexture(textureString);
-    }
-    public static Texture getHiDefPowerTexture(final String powerName)
-    {
-        String textureString = powerPath("large/" + powerName + ".png");
-        return getTextureNull(textureString);
-    }
 }

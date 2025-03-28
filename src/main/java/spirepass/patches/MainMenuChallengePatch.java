@@ -65,11 +65,16 @@ public class MainMenuChallengePatch {
     public static class RenderPatch {
         @SpirePostfixPatch
         public static void renderButtons(MainMenuScreen instance, SpriteBatch sb) {
+            // Add this check
+            if (!Spirepass.enableMainMenuElements) {
+                return;
+            }
+            // Original code follows
             if (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
                 sb.setColor(Color.WHITE);
                 if (weeklyButton != null) weeklyButton.render(sb);
                 if (dailyButton != null) dailyButton.render(sb);
-            //    if (devRefreshButton != null) devRefreshButton.render(sb);
+                // if (devRefreshButton != null) devRefreshButton.render(sb);
                 if (adButton != null && isAdButtonVisible) adButton.render(sb);
                 sb.setColor(Color.WHITE);
             }
@@ -80,6 +85,18 @@ public class MainMenuChallengePatch {
     public static class UpdatePatch {
         @SpirePostfixPatch
         public static void updateButtons(MainMenuScreen instance) {
+            // Add this check
+            if (!Spirepass.enableMainMenuElements) {
+                // Reset initialized flag if elements are disabled, so they re-init if re-enabled
+                if (initialized) {
+                    dailyButton = null;
+                    weeklyButton = null;
+                    adButton = null;
+                    initialized = false;
+                }
+                return;
+            }
+            // Original code follows
             if (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
                 if (!initialized) {
                     initializeButtons();
@@ -94,7 +111,7 @@ public class MainMenuChallengePatch {
 
                 if (dailyButton != null) dailyButton.update();
                 if (weeklyButton != null) weeklyButton.update();
-            //    if (devRefreshButton != null) devRefreshButton.update();
+                // if (devRefreshButton != null) devRefreshButton.update();
                 if (adButton != null && isAdButtonVisible) adButton.update();
 
                 checkAndRenderTooltips();
@@ -230,7 +247,7 @@ public class MainMenuChallengePatch {
         }
 
         TipHelper.renderGenericTip(tipX, tipY,
-                "Daily challenges award 25 Spirepass XP when completed.",
+                "Daily challenges grant 25 Spirepass XP when completed.",
                 tipBody.toString()
         );
     }
@@ -275,7 +292,7 @@ public class MainMenuChallengePatch {
         }
 
         TipHelper.renderGenericTip(tipX, tipY,
-                "Weekly challenges award 75 Spirepass XP when completed.", // Header
+                "Weekly challenges grant 75 Spirepass XP when completed.", // Header
                 tipBody.toString()
         );
     }

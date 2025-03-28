@@ -3,6 +3,7 @@ package spirepass.screens;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Disposable;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
@@ -14,15 +15,18 @@ import spirepass.spirepassutil.SpirepassPositionSettings;
 import spirepass.spirepassutil.SpirepassRewardData;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static spirepass.Spirepass.makeID;
 
-public class SpirepassRewardManager {
+public class SpirepassRewardManager implements Disposable {
     private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID(""));
     // Maps to hold our reward data and textures
     private HashMap<Integer, SpirepassRewardData> rewardData;
     private HashMap<Integer, Texture> rewardTextures;
     private HashMap<String, Texture> backgroundTextures;
+    private Texture lockTexture; // <-- Added: Load lock texture once
 
     // Animation manager for rendering character models
     private SpirepassAnimationManager animationManager;
@@ -35,31 +39,145 @@ public class SpirepassRewardManager {
         // Initialize the animation manager
         this.animationManager = new SpirepassAnimationManager();
 
-        // Load background textures
-        loadBackgroundTextures();
+        // Load background textures (including lock texture now)
+        loadManagedTextures(); // Renamed for clarity
 
         // Initialize reward data and textures
         initializeRewardData();
     }
 
-    private void loadBackgroundTextures() {
+    // Renamed method to reflect it loads more than just backgrounds
+    private void loadManagedTextures() {
         // Load the background textures for different rarities
-        String[] paths = {
+        String[] backgroundPaths = {
                 "spirepass/images/screen/CommonRewardBackground.png",
                 "spirepass/images/screen/UncommonRewardBackground.png",
                 "spirepass/images/screen/RareRewardBackground.png",
                 "spirepass/images/screen/LockedRewardBackground.png"
         };
 
-        for (String path : paths) {
+        for (String path : backgroundPaths) {
             try {
                 backgroundTextures.put(path, ImageMaster.loadImage(path));
             } catch (Exception e) {
                 System.err.println("Failed to load background texture: " + path);
             }
         }
+
+        // Load the lock texture once
+        try {
+            this.lockTexture = ImageMaster.loadImage("spirepass/images/screen/lock.png");
+        } catch (Exception e) {
+            System.err.println("Failed to load lock texture: " + e.getMessage());
+            this.lockTexture = null; // Ensure it's null on failure
+        }
     }
 
+    // Modified renderLockedReward to use the member variable
+    private void renderLockedReward(SpriteBatch sb) {
+        Texture lockedBackgroundTexture = backgroundTextures.get("spirepass/images/screen/LockedRewardBackground.png");
+
+        if (lockedBackgroundTexture != null) {
+            float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
+            float previewWidth = previewHeight * (lockedBackgroundTexture.getWidth() / (float) lockedBackgroundTexture.getHeight());
+            sb.setColor(Color.WHITE);
+            sb.draw(
+                    lockedBackgroundTexture,
+                    Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                    previewWidth,
+                    previewHeight
+            );
+        }
+
+        // Use the pre-loaded lockTexture
+        if (this.lockTexture != null) {
+            float lockSize = 120.0f * Settings.scale;
+            sb.setColor(Color.WHITE);
+            sb.draw(
+                    this.lockTexture, // Use the member variable
+                    Settings.WIDTH / 2.0f - lockSize / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - lockSize / 4.0f,
+                    lockSize,
+                    lockSize
+            );
+        } else {
+            // Optional: Render fallback text if lock texture failed to load
+            FontHelper.renderFontCentered(sb, FontHelper.tipBodyFont, "[X]", Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y, Color.RED);
+        }
+
+
+        FontHelper.renderFontCentered(
+                sb,
+                FontHelper.tipBodyFont,
+                "Reward locked. Go complete some challenges!",
+                Settings.WIDTH / 2.0f,
+                SpirepassPositionSettings.REWARD_PREVIEW_Y - 80.0f * Settings.scale,
+                Color.WHITE
+        );
+    }
+
+
+    // --- NEW dispose() method ---
+    @Override // From Disposable interface
+    public void dispose() {
+        System.out.println("Disposing SpirepassRewardManager resources...");
+
+        // Use a Set to track unique textures and avoid double disposal,
+        // especially important for the badgeTexture shared across multiple levels.
+        Set<Texture> uniqueTextures = new HashSet<>();
+
+        // Collect unique textures from backgroundTextures
+        if (backgroundTextures != null) {
+            for (Texture texture : backgroundTextures.values()) {
+                if (texture != null) {
+                    uniqueTextures.add(texture);
+                }
+            }
+            backgroundTextures.clear(); // Clear map after collecting
+        }
+
+        // Collect unique textures from rewardTextures
+        if (rewardTextures != null) {
+            for (Texture texture : rewardTextures.values()) {
+                if (texture != null) {
+                    uniqueTextures.add(texture);
+                }
+            }
+            rewardTextures.clear(); // Clear map after collecting
+        }
+
+        // Dispose the single lock texture instance
+        if (this.lockTexture != null) {
+            uniqueTextures.add(this.lockTexture); // Add it to the set just in case it overlaps somehow
+        }
+
+        // Dispose all collected unique textures
+        for (Texture texture : uniqueTextures) {
+            try {
+                // System.out.println("Disposing texture: " + texture.toString()); // Optional debug log
+                texture.dispose();
+            } catch (Exception e) {
+                System.err.println("Error disposing texture: " + e.getMessage());
+            }
+        }
+        uniqueTextures.clear(); // Clear the helper set
+
+        // Set references to null after disposal
+        backgroundTextures = null;
+        rewardTextures = null;
+        lockTexture = null;
+        animationManager = null; // Nullify reference, but don't dispose here
+
+        System.out.println("SpirepassRewardManager disposal complete.");
+    }
+
+
+    // --- Rest of the SpirepassRewardManager class ---
+    // (initializeRewardData, renderReward, renderTextReward, renderRewardWithData,
+    // renderDefaultReward, renderFallbackText, isRewardEquipped, toggleRewardEquipped,
+    // createReward methods, getters remain the same)
+    // ...
     private void initializeRewardData() {
 
         rewardData.put(0, new SpirepassRewardData(
@@ -376,7 +494,14 @@ public class SpirepassRewardManager {
         ));
 
         // Default reward for all other levels (badge image)
-        Texture badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
+        // Now need to handle this badgeTexture disposal correctly
+        Texture badgeTexture = null;
+        try {
+            badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
+        } catch (Exception e) {
+            System.err.println("Failed to load badge texture: " + e.getMessage());
+        }
+
 
         // Load the image textures for any image-type or cardback-type rewards
         for (Integer level : rewardData.keySet()) {
@@ -391,38 +516,34 @@ public class SpirepassRewardManager {
         }
 
         // For any unspecified levels, use the badge texture as a fallback
-        for (int i = 0; i <= 30; i++) {
-            if (!rewardTextures.containsKey(i) && !rewardData.containsKey(i)) {
-                rewardTextures.put(i, badgeTexture);
+        // Only add if badgeTexture loaded successfully
+        if (badgeTexture != null) {
+            for (int i = 0; i <= 30; i++) {
+                if (!rewardTextures.containsKey(i) && !rewardData.containsKey(i)) {
+                    // Put the SAME badgeTexture instance for all fallback levels
+                    rewardTextures.put(i, badgeTexture);
+                }
             }
+        } else {
+            // Handle case where badge texture failed to load if necessary
         }
     }
 
     public void renderReward(SpriteBatch sb, int level, boolean isUnlocked) {
-        // If the reward is locked, show the locked view
         if (!isUnlocked) {
             renderLockedReward(sb);
             return;
         }
-
-        // Original code for unlocked rewards
         SpirepassRewardData reward = getRewardData(level);
-
-        // If we have specific reward data, use it
         if (reward != null) {
             renderRewardWithData(sb, level, isUnlocked, reward);
         } else {
             renderDefaultReward(sb, level);
         }
     }
-
-    // Update the renderTextReward method to use localized strings
     private void renderTextReward(SpriteBatch sb, SpirepassRewardData reward) {
-        // Get the appropriate background texture based on the reward's rarity
         String backgroundPath = reward.getBackgroundTexturePath();
         Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
-
-        // Render the background
         if (backgroundTexture != null) {
             float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
             float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float) backgroundTexture.getHeight());
@@ -435,119 +556,39 @@ public class SpirepassRewardManager {
                     previewHeight
             );
         }
-
-        // Different message text and style based on level
         if (reward.getLevel() == 0) {
-            // Level 0 message - single line
             UIStrings welcomeStrings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassWelcomeMessage"));
             String messageText = welcomeStrings.TEXT[0];
             FontHelper.renderFontCentered(
-                    sb,
-                    FontHelper.tipBodyFont,
-                    messageText,
-                    Settings.WIDTH / 2.0f,
-                    SpirepassPositionSettings.REWARD_PREVIEW_Y,
-                    Color.WHITE
+                    sb, FontHelper.tipBodyFont, messageText, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y, Color.WHITE
             );
         } else if (reward.getLevel() == 30) {
-            // Level 30 message - split into two lines
             UIStrings maxLevelStrings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassMaxLevelMessage"));
             String line1 = maxLevelStrings.TEXT[0];
             String line2 = maxLevelStrings.TEXT[1];
-
-            // Render first line
             FontHelper.renderFontCentered(
-                    sb,
-                    FontHelper.tipBodyFont,
-                    line1,
-                    Settings.WIDTH / 2.0f,
-                    SpirepassPositionSettings.REWARD_PREVIEW_Y + 15.0f * Settings.scale,
-                    Color.GOLD
+                    sb, FontHelper.tipBodyFont, line1, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y + 15.0f * Settings.scale, Color.GOLD
             );
-            // Render second line
             FontHelper.renderFontCentered(
-                    sb,
-                    FontHelper.tipBodyFont,
-                    line2,
-                    Settings.WIDTH / 2.0f,
-                    SpirepassPositionSettings.REWARD_PREVIEW_Y - 15.0f * Settings.scale,
-                    Color.GOLD
+                    sb, FontHelper.tipBodyFont, line2, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y - 15.0f * Settings.scale, Color.GOLD
             );
         } else {
-            // Fallback for any other levels
             String messageText = "Level " + reward.getLevel() + " Reward";
             FontHelper.renderFontCentered(
-                    sb,
-                    FontHelper.tipBodyFont,
-                    messageText,
-                    Settings.WIDTH / 2.0f,
-                    SpirepassPositionSettings.REWARD_PREVIEW_Y,
-                    Color.WHITE
+                    sb, FontHelper.tipBodyFont, messageText, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y, Color.WHITE
             );
         }
     }
-
-    private void renderLockedReward(SpriteBatch sb) {
-        // Get the locked background texture
-        Texture lockedBackgroundTexture = backgroundTextures.get("spirepass/images/screen/LockedRewardBackground.png");
-
-        // Render the locked background
-        if (lockedBackgroundTexture != null) {
-            float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
-            float previewWidth = previewHeight * (lockedBackgroundTexture.getWidth() / (float) lockedBackgroundTexture.getHeight());
-
-            sb.setColor(Color.WHITE);
-            sb.draw(
-                    lockedBackgroundTexture,
-                    Settings.WIDTH / 2.0f - previewWidth / 2.0f,
-                    SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
-                    previewWidth,
-                    previewHeight
-            );
-        }
-
-        // Render the lock image
-        Texture lockTexture = ImageMaster.loadImage("spirepass/images/screen/lock.png");
-        if (lockTexture != null) {
-            // Adjustable size for the lock image - you can modify these values as needed
-            float lockSize = 120.0f * Settings.scale; // Size of the lock image
-
-            sb.setColor(Color.WHITE);
-            sb.draw(
-                    lockTexture,
-                    Settings.WIDTH / 2.0f - lockSize / 2.0f,
-                    SpirepassPositionSettings.REWARD_PREVIEW_Y - lockSize / 4.0f, // Positioned slightly above center
-                    lockSize,
-                    lockSize
-            );
-        }
-
-        // Render the locked message (moved down to make room for the lock)
-        FontHelper.renderFontCentered(
-                sb,
-                FontHelper.tipBodyFont,
-                "Reward locked. Go complete some challenges!",
-                Settings.WIDTH / 2.0f,
-                SpirepassPositionSettings.REWARD_PREVIEW_Y - 80.0f * Settings.scale, // Moved down to be below the lock
-                Color.WHITE
-        );
-    }
-
     private void renderRewardWithData(SpriteBatch sb, int level, boolean isUnlocked, SpirepassRewardData reward) {
-        // Get the background texture path
         String backgroundPath = reward.getBackgroundTexturePath();
         Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
-
         if (reward.getType() == SpirepassRewardData.RewardType.TEXT) {
             renderTextReward(sb, reward);
             return;
         }
-
-        // Render the background if available
         if (backgroundTexture != null) {
             float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
             float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float) backgroundTexture.getHeight());
-
             sb.setColor(Color.WHITE);
             sb.draw(
                     backgroundTexture,
@@ -557,27 +598,17 @@ public class SpirepassRewardManager {
                     previewHeight
             );
         }
-
-        // Render reward preview based on type
         if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
             String modelId = reward.getModelId();
             String entityId = reward.getEntityId();
-
-            // Get the variant from the model ID
             String variant = SpirepassAnimationManager.getVariantFromModelId(entityId, modelId);
-
-            // Render the appropriate entity preview
             animationManager.renderAnimationPreview(sb, entityId, variant);
-        } else if (reward.getType() == SpirepassRewardData.RewardType.IMAGE ||
-                reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
-            // For both IMAGE and CARDBACK types, display the image preview
+        } else if (reward.getType() == SpirepassRewardData.RewardType.IMAGE || reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
             Texture rewardTexture = getRewardTexture(level);
-
             if (rewardTexture != null) {
                 float previewHeight = SpirepassPositionSettings.REWARD_IMAGE_HEIGHT * SpirepassPositionSettings.REWARD_CONTENT_SCALE;
                 float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
                 float previewWidth = previewHeight * aspectRatio;
-
                 sb.setColor(Color.WHITE);
                 sb.draw(
                         rewardTexture,
@@ -588,50 +619,23 @@ public class SpirepassRewardManager {
                 );
             }
         }
-
-        // Get the color based on rarity
         Color titleColor;
         switch (reward.getRarity()) {
-            case UNCOMMON:
-                titleColor = new Color(0.5058f, 0.8862f, 0.9098f, 1.0f); // #81e2e8
-                break;
-            case RARE:
-                titleColor = new Color(0.9804f, 0.7333f, 0.2627f, 1.0f); // #fabb43
-                break;
-            case COMMON:
-            default:
-                titleColor = Color.WHITE;
-                break;
+            case UNCOMMON: titleColor = new Color(0.5058f, 0.8862f, 0.9098f, 1.0f); break;
+            case RARE: titleColor = new Color(0.9804f, 0.7333f, 0.2627f, 1.0f); break;
+            case COMMON: default: titleColor = Color.WHITE; break;
         }
-
-        // Render reward title with the appropriate color
         FontHelper.renderFontCentered(
-                sb,
-                FontHelper.tipBodyFont,
-                reward.getName(),
-                Settings.WIDTH / 2.0f,
-                SpirepassPositionSettings.REWARD_NAME_Y,
-                titleColor
+                sb, FontHelper.tipBodyFont, reward.getName(), Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_NAME_Y, titleColor
         );
-
-        // Render description
         FontHelper.renderFontCentered(
-                sb,
-                FontHelper.tipBodyFont,
-                reward.getDescription(),
-                Settings.WIDTH / 2.0f,
-                SpirepassPositionSettings.REWARD_DESCRIPTION_Y,
-                Color.LIGHT_GRAY
+                sb, FontHelper.tipBodyFont, reward.getDescription(), Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_DESCRIPTION_Y, Color.LIGHT_GRAY
         );
     }
-
     private void renderDefaultReward(SpriteBatch sb, int level) {
-        // No specific reward data, just show level number and a generic message
         Texture rewardTexture = getRewardTexture(level);
         if (rewardTexture != null) {
-            // Set desired height for all reward images
             float previewHeight = 200.0f * Settings.scale;
-            // Calculate width based on the texture's aspect ratio
             float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
             float previewWidth = previewHeight * aspectRatio;
             sb.setColor(Color.WHITE);
@@ -643,188 +647,105 @@ public class SpirepassRewardManager {
                     previewHeight
             );
         } else {
-            // Only show text if no texture is available
             renderFallbackText(sb, "No preview available for Level " + level, Color.ORANGE);
         }
-
-        // Render generic title
         FontHelper.renderFontCentered(
-                sb,
-                FontHelper.tipBodyFont,
-                "Level " + level + " Reward",
-                Settings.WIDTH / 2.0f,
-                SpirepassPositionSettings.REWARD_NAME_Y,
-                Color.WHITE
+                sb, FontHelper.tipBodyFont, "Level " + level + " Reward", Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_NAME_Y, Color.WHITE
         );
     }
-
     private void renderFallbackText(SpriteBatch sb, String text, Color color) {
         FontHelper.renderFontCentered(
-                sb,
-                FontHelper.tipBodyFont,
-                text,
-                Settings.WIDTH / 2.0f,
-                SpirepassPositionSettings.REWARD_PREVIEW_Y,
-                color
+                sb, FontHelper.tipBodyFont, text, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y, color
         );
     }
-
     public boolean isRewardEquipped(SpirepassRewardData reward) {
-        if (reward == null) {
-            return false;
-        }
-
-        // Special handling for level 6 (or any background)
+        if (reward == null) return false;
         if (reward.isBackgroundReward()) {
             String currentBackground = SkinManager.getInstance().getAppliedSkin(SkinManager.BACKGROUND_SCREEN);
             return reward.getImagePath().equals(currentBackground);
         } else if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
-            // Existing code for character models
             String entityId = reward.getEntityId();
             String modelId = reward.getModelId();
             String currentSkin = SkinManager.getInstance().getAppliedSkin(entityId);
             return modelId.equals(currentSkin);
         } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
-            // Existing code for cardbacks
             String cardbackType = reward.getCardbackType();
             String cardbackId = reward.getCardbackId();
             String currentCardback = SkinManager.getInstance().getAppliedCardback(cardbackType);
             return cardbackId.equals(currentCardback);
         }
-
         return false;
     }
-
     public void toggleRewardEquipped(SpirepassRewardData reward) {
-        if (reward == null) {
-            return;
-        }
-
-        // Special handling for level 6 (or any background)
+        if (reward == null) return;
+        boolean stateChanged = false;
         if (reward.isBackgroundReward()) {
             String currentBackground = SkinManager.getInstance().getAppliedSkin(SkinManager.BACKGROUND_SCREEN);
             boolean shouldUnequip = reward.getImagePath().equals(currentBackground);
-            SkinManager.getInstance().setAppliedSkin(SkinManager.BACKGROUND_SCREEN, shouldUnequip ? "" : reward.getImagePath());
-          //  System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
-         //           "background: " + reward.getImagePath());
+            String newValue = shouldUnequip ? "" : reward.getImagePath();
+            if (!newValue.equals(currentBackground)) {
+                SkinManager.getInstance().setAppliedSkin(SkinManager.BACKGROUND_SCREEN, newValue);
+                stateChanged = true;
+            }
         } else if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
-            // Existing code for character models
             String entityId = reward.getEntityId();
             String modelId = reward.getModelId();
             String currentSkin = SkinManager.getInstance().getAppliedSkin(entityId);
             boolean shouldUnequip = modelId.equals(currentSkin);
-            SkinManager.getInstance().setAppliedSkin(entityId, shouldUnequip ? "" : modelId);
-           // System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
-           //         entityId + " skin: " + modelId);
+            String newValue = shouldUnequip ? "" : modelId;
+            if (!newValue.equals(currentSkin)) {
+                SkinManager.getInstance().setAppliedSkin(entityId, newValue);
+                stateChanged = true;
+                // Sound logic could go here if needed
+            }
         } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
-            // Existing code for cardbacks
             String cardbackType = reward.getCardbackType();
             String cardbackId = reward.getCardbackId();
             String currentCardback = SkinManager.getInstance().getAppliedCardback(cardbackType);
             boolean shouldUnequip = cardbackId.equals(currentCardback);
-            SkinManager.getInstance().setAppliedCardback(cardbackType, shouldUnequip ? "" : cardbackId);
-        //    System.out.println((shouldUnequip ? "Unequipped " : "Equipped ") +
-          //          cardbackType + " cardback: " + cardbackId);
+            String newValue = shouldUnequip ? "" : cardbackId;
+            if (!newValue.equals(currentCardback)) {
+                SkinManager.getInstance().setAppliedCardback(cardbackType, newValue);
+                stateChanged = true;
+            }
         }
-
-        // Save the config immediately after changing the reward state
-        Spirepass.saveConfig();
+        if (stateChanged) {
+            Spirepass.saveConfig();
+        }
     }
-
-    // Utility
-
-    // Helper methods for reward creation
-    private SpirepassRewardData createReward(
-            int id,
-            String nameKey,
-            SpirepassRewardData.RewardRarity rarity,
-            SpirepassRewardData.RewardType type) {
-
+    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type) {
         UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
-        return new SpirepassRewardData(
-                id,
-                strings.TEXT[0],  // Name
-                strings.TEXT[1],  // Description
-                rarity,
-                type
-        );
+        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type);
     }
-
-    private SpirepassRewardData createReward(
-            int id,
-            String nameKey,
-            SpirepassRewardData.RewardRarity rarity,
-            SpirepassRewardData.RewardType type,
-            String entityOrPath) {
-
+    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entityOrPath) {
         UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
-        return new SpirepassRewardData(
-                id,
-                strings.TEXT[0],  // Name
-                strings.TEXT[1],  // Description
-                rarity,
-                type,
-                entityOrPath
-        );
+        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entityOrPath);
     }
-
-    private SpirepassRewardData createReward(
-            int id,
-            String nameKey,
-            SpirepassRewardData.RewardRarity rarity,
-            SpirepassRewardData.RewardType type,
-            String entity,
-            String skin) {
-
+    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entity, String skin) {
         UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
-        return new SpirepassRewardData(
-                id,
-                strings.TEXT[0],  // Name
-                strings.TEXT[1],  // Description
-                rarity,
-                type,
-                entity,
-                skin
-        );
+        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entity, skin);
     }
-
-    private SpirepassRewardData createReward(
-            int id,
-            String nameKey,
-            SpirepassRewardData.RewardRarity rarity,
-            SpirepassRewardData.RewardType type,
-            String entity,
-            String skin,
-            String imagePath) {
-
+    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entity, String skin, String imagePath) {
         UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
-        return new SpirepassRewardData(
-                id,
-                strings.TEXT[0],  // Name
-                strings.TEXT[1],  // Description
-                rarity,
-                type,
-                entity,
-                skin,
-                imagePath
-        );
+        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entity, skin, imagePath);
     }
-
-
-    // Getters
     public SpirepassRewardData getRewardData(int level) {
         return rewardData.getOrDefault(level, null);
     }
-
     public Texture getRewardTexture(int level) {
-        if (rewardTextures.containsKey(level)) {
+        // Ensure rewardTextures map exists before accessing
+        if (rewardTextures != null && rewardTextures.containsKey(level)) {
             return rewardTextures.get(level);
-        } else {
-            // Return the badge texture as default if level not found
-            for (Integer key : rewardTextures.keySet()) {
-                return rewardTextures.get(key);  // Return the first one we find
+        } else if (rewardTextures != null) {
+            // Fallback logic might need adjustment depending on how badge texture is handled
+            // This simplified version just returns the first texture found if the specific level isn't there.
+            // A better approach might be to specifically fetch the badge texture if needed.
+            for (Texture texture : rewardTextures.values()) {
+                if (texture != null) return texture; // Return the first valid one found (likely badge)
             }
-            return null;  // Fallback
         }
+        return null; // Ultimate fallback
     }
-}
+
+
+} // End of SpirepassRewardManager class

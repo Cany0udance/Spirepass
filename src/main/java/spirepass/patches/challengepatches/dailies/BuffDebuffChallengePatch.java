@@ -1,6 +1,7 @@
 package spirepass.patches.challengepatches.dailies;
 
 import com.evacipated.cardcrawl.modthespire.lib.*;
+import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import javassist.CtBehavior;
@@ -9,50 +10,40 @@ import org.apache.logging.log4j.Logger;
 import spirepass.Spirepass;
 import spirepass.challengeutil.ChallengeHelper;
 
-@SpirePatch(clz = AbstractCreature.class, method = "addPower")
+import static basemod.BaseMod.logger;
+
+@SpirePatch(clz = ApplyPowerAction.class, method = "update")
 public class BuffDebuffChallengePatch {
-    @SpireInsertPatch(
-            locator = AfterPowerAddLocator.class
-    )
-    public static void onAddPower(AbstractCreature __instance, AbstractPower powerToApply) {
-        // Only proceed if this is the player
-        if (!__instance.isPlayer) {
-            return;
-        }
 
-        // Count active buffs and debuffs
-        int buffCount = 0;
-        int debuffCount = 0;
+    @SpirePostfixPatch
+    public static void checkChallengesAfterPowerAppliedByAction(ApplyPowerAction __instance) {
 
-        for (AbstractPower p : __instance.powers) {
-            if (p.type == AbstractPower.PowerType.BUFF) {
-                buffCount++;
-            } else if (p.type == AbstractPower.PowerType.DEBUFF) {
-                debuffCount++;
+        AbstractCreature target = __instance.target;
+
+        if (target != null && target.isPlayer && __instance.isDone) {
+
+            int buffCount = 0;
+            int debuffCount = 0;
+
+            for (AbstractPower p : target.powers) {
+                if (p.type == AbstractPower.PowerType.BUFF) {
+                    buffCount++;
+                } else if (p.type == AbstractPower.PowerType.DEBUFF) {
+                    debuffCount++;
+                }
             }
-        }
 
-        // Check buff challenge
-        if (buffCount >= 5) {
-            if (ChallengeHelper.isActiveChallengeIncomplete("daily_buff")) {
-                ChallengeHelper.completeChallenge("daily_buff");
+            if (buffCount >= 5) {
+                if (ChallengeHelper.isActiveChallengeIncomplete("daily_buff")) {
+                    ChallengeHelper.completeChallenge("daily_buff");
+                }
             }
-        }
 
-        // Check debuff challenge
-        if (debuffCount >= 4) {
-            if (ChallengeHelper.isActiveChallengeIncomplete("daily_debuff")) {
-                ChallengeHelper.completeChallenge("daily_debuff");
+            if (debuffCount >= 4) {
+                if (ChallengeHelper.isActiveChallengeIncomplete("daily_debuff")) {
+                    ChallengeHelper.completeChallenge("daily_debuff");
+                }
             }
-        }
-    }
-
-    // Locator to find the spot after the power is added
-    private static class AfterPowerAddLocator extends SpireInsertLocator {
-        @Override
-        public int[] Locate(CtBehavior ctMethodToPatch) throws Exception {
-            Matcher matcher = new Matcher.FieldAccessMatcher(AbstractCreature.class, "powers");
-            return LineFinder.findInOrder(ctMethodToPatch, matcher);
         }
     }
 }

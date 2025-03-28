@@ -1,9 +1,6 @@
 package spirepass;
 
-import basemod.BaseMod;
-import basemod.IUIElement;
-import basemod.ModLabeledButton;
-import basemod.ModPanel;
+import basemod.*;
 import basemod.interfaces.*;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
@@ -11,7 +8,6 @@ import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.evacipated.cardcrawl.modthespire.Loader;
 import com.evacipated.cardcrawl.modthespire.ModInfo;
@@ -19,28 +15,23 @@ import com.evacipated.cardcrawl.modthespire.Patcher;
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
-import com.megacrit.cardcrawl.helpers.input.InputHelper;
-import com.megacrit.cardcrawl.localization.*;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import org.apache.logging.log4j.LogManager;
-// import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Logger;
 import org.scannotation.AnnotationDB;
 import spirepass.challengeutil.*;
 import spirepass.spirepassutil.SkinManager;
 import spirepass.util.GeneralUtils;
-import spirepass.util.KeywordInfo;
 import spirepass.util.TextureLoader;
 
-import java.time.DayOfWeek;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,6 +58,15 @@ public class Spirepass implements
     private static final int NUM_DAILY_CHALLENGES = 3;
     private static final int NUM_WEEKLY_CHALLENGES = 3;
     private static final int REFRESH_HOUR_EST = 12; // 12 PM EST
+    // Keys for config file
+    private static final String JUMP_TO_LEVEL_KEY = "jumpToCurrentLevel";
+    private static final String ENABLE_MENU_ELEMENTS_KEY = "enableMainMenuElements";
+    private static final String PLAY_CHALLENGE_SOUND_KEY = "playChallengeCompleteSound";
+
+    // Static fields to hold current config values
+    public static boolean jumpToCurrentLevel;
+    public static boolean enableMainMenuElements;
+    public static boolean playChallengeCompleteSound;
 
     // XP and level system constants
     private static final String TOTAL_XP_KEY = "totalXP";
@@ -96,8 +96,22 @@ public class Spirepass implements
             defaults.setProperty(LAST_WEEKLY_REFRESH, String.valueOf(0));
             // Add XP default
             defaults.setProperty(TOTAL_XP_KEY, "0");
+
+            // --- NEW CONFIG OPTIONS DEFAULTS ---
+            defaults.setProperty(JUMP_TO_LEVEL_KEY, "true"); // Default enabled
+            defaults.setProperty(ENABLE_MENU_ELEMENTS_KEY, "true"); // Default enabled
+            defaults.setProperty(PLAY_CHALLENGE_SOUND_KEY, "false"); // Default disabled
+            // --- END NEW CONFIG OPTIONS DEFAULTS ---
+
             // Initialize config with defaults
             config = new SpireConfig(modID, "config", defaults);
+
+            // --- LOAD NEW CONFIG VALUES ---
+            jumpToCurrentLevel = config.getBool(JUMP_TO_LEVEL_KEY);
+            enableMainMenuElements = config.getBool(ENABLE_MENU_ELEMENTS_KEY);
+            playChallengeCompleteSound = config.getBool(PLAY_CHALLENGE_SOUND_KEY);
+            // --- END LOAD NEW CONFIG VALUES ---
+
 
             // Load XP data after config is initialized
             if (config.has(TOTAL_XP_KEY)) {
@@ -105,8 +119,10 @@ public class Spirepass implements
 //                 logger.info("Loaded battle pass XP: " + totalXP);
             }
 
+
             // Load skin data AFTER config is fully initialized
             skinManager.loadData(config);
+
 
             // Initialize challenge manager and load challenge data
             ChallengeManager challengeManager = ChallengeManager.getInstance();
@@ -115,9 +131,11 @@ public class Spirepass implements
             // Check if we need to generate/refresh challenges
             checkAndRefreshChallenges();
 
+
             // Important: Save the config after everything is loaded
             // This ensures any missing properties get saved with defaults
             config.save();
+
 
         } catch (Exception e) {
 //             logger.error("Failed to load config: " + e.getMessage());
@@ -152,84 +170,147 @@ public class Spirepass implements
 
     @Override
     public void receivePostInitialize() {
-        // Create the settings panel
         ModPanel settingsPanel = new ModPanel();
 
-// Create the XP button - initially positioned off-screen
+        UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ConfigMenuText"));
+        String[] TEXT = uiStrings.TEXT;
+
+        float toggleX = 350.0f;
+        float toggleStartY = 750.0f;
+        float toggleSpacing = 50.0f;
+
+        final ModLabeledToggleButton[] menuToggleRef = new ModLabeledToggleButton[1];
+        final ModLabeledToggleButton[] soundToggleRef = new ModLabeledToggleButton[1];
+
+        ModLabeledToggleButton jumpToggle = new ModLabeledToggleButton(TEXT[0],
+                toggleX, toggleStartY, Settings.CREAM_COLOR, FontHelper.charDescFont,
+                jumpToCurrentLevel,
+                settingsPanel, (label) -> {}, (button) -> {
+            jumpToCurrentLevel = button.enabled;
+            try {
+                config.setBool(JUMP_TO_LEVEL_KEY, jumpToCurrentLevel);
+                config.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        settingsPanel.addUIElement(jumpToggle);
+
+        ModLabeledToggleButton menuElementsToggle = new ModLabeledToggleButton(TEXT[1],
+                toggleX, toggleStartY - toggleSpacing, Settings.CREAM_COLOR, FontHelper.charDescFont,
+                enableMainMenuElements,
+                settingsPanel, (label) -> {}, (button) -> {
+            boolean nowEnabled = button.enabled;
+            enableMainMenuElements = nowEnabled;
+
+            try {
+                config.setBool(ENABLE_MENU_ELEMENTS_KEY, nowEnabled);
+
+                if (!nowEnabled) {
+                    ModLabeledToggleButton soundToggle = soundToggleRef[0];
+                    if (soundToggle != null && soundToggle.toggle.enabled) {
+                        soundToggle.toggle.enabled = false;
+                        playChallengeCompleteSound = false;
+                        config.setBool(PLAY_CHALLENGE_SOUND_KEY, false);
+                    }
+                }
+                config.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        settingsPanel.addUIElement(menuElementsToggle);
+        menuToggleRef[0] = menuElementsToggle;
+
+        ModLabeledToggleButton playSoundToggle = new ModLabeledToggleButton(TEXT[2],
+                toggleX, toggleStartY - (toggleSpacing * 2), Settings.CREAM_COLOR, FontHelper.charDescFont,
+                enableMainMenuElements && playChallengeCompleteSound,
+                settingsPanel, (label) -> {}, (button) -> {
+            boolean nowEnabled = button.enabled;
+            playChallengeCompleteSound = nowEnabled;
+
+            try {
+                config.setBool(PLAY_CHALLENGE_SOUND_KEY, nowEnabled);
+
+                if (nowEnabled) {
+                    ModLabeledToggleButton menuToggle = menuToggleRef[0];
+                    if (menuToggle != null && !menuToggle.toggle.enabled) {
+                        menuToggle.toggle.enabled = true;
+                        enableMainMenuElements = true;
+                        config.setBool(ENABLE_MENU_ELEMENTS_KEY, true);
+                    }
+                }
+                config.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        settingsPanel.addUIElement(playSoundToggle);
+        soundToggleRef[0] = playSoundToggle;
+
+        if (!menuElementsToggle.toggle.enabled && playSoundToggle.toggle.enabled) {
+            playSoundToggle.toggle.enabled = false;
+        }
+
         ModLabeledButton xpButton = new ModLabeledButton(
                 "Add 10,000 XP",
-                9999.0f, // Off-screen X position
-                9999.0f, // Off-screen Y position
-                Settings.GOLD_COLOR, // Normal color - gold
-                Settings.GOLD_COLOR, // Hover color - SAME as normal color
+                9999.0f,
+                9999.0f,
+                Settings.GOLD_COLOR,
+                Settings.GOLD_COLOR,
                 FontHelper.buttonLabelFont,
                 settingsPanel,
                 (button) -> {
-                    // When clicked, add 10,000 XP
                     addXP(10000);
-//                     logger.info("Added 10,000 XP via secret button");
-                    // Keep the button visible (don't move off-screen)
                 }
         );
 
-// Create the Reset XP button - initially positioned off-screen
         ModLabeledButton resetXpButton = new ModLabeledButton(
                 "Reset XP to 0",
-                9999.0f, // Off-screen X position
-                9999.0f, // Off-screen Y position
-                Settings.RED_TEXT_COLOR, // Normal color - red
-                Settings.RED_TEXT_COLOR, // Hover color - SAME as normal color
+                9999.0f,
+                9999.0f,
+                Settings.RED_TEXT_COLOR,
+                Settings.RED_TEXT_COLOR,
                 FontHelper.buttonLabelFont,
                 settingsPanel,
                 (button) -> {
-                    // Reset XP to 0
                     totalXP = 0;
-                    config.setInt(TOTAL_XP_KEY, 0);
-                    saveConfig();
-//                     logger.info("Reset XP to 0 via secret button");
-                    // Keep the button visible (don't move off-screen)
+                    if (config != null) {
+                        config.setInt(TOTAL_XP_KEY, 0);
+                        saveConfig();
+                        logger.info("Reset XP to 0 via secret button"); // Left logger intentionally, remove if unwanted
+                    } else {
+                        logger.error("Config not initialized when trying to reset XP!"); // Left logger intentionally, remove if unwanted
+                    }
                 }
         );
 
-        // Add both buttons to the panel
         settingsPanel.addUIElement(xpButton);
         settingsPanel.addUIElement(resetXpButton);
 
-        // Create a secret area detector that exactly matches button hitboxes
+// Create a secret area detector that exactly matches button hitboxes
         class SecretAreaElement implements IUIElement {
-            // Position values for our buttons - easy to adjust
-            private final float BUTTON_X = Settings.WIDTH / 2.0f / Settings.scale - 75.0f;
-            private final float BUTTON_Y_TOP = Settings.HEIGHT / 2.0f / Settings.scale - 10.0f;
-            private final float BUTTON_Y_SPACING = 70.0f; // Increased spacing between buttons
-            private final float BUTTON_Y_BOTTOM = BUTTON_Y_TOP - BUTTON_Y_SPACING;
+            private final float BUTTON_X = Settings.WIDTH / Settings.scale - 650.0f;
+            private final float BUTTON_Y_BOTTOM = 250.0f;
+            private final float BUTTON_Y_SPACING = 70.0f;
+            private final float BUTTON_Y_TOP = BUTTON_Y_BOTTOM + BUTTON_Y_SPACING;
 
-            // Track when buttons become visible
             private boolean areButtonsVisible = false;
-
-            // Holds hitbox references that match exactly where the buttons would be
             private Hitbox topButtonHitbox;
             private Hitbox bottomButtonHitbox;
 
             public SecretAreaElement() {
-                // Create invisible hitboxes to match exactly where buttons would appear
-                // We use the same hitbox size logic as ModLabeledButton
+                String topButtonText = "Add 10,000 XP";
+                String bottomButtonText = "Reset XP to 0";
 
-                // For Add XP button
-                float topTextWidth = FontHelper.getSmartWidth(
-                        FontHelper.buttonLabelFont,
-                        "Add 10,000 XP",
-                        9999.0f,
-                        0.0f
-                );
-                float topMiddleWidth = Math.max(0.0f, topTextWidth - 18.0f * Settings.scale);
-                // Use the same textures as the ModLabeledButton class
                 Texture textureLeft = ImageMaster.loadImage("img/ButtonLeft.png");
                 Texture textureRight = ImageMaster.loadImage("img/ButtonRight.png");
-
-                float topButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + topMiddleWidth;
                 float buttonHeight = textureLeft.getHeight() * Settings.scale;
 
-                // Hitbox for top button - use exact same offsets as ModLabeledButton
+                float topTextWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, topButtonText, 9999.0f, 0.0f);
+                float topMiddleWidth = Math.max(0.0f, topTextWidth - 18.0f * Settings.scale);
+                float topButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + topMiddleWidth;
+
                 topButtonHitbox = new Hitbox(
                         BUTTON_X * Settings.scale + 1.0f * Settings.scale,
                         BUTTON_Y_TOP * Settings.scale + 1.0f * Settings.scale,
@@ -237,17 +318,10 @@ public class Spirepass implements
                         buttonHeight - 2.0f * Settings.scale
                 );
 
-                // For Reset XP button
-                float bottomTextWidth = FontHelper.getSmartWidth(
-                        FontHelper.buttonLabelFont,
-                        "Reset XP to 0",
-                        9999.0f,
-                        0.0f
-                );
+                float bottomTextWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, bottomButtonText, 9999.0f, 0.0f);
                 float bottomMiddleWidth = Math.max(0.0f, bottomTextWidth - 18.0f * Settings.scale);
                 float bottomButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + bottomMiddleWidth;
 
-                // Hitbox for bottom button
                 bottomButtonHitbox = new Hitbox(
                         BUTTON_X * Settings.scale + 1.0f * Settings.scale,
                         BUTTON_Y_BOTTOM * Settings.scale + 1.0f * Settings.scale,
@@ -258,56 +332,41 @@ public class Spirepass implements
 
             @Override
             public void render(SpriteBatch sb) {
-                // Optional debugging - uncomment to see hitboxes
-                // topButtonHitbox.render(sb);
-                // bottomButtonHitbox.render(sb);
             }
 
             @Override
             public void update() {
-                // Update our invisible hitboxes
                 topButtonHitbox.update();
                 bottomButtonHitbox.update();
-
-                // Check if mouse is hovering over either hitbox
                 boolean isHoveringOverButtonArea = topButtonHitbox.hovered || bottomButtonHitbox.hovered;
 
-                // Only take action if the state changes
                 if (isHoveringOverButtonArea != areButtonsVisible) {
                     areButtonsVisible = isHoveringOverButtonArea;
-
                     if (isHoveringOverButtonArea) {
-                        // Show buttons in their proper positions
+                        // These button variables (xpButton, resetXpButton) must be accessible
+                        // from the outer scope where SecretAreaElement is instantiated.
+                        // Assuming xpButton and resetXpButton are fields or effectively final
+                        // local variables in receivePostInitialize.
                         xpButton.set(BUTTON_X, BUTTON_Y_TOP);
                         resetXpButton.set(BUTTON_X, BUTTON_Y_BOTTOM);
                     } else {
-                        // Hide buttons
                         xpButton.set(9999.0f, 9999.0f);
                         resetXpButton.set(9999.0f, 9999.0f);
                     }
                 }
             }
 
-            // Implementing required methods from IUIElement
-            @Override
-            public int renderLayer() {
-                return 0;
-            }
-
-            @Override
-            public int updateOrder() {
-                return 0;
-            }
+            @Override public int renderLayer() { return 1; }
+            @Override public int updateOrder() { return 1; }
         }
 
-        // Add the secret area detector
         settingsPanel.addUIElement(new SecretAreaElement());
 
-        // Register the mod badge with the settings panel
         Texture badgeTexture = TextureLoader.getTexture(imagePath("badge.png"));
         BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors),
                 info.Description, settingsPanel);
     }
+
 
     /**
      * Check if challenge lists need to be generated or refreshed based on time
@@ -547,8 +606,6 @@ public class Spirepass implements
     }
     private static final String defaultLanguage = "eng";
 
-    public static final Map<String, KeywordInfo> keywords = new HashMap<>();
-
     @Override
     public void receiveEditStrings() {
         loadLocalization(defaultLanguage); //no exception catching for default localization; you better have at least one that works.
@@ -563,20 +620,6 @@ public class Spirepass implements
     }
 
     private void loadLocalization(String lang) {
-        BaseMod.loadCustomStringsFile(CardStrings.class,
-                localizationPath(lang, "CardStrings.json"));
-        BaseMod.loadCustomStringsFile(CharacterStrings.class,
-                localizationPath(lang, "CharacterStrings.json"));
-        BaseMod.loadCustomStringsFile(EventStrings.class,
-                localizationPath(lang, "EventStrings.json"));
-        BaseMod.loadCustomStringsFile(OrbStrings.class,
-                localizationPath(lang, "OrbStrings.json"));
-        BaseMod.loadCustomStringsFile(PotionStrings.class,
-                localizationPath(lang, "PotionStrings.json"));
-        BaseMod.loadCustomStringsFile(PowerStrings.class,
-                localizationPath(lang, "PowerStrings.json"));
-        BaseMod.loadCustomStringsFile(RelicStrings.class,
-                localizationPath(lang, "RelicStrings.json"));
         BaseMod.loadCustomStringsFile(UIStrings.class,
                 localizationPath(lang, "UIStrings.json"));
     }
@@ -587,15 +630,6 @@ public class Spirepass implements
 
     public static String imagePath(String file) {
         return resourcesFolder + "/images/" + file;
-    }
-    public static String characterPath(String file) {
-        return resourcesFolder + "/images/character/" + file;
-    }
-    public static String powerPath(String file) {
-        return resourcesFolder + "/images/powers/" + file;
-    }
-    public static String relicPath(String file) {
-        return resourcesFolder + "/images/relics/" + file;
     }
 
     /**

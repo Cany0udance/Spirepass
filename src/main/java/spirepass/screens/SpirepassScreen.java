@@ -1,6 +1,7 @@
 package spirepass.screens;
 
 import basemod.ModLabeledButton;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
@@ -75,8 +76,14 @@ public class SpirepassScreen {
         // Setup level boxes and scrolling
         initializeLevelBoxes();
         calculateScrollBounds();
-        centerOnLevel(currentLevel);
-        setSelectedLevel(currentLevel);
+
+        if (Spirepass.jumpToCurrentLevel) {
+            centerOnLevel(currentLevel);
+            setSelectedLevel(currentLevel);
+        } else {
+            centerOnLevel(0);
+            setSelectedLevel(0);
+        }
 
         // Ignore clicks for a brief moment
         InputHelper.justClickedLeft = false;
@@ -91,7 +98,6 @@ public class SpirepassScreen {
     }
 
     public void update() {
-        // Handle cancel button
         this.cancelButton.update();
         if (this.cancelButton.hb.clicked || InputHelper.pressedEscape) {
             InputHelper.pressedEscape = false;
@@ -100,31 +106,26 @@ public class SpirepassScreen {
             return;
         }
 
-        // Main update logic
         updateScrolling();
         updateLevelBoxPositions();
         updateLevelBoxes();
 
-        // Update equipment button if a level is selected
-        if (selectedLevel != -1 && selectedLevel < levelBoxes.size()) {
-            ModLabeledButton button = renderer.getEquipButton();
-            if (button != null) {
-                button.update();
-            }
-        }
+        renderer.updateUI();
     }
 
     public void render(SpriteBatch sb) {
-        // Render main screen elements
         this.renderer.render(sb, this, scrollX, edgePadding, levelBoxes);
 
-        // Render selected level details
         if (selectedLevel != -1 && selectedLevel < levelBoxes.size()) {
             SpirepassLevelBox selectedBox = levelBoxes.get(selectedLevel);
             this.renderer.renderSelectedLevelReward(sb, selectedBox);
         }
 
         this.cancelButton.render(sb);
+
+        sb.setColor(Color.WHITE);
+
+        this.renderer.renderUIElements(sb);
     }
 
     // ==================== LEVEL BOX MANAGEMENT ====================

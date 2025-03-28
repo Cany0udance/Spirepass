@@ -46,6 +46,15 @@ public class MainMenuLevelDisplayPatch {
     public static class RenderPatch {
         @SpirePostfixPatch
         public static void renderLevelDisplay(MainMenuScreen instance, SpriteBatch sb) {
+            // Add this check
+            if (!Spirepass.enableMainMenuElements) {
+                // Reset initialized flag if elements are disabled, so they re-init if re-enabled
+                if (initialized) {
+                    initialized = false;
+                }
+                return;
+            }
+            // Original code follows
             if (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
                 if (!initialized) {
                     initializeStaticData();
