@@ -130,9 +130,6 @@ public class Spirepass implements
             ChallengeManager challengeManager = ChallengeManager.getInstance();
             challengeManager.loadData(config);
 
-            // Check if we need to generate/refresh challenges
-            checkAndRefreshChallenges();
-
             // Save the config after everything is loaded
             config.save();
 
@@ -170,6 +167,7 @@ public class Spirepass implements
 
     @Override
     public void receivePostInitialize() {
+        checkAndRefreshChallenges();
         ModPanel settingsPanel = new ModPanel();
 
         UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ConfigMenuText"));
@@ -371,60 +369,63 @@ public class Spirepass implements
         // Check if any challenges exist - if not, generate initial set
         boolean needInitialChallenges = manager.getDailyChallenges().isEmpty() ||
                 manager.getWeeklyChallenges().isEmpty();
-
         if (needInitialChallenges) {
             generateInitialChallenges();
             return;
         }
 
-        // Use local Calendar instance
+        // Get current time and last refresh times
         Calendar now = Calendar.getInstance();
-        int currentHour = now.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = now.get(Calendar.MINUTE);
-        int currentDayOfWeek = now.get(Calendar.DAY_OF_WEEK);
 
-        // Check if current time has passed the refresh time
-        boolean passedRefreshTime = (currentHour > REFRESH_HOUR_LOCAL ||
-                (currentHour == REFRESH_HOUR_LOCAL && currentMinute >= REFRESH_MINUTE_LOCAL));
-
-        // Get the last refresh timestamps
-        long lastDailyRefresh = manager.getLastDailyRefreshTime();
-        long lastWeeklyRefresh = manager.getLastWeeklyRefreshTime();
-
-        // Convert timestamps to Calendar objects
         Calendar lastDailyRefreshDate = Calendar.getInstance();
-        lastDailyRefreshDate.setTimeInMillis(lastDailyRefresh);
+        lastDailyRefreshDate.setTimeInMillis(manager.getLastDailyRefreshTime());
 
         Calendar lastWeeklyRefreshDate = Calendar.getInstance();
-        lastWeeklyRefreshDate.setTimeInMillis(lastWeeklyRefresh);
+        lastWeeklyRefreshDate.setTimeInMillis(manager.getLastWeeklyRefreshTime());
 
         // Check if we need to refresh daily challenges
-        boolean needsDailyRefresh = passedRefreshTime &&
-                (isSameDay(now, lastDailyRefreshDate) ?
-                        (lastDailyRefreshDate.get(Calendar.HOUR_OF_DAY) < REFRESH_HOUR_LOCAL ||
-                                (lastDailyRefreshDate.get(Calendar.HOUR_OF_DAY) == REFRESH_HOUR_LOCAL &&
-                                        lastDailyRefreshDate.get(Calendar.MINUTE) < REFRESH_MINUTE_LOCAL)) :
-                        true);
-
-        if (needsDailyRefresh) {
+        if (needsDailyRefresh(now, lastDailyRefreshDate)) {
             generateDailyChallenges();
         }
 
         // Check if we need to refresh weekly challenges
-        boolean isMonday = currentDayOfWeek == Calendar.MONDAY;
-        boolean needsWeeklyRefresh = isMonday && passedRefreshTime &&
-                (isSameDay(now, lastWeeklyRefreshDate) ?
-                        (lastWeeklyRefreshDate.get(Calendar.HOUR_OF_DAY) < REFRESH_HOUR_LOCAL ||
-                                (lastWeeklyRefreshDate.get(Calendar.HOUR_OF_DAY) == REFRESH_HOUR_LOCAL &&
-                                        lastWeeklyRefreshDate.get(Calendar.MINUTE) < REFRESH_MINUTE_LOCAL)) :
-                        !isMonday(lastWeeklyRefreshDate) || !isSameWeek(now, lastWeeklyRefreshDate));
-
-        if (needsWeeklyRefresh) {
+        if (needsWeeklyRefresh(now, lastWeeklyRefreshDate)) {
             generateWeeklyChallenges();
         }
 
         // Save the updated timestamps
         saveConfig();
+    }
+
+    // Helper method for daily refresh check
+    private static boolean needsDailyRefresh(Calendar now, Calendar lastRefresh) {
+        // Get time at 12:00 PM today
+        Calendar todayRefreshTime = (Calendar) now.clone();
+        todayRefreshTime.set(Calendar.HOUR_OF_DAY, REFRESH_HOUR_LOCAL);
+        todayRefreshTime.set(Calendar.MINUTE, REFRESH_MINUTE_LOCAL);
+        todayRefreshTime.set(Calendar.SECOND, 0);
+        // No need to set milliseconds
+
+        // If now is after today's refresh time AND last refresh was before today's refresh time
+        return now.after(todayRefreshTime) && lastRefresh.before(todayRefreshTime);
+    }
+
+    // Helper method for weekly refresh check
+    private static boolean needsWeeklyRefresh(Calendar now, Calendar lastRefresh) {
+        // Find the date of this week's Monday at refresh time
+        Calendar thisWeeksMonday = (Calendar) now.clone();
+        thisWeeksMonday.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        thisWeeksMonday.set(Calendar.HOUR_OF_DAY, REFRESH_HOUR_LOCAL);
+        thisWeeksMonday.set(Calendar.MINUTE, REFRESH_MINUTE_LOCAL);
+        thisWeeksMonday.set(Calendar.SECOND, 0);
+
+        // If we're earlier than Monday's refresh time, we need to go back to last week's Monday
+        if (now.before(thisWeeksMonday)) {
+            thisWeeksMonday.add(Calendar.DAY_OF_MONTH, -7);
+        }
+
+        // If last refresh was before this week's Monday refresh time, we need to refresh
+        return lastRefresh.before(thisWeeksMonday);
     }
 
     private static void generateInitialChallenges() {
