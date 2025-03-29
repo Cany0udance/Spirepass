@@ -15,24 +15,24 @@ import spirepass.spirepassutil.SpirepassPositionSettings;
 import java.util.HashMap;
 
 public class SpirepassAnimationManager {
-    // Maps for entity previews - generalized for any entity type
+    // ==================== DATA STRUCTURES ====================
+
     private HashMap<String, HashMap<String, AnimationState>> previewAnimations = new HashMap<>();
     private HashMap<String, HashMap<String, Skeleton>> previewSkeletons = new HashMap<>();
     private HashMap<String, HashMap<String, Boolean>> animationInitialized = new HashMap<>();
     private static SkeletonMeshRenderer skeletonMeshRenderer;
     private PolygonSpriteBatch polyBatch;
 
-    public SpirepassAnimationManager() {
-        // Initialize entity preview maps
-        initializeAnimationMaps();
+    // ==================== INITIALIZATION ====================
 
+    public SpirepassAnimationManager() {
+        initializeAnimationMaps();
         this.polyBatch = new PolygonSpriteBatch();
         skeletonMeshRenderer = new SkeletonMeshRenderer();
         skeletonMeshRenderer.setPremultipliedAlpha(true);
     }
 
     private void initializeAnimationMaps() {
-        // Create maps for all entity types
         String[] entityTypes = {
                 SkinManager.ENTITY_IRONCLAD,
                 SkinManager.ENTITY_SILENT,
@@ -62,17 +62,15 @@ public class SpirepassAnimationManager {
         }
     }
 
+    // ==================== ANIMATION MANAGEMENT ====================
+
     private void initializeAnimationPreview(String entityId, String variant) {
-        // Skip if already initialized
         if (animationInitialized.get(entityId).getOrDefault(variant, false)) {
             return;
         }
         try {
-//             BaseMod.logger.info("Creating animation preview for " + entityId + " variant: " + variant);
-            // Define animation paths based on variant and entity
             String atlasUrl, skeletonUrl;
 
-            // Always use skin asset paths, never default
             String basePath = getBasePath(entityId, variant);
             if (basePath.isEmpty()) {
                 throw new Exception("Unknown entity type: " + entityId);
@@ -81,25 +79,17 @@ public class SpirepassAnimationManager {
             atlasUrl = basePath + "skeleton.atlas";
             skeletonUrl = basePath + "skeleton.json";
 
-            // Load the skeleton directly
             TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(atlasUrl));
             SkeletonJson json = new SkeletonJson(atlas);
             SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal(skeletonUrl));
 
-            // Create skeleton
             Skeleton skeleton = new Skeleton(skeletonData);
-
-            // Create animation state
             AnimationStateData stateData = new AnimationStateData(skeletonData);
             AnimationState state = new AnimationState(stateData);
 
-            // Check available animations and determine the correct idle animation name
             String idleAnimation = null;
             String idle1Animation = null;
-//             BaseMod.logger.info("Available animations for " + entityId + ":");
             for (Animation anim : skeletonData.getAnimations()) {
-//                 BaseMod.logger.info(" - " + anim.getName() + " (duration: " + anim.getDuration() + ")");
-                // Look for idle animation with case-insensitive comparison
                 if (anim.getName().equalsIgnoreCase("idle")) {
                     idleAnimation = anim.getName();
                 } else if (anim.getName().equalsIgnoreCase("idle_1")) {
@@ -107,39 +97,127 @@ public class SpirepassAnimationManager {
                 }
             }
 
-            // Set appropriate idle animation if found
             if (idleAnimation != null) {
                 state.setAnimation(0, idleAnimation, true);
-//                 BaseMod.logger.info(entityId + " using 'idle' animation: " + idleAnimation);
             } else if (idle1Animation != null) {
                 state.setAnimation(0, idle1Animation, true);
-//                 BaseMod.logger.info(entityId + " using 'idle_1' animation: " + idle1Animation);
             } else {
-                // If no idle animation was found, try to use the first available animation
                 if (skeletonData.getAnimations().size > 0) {
                     String firstAnim = skeletonData.getAnimations().get(0).getName();
                     state.setAnimation(0, firstAnim, true);
-//                     BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized with fallback animation: " + firstAnim);
                 } else {
                     throw new Exception("No animations found in skeleton data");
                 }
             }
 
-            // Set animation speed
-            float scale = getScaleFactor(entityId);
-            state.getCurrent(0).setTimeScale(0.6f * scale);
+            state.getCurrent(0).setTimeScale(0.85f);
 
-            // Store animation and skeleton
             previewAnimations.get(entityId).put(variant, state);
             previewSkeletons.get(entityId).put(variant, skeleton);
             animationInitialized.get(entityId).put(variant, true);
-//             BaseMod.logger.info(entityId + " animation preview for " + variant + " initialized successfully");
         } catch (Exception e) {
-//             BaseMod.logger.error("Error initializing animation for " + entityId + "/" + variant + ": " + e.getMessage());
             e.printStackTrace();
-            // Don't store anything for failed animations - let it fail properly
         }
     }
+
+    public void renderAnimationPreview(SpriteBatch sb, String entityId, String variant) {
+        if (!animationInitialized.get(entityId).getOrDefault(variant, false)) {
+            initializeAnimationPreview(entityId, variant);
+        }
+
+        AnimationState state = previewAnimations.get(entityId).get(variant);
+        Skeleton skeleton = previewSkeletons.get(entityId).get(variant);
+
+        if (state != null && skeleton != null) {
+            try {
+                state.update(Gdx.graphics.getDeltaTime());
+                state.apply(skeleton);
+
+                skeleton.setPosition(
+                        Settings.WIDTH / 2.0f,
+                        SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET
+                );
+
+                float scale = getScaleFactor(entityId);
+                skeleton.getRootBone().setScale(scale, scale);
+
+                skeleton.updateWorldTransform();
+
+                boolean batchWasDrawing = sb.isDrawing();
+
+                if (batchWasDrawing) {
+                    sb.end();
+                }
+
+                polyBatch.setProjectionMatrix(sb.getProjectionMatrix());
+                polyBatch.setTransformMatrix(sb.getTransformMatrix());
+                polyBatch.begin();
+
+                skeletonMeshRenderer.draw(polyBatch, skeleton);
+
+                polyBatch.end();
+
+                if (batchWasDrawing) {
+                    sb.begin();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (!sb.isDrawing()) {
+                    sb.begin();
+                }
+                renderFallbackText(sb, "Error Rendering Animation", Color.RED);
+            }
+        } else {
+            renderFallbackText(sb, entityId + " " + variant + " Preview", Color.RED);
+        }
+    }
+
+    // ==================== UTILITY METHODS ====================
+
+    private void renderFallbackText(SpriteBatch sb, String text, Color color) {
+        FontHelper.renderFontCentered(
+                sb,
+                FontHelper.tipBodyFont,
+                text,
+                Settings.WIDTH / 2.0f,
+                SpirepassPositionSettings.REWARD_PREVIEW_Y,
+                color
+        );
+    }
+
+    private float getScaleFactor(String entityId) {
+        float baseScale;
+        if (entityId.equals(SkinManager.ENTITY_IRONCLAD) ||
+                entityId.equals(SkinManager.ENTITY_SILENT) ||
+                entityId.equals(SkinManager.ENTITY_DEFECT)) {
+            baseScale = SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
+        } else {
+            baseScale = SpirepassPositionSettings.MONSTER_MODEL_SCALE;
+        }
+
+        switch (entityId) {
+            case SkinManager.ENTITY_DONU:
+                return baseScale * 0.75f;
+            case SkinManager.ENTITY_CENTURION:
+                return baseScale * 0.85f;
+            case SkinManager.ENTITY_GREMLIN_NOB:
+                return baseScale * 0.8f;
+            case SkinManager.ENTITY_SNECKO:
+                return baseScale * 0.9f;
+            case SkinManager.ENTITY_DECA:
+                return baseScale * 0.75f;
+            case SkinManager.ENTITY_WATCHER:
+                return SpirepassPositionSettings.CHARACTER_MODEL_SCALE * 0.95f;
+            case SkinManager.ENTITY_SENTRY:
+                return baseScale * 0.85f;
+            case SkinManager.ENTITY_WRITHING_MASS:
+                return baseScale * 0.9f;
+            default:
+                return baseScale;
+        }
+    }
+
+    // ==================== PATH MANAGEMENT ====================
 
     private String getBasePath(String entityId, String variant) {
         String basePath = "";
@@ -185,110 +263,6 @@ public class SpirepassAnimationManager {
         }
 
         return basePath;
-    }
-
-    public void renderAnimationPreview(SpriteBatch sb, String entityId, String variant) {
-        // Initialize if needed
-        if (!animationInitialized.get(entityId).getOrDefault(variant, false)) {
-            initializeAnimationPreview(entityId, variant);
-        }
-
-        AnimationState state = previewAnimations.get(entityId).get(variant);
-        Skeleton skeleton = previewSkeletons.get(entityId).get(variant);
-
-        if (state != null && skeleton != null) {
-            try {
-                // Update animation
-                state.update(Gdx.graphics.getDeltaTime());
-                state.apply(skeleton);
-
-                // Position the skeleton
-                skeleton.setPosition(
-                        Settings.WIDTH / 2.0f,
-                        SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET
-                );
-
-                // Apply scale based on entity type
-                float scale = getScaleFactor(entityId);
-                skeleton.getRootBone().setScale(scale, scale);
-
-                // Update world transform after position and scale changes
-                skeleton.updateWorldTransform();
-
-                // Check if we're already inside a rendering block
-                boolean batchWasDrawing = sb.isDrawing();
-
-                // If the batch was actively drawing, we need to end it before switching renderers
-                if (batchWasDrawing) {
-                    sb.end();
-                }
-
-                // Configure and start our polygon batch
-                polyBatch.setProjectionMatrix(sb.getProjectionMatrix());
-                polyBatch.setTransformMatrix(sb.getTransformMatrix());
-                polyBatch.begin();
-
-                // Draw with our mesh renderer
-                skeletonMeshRenderer.draw(polyBatch, skeleton);
-
-                // End our polygon batch
-                polyBatch.end();
-
-                // If the original batch was drawing, restart it
-                if (batchWasDrawing) {
-                    sb.begin();
-                }
-            } catch (Exception e) {
-//                 BaseMod.logger.error("Error rendering animation for " + entityId + "/" + variant + ": " + e.getMessage());
-                e.printStackTrace();
-                // Make sure we restart the main batch if there was an error
-                if (!sb.isDrawing()) {
-                    sb.begin();
-                }
-                renderFallbackText(sb, "Error Rendering Animation", Color.RED);
-            }
-        } else {
-            renderFallbackText(sb, entityId + " " + variant + " Preview", Color.RED);
-        }
-    }
-
-    private void renderFallbackText(SpriteBatch sb, String text, Color color) {
-        FontHelper.renderFontCentered(
-                sb,
-                FontHelper.tipBodyFont,
-                text,
-                Settings.WIDTH / 2.0f,
-                SpirepassPositionSettings.REWARD_PREVIEW_Y,
-                color
-        );
-    }
-
-    // Get the scale factor for different entity types
-    private float getScaleFactor(String entityId) {
-        // Different entities might need different scaling
-        if (entityId.equals(SkinManager.ENTITY_IRONCLAD) ||
-                entityId.equals(SkinManager.ENTITY_SILENT) ||
-                entityId.equals(SkinManager.ENTITY_WATCHER) ||
-                entityId.equals(SkinManager.ENTITY_DEFECT)) {
-            return SpirepassPositionSettings.CHARACTER_MODEL_SCALE;
-        } else if (entityId.equals(SkinManager.ENTITY_JAW_WORM) ||
-                entityId.equals(SkinManager.ENTITY_CULTIST) ||
-                entityId.equals(SkinManager.ENTITY_AWAKENED_ONE) ||
-                entityId.equals(SkinManager.ENTITY_SENTRY) ||
-                entityId.equals(SkinManager.ENTITY_GREMLIN_NOB) ||
-                entityId.equals(SkinManager.ENTITY_BEAR) ||
-                entityId.equals(SkinManager.ENTITY_ROMEO) ||
-                entityId.equals(SkinManager.ENTITY_CENTURION) ||
-                entityId.equals(SkinManager.ENTITY_SNECKO) ||
-                entityId.equals(SkinManager.ENTITY_GIANT_HEAD) ||
-                entityId.equals(SkinManager.ENTITY_WRITHING_MASS) ||
-                entityId.equals(SkinManager.ENTITY_DONU) ||
-                entityId.equals(SkinManager.ENTITY_DECA) ||
-                entityId.equals(SkinManager.ENTITY_BLUE_SLAVER) ||
-                entityId.equals(SkinManager.ENTITY_RED_SLAVER)) {
-            return SpirepassPositionSettings.MONSTER_MODEL_SCALE;
-        }
-        return SpirepassPositionSettings.CHARACTER_MODEL_SCALE; // Default
     }
 
     public static String getVariantFromModelId(String entityId, String modelId) {
@@ -338,8 +312,10 @@ public class SpirepassAnimationManager {
             return modelId.substring(prefix.length()).toLowerCase();
         }
 
-        return modelId.toLowerCase(); // Use the modelId directly if no prefix match
+        return modelId.toLowerCase();
     }
+
+    // ==================== CLEANUP ====================
 
     public void dispose() {
         if (polyBatch != null) {

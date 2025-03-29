@@ -1,6 +1,5 @@
 package spirepass.patches;
 
-import basemod.BaseMod;
 import basemod.ReflectionHacks;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -21,7 +20,6 @@ import com.megacrit.cardcrawl.monsters.city.BanditLeader;
 import com.megacrit.cardcrawl.monsters.city.Centurion;
 import com.megacrit.cardcrawl.monsters.city.Snecko;
 import com.megacrit.cardcrawl.monsters.exordium.*;
-import spirepass.Spirepass;
 import spirepass.spirepassutil.SkinManager;
 
 import java.io.PrintWriter;
@@ -33,159 +31,73 @@ import java.util.HashMap;
         method = "loadAnimation"
 )
 public class EntitySkinPatch {
+    // ==================== TEXTURE CACHING ====================
+
     private static HashMap<String, Texture> textureCache = new HashMap<>();
+
+    // ==================== PATCH METHODS ====================
 
     @SpirePrefixPatch
     public static SpireReturn<Void> Prefix(AbstractCreature __instance,
                                            String atlasUrl,
                                            String skeletonUrl,
                                            float scale) {
-        // Log every character that tries to load animation
-//         BaseMod.logger.info("loadAnimation called for: " + __instance.getClass().getSimpleName()
-          //      + ", atlas: " + atlasUrl
-        //        + ", skeleton: " + skeletonUrl);
-
-        // Only apply if:
-        // 1. We're in a dungeon OR loading a save
-        // 2. This is not a preview character
         boolean inDungeon = CardCrawlGame.dungeon != null;
         boolean isLoadingSave = CardCrawlGame.loadingSave;
         boolean isPreview = __instance.name != null && __instance.name.contains("Preview");
-
-        // The below variables are experimental, meant to fix the issue where skins wouldn't apply
-        // when first entering a game
-
         boolean isPlayerCharacter = __instance instanceof AbstractPlayer;
         boolean isInGameMode = CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT ||
                 CardCrawlGame.mode == CardCrawlGame.GameMode.GAMEPLAY;
 
         if ((inDungeon || isLoadingSave || (isPlayerCharacter && isInGameMode)) && !isPreview) {
-            // Original check: if ((inDungeon || isLoadingSave) && !isPreview) {
+            String entityId = getEntityId(__instance);
 
-            // Determine which entity type this is
-            String entityId = null;
-
-            if (__instance instanceof Ironclad) {
-                entityId = SkinManager.ENTITY_IRONCLAD;
-            } else if (__instance instanceof TheSilent) {
-                entityId = SkinManager.ENTITY_SILENT;
-            } else if (__instance instanceof Defect) {
-                entityId = SkinManager.ENTITY_DEFECT;
-            } else if (__instance instanceof Watcher) {
-                entityId = SkinManager.ENTITY_WATCHER;
-            } else if (__instance instanceof JawWorm) {
-                entityId = SkinManager.ENTITY_JAW_WORM;
-            } else if (__instance instanceof Cultist) {
-                entityId = SkinManager.ENTITY_CULTIST;
-            } else if (__instance instanceof SlaverBlue) {
-                entityId = SkinManager.ENTITY_BLUE_SLAVER;
-            } else if (__instance instanceof SlaverRed) {
-                entityId = SkinManager.ENTITY_RED_SLAVER;
-            } else if (__instance instanceof Sentry) {
-                entityId = SkinManager.ENTITY_SENTRY;
-            } else if (__instance instanceof GremlinNob) {
-                entityId = SkinManager.ENTITY_GREMLIN_NOB;
-            } else if (__instance instanceof BanditLeader) {
-                entityId = SkinManager.ENTITY_ROMEO;
-            } else if (__instance instanceof BanditBear) {
-                entityId = SkinManager.ENTITY_BEAR;
-            } else if (__instance instanceof Centurion) {
-                entityId = SkinManager.ENTITY_CENTURION;
-            } else if (__instance instanceof Snecko) {
-                entityId = SkinManager.ENTITY_SNECKO;
-            } else if (__instance instanceof WrithingMass) {
-                entityId = SkinManager.ENTITY_WRITHING_MASS;
-            } else if (__instance instanceof GiantHead) {
-                entityId = SkinManager.ENTITY_GIANT_HEAD;
-            } else if (__instance instanceof Donu) {
-                entityId = SkinManager.ENTITY_DONU;
-            } else if (__instance instanceof Deca) {
-                entityId = SkinManager.ENTITY_DECA;
-            } else if (__instance instanceof AwakenedOne) {
-                entityId = SkinManager.ENTITY_AWAKENED_ONE;
-            }
-
-            // If we recognized the entity and have a skin for it
             if (entityId != null) {
                 String skinId = SkinManager.getInstance().getAppliedSkin(entityId);
 
                 if (skinId != null && !skinId.isEmpty()) {
-//                     BaseMod.logger.info("Applying skin " + skinId + " to " + entityId);
-
                     try {
-                        // Get the path for this entity's skin
                         String basePath = getSkinPath(entityId, skinId);
                         if (basePath == null) {
-//                             BaseMod.logger.info("Using default skin for " + entityId);
                             return SpireReturn.Continue();
                         }
 
-                        // Set paths for the custom skin
                         String customAtlasUrl = basePath + "skeleton.atlas";
                         String customSkeletonUrl = basePath + "skeleton.json";
 
-                        // Log the skin application
-//                         Spirepass.logger.info("Applying skin from " + customAtlasUrl);
-
-                        // Check if files exist
                         FileHandle atlasFile = Gdx.files.internal(customAtlasUrl);
                         FileHandle skeletonFile = Gdx.files.internal(customSkeletonUrl);
 
-//                         BaseMod.logger.info("Atlas file exists: " + atlasFile.exists() + ", path: " + customAtlasUrl);
-//                         BaseMod.logger.info("Skeleton file exists: " + skeletonFile.exists() + ", path: " + customSkeletonUrl);
-
                         if (!atlasFile.exists() || !skeletonFile.exists()) {
-//                             BaseMod.logger.error("Skin files not found! Falling back to default");
                             return SpireReturn.Continue();
                         }
 
-                        // Load the atlas data
-//                         BaseMod.logger.info("Loading texture atlas data from: " + customAtlasUrl);
                         TextureAtlas.TextureAtlasData data = new TextureAtlas.TextureAtlasData(
                                 atlasFile,
                                 Gdx.files.internal(basePath),
                                 false
                         );
 
-                        // Pre-load textures
-//                         BaseMod.logger.info("Pre-loading textures for skin...");
                         for (TextureAtlas.TextureAtlasData.Page page : data.getPages()) {
                             String texturePath = basePath + page.textureFile.name();
-//                             BaseMod.logger.info("Loading texture: " + texturePath);
                             getOrLoadTexture(texturePath);
                         }
-//                         BaseMod.logger.info("Finished pre-loading textures");
 
-                        // Create the texture atlas
-//                         BaseMod.logger.info("Creating texture atlas");
                         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(customAtlasUrl));
                         ReflectionHacks.setPrivate(__instance, AbstractCreature.class, "atlas", atlas);
 
-                        // Load the skeleton data
-//                         BaseMod.logger.info("Loading skeleton data");
                         SkeletonJson json = new SkeletonJson(atlas);
                         json.setScale(Settings.renderScale / scale);
                         SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal(customSkeletonUrl));
 
-                        // Check available animations
-//                         BaseMod.logger.info("Available animations:");
-                        for (Animation anim : skeletonData.getAnimations()) {
-//                             BaseMod.logger.info(" - " + anim.getName() + " (duration: " + anim.getDuration() + ")");
-                        }
-
-                        // Create and configure the skeleton
-//                         BaseMod.logger.info("Creating skeleton");
                         Skeleton skeleton = new Skeleton(skeletonData);
                         skeleton.setColor(Color.WHITE);
                         ReflectionHacks.setPrivate(__instance, AbstractCreature.class, "skeleton", skeleton);
 
-                        // Set up the animation state
-//                         BaseMod.logger.info("Setting up animation state");
                         AnimationStateData stateData = new AnimationStateData(skeletonData);
                         ReflectionHacks.setPrivate(__instance, AbstractCreature.class, "stateData", stateData);
                         __instance.state = new AnimationState(stateData);
 
-//                         BaseMod.logger.info("Skin " + skinId + " successfully applied to " + entityId);
                         return SpireReturn.Return();
                     } catch (Exception e) {
                         logError(e, entityId, skinId);
@@ -198,6 +110,51 @@ public class EntitySkinPatch {
         return SpireReturn.Continue();
     }
 
+    // ==================== HELPER METHODS ====================
+
+    private static String getEntityId(AbstractCreature creature) {
+        if (creature instanceof Ironclad) {
+            return SkinManager.ENTITY_IRONCLAD;
+        } else if (creature instanceof TheSilent) {
+            return SkinManager.ENTITY_SILENT;
+        } else if (creature instanceof Defect) {
+            return SkinManager.ENTITY_DEFECT;
+        } else if (creature instanceof Watcher) {
+            return SkinManager.ENTITY_WATCHER;
+        } else if (creature instanceof JawWorm) {
+            return SkinManager.ENTITY_JAW_WORM;
+        } else if (creature instanceof Cultist) {
+            return SkinManager.ENTITY_CULTIST;
+        } else if (creature instanceof SlaverBlue) {
+            return SkinManager.ENTITY_BLUE_SLAVER;
+        } else if (creature instanceof SlaverRed) {
+            return SkinManager.ENTITY_RED_SLAVER;
+        } else if (creature instanceof Sentry) {
+            return SkinManager.ENTITY_SENTRY;
+        } else if (creature instanceof GremlinNob) {
+            return SkinManager.ENTITY_GREMLIN_NOB;
+        } else if (creature instanceof BanditLeader) {
+            return SkinManager.ENTITY_ROMEO;
+        } else if (creature instanceof BanditBear) {
+            return SkinManager.ENTITY_BEAR;
+        } else if (creature instanceof Centurion) {
+            return SkinManager.ENTITY_CENTURION;
+        } else if (creature instanceof Snecko) {
+            return SkinManager.ENTITY_SNECKO;
+        } else if (creature instanceof WrithingMass) {
+            return SkinManager.ENTITY_WRITHING_MASS;
+        } else if (creature instanceof GiantHead) {
+            return SkinManager.ENTITY_GIANT_HEAD;
+        } else if (creature instanceof Donu) {
+            return SkinManager.ENTITY_DONU;
+        } else if (creature instanceof Deca) {
+            return SkinManager.ENTITY_DECA;
+        } else if (creature instanceof AwakenedOne) {
+            return SkinManager.ENTITY_AWAKENED_ONE;
+        }
+        return null;
+    }
+
     private static String getSkinPath(String entityId, String skinId) {
         if (entityId.equals(SkinManager.ENTITY_IRONCLAD)) {
             if (skinId.equals("IRONCLAD")) {
@@ -208,7 +165,7 @@ public class EntitySkinPatch {
             }
         } else if (entityId.equals(SkinManager.ENTITY_SILENT)) {
             if (skinId.equals("SILENT")) {
-                return null; // Default Watcher
+                return null; // Default Silent
             } else if (skinId.startsWith("SILENT_")) {
                 String variant = skinId.substring("SILENT_".length()).toLowerCase();
                 return "spirepass/images/skins/silent/" + variant + "/";
@@ -334,7 +291,6 @@ public class EntitySkinPatch {
             }
         }
 
-
         return null; // Unknown format or default skin
     }
 
@@ -347,10 +303,8 @@ public class EntitySkinPatch {
     }
 
     private static void logError(Exception e, String entityId, String skinId) {
-//         BaseMod.logger.error("ERROR APPLYING SKIN " + skinId + " TO " + entityId + ": " + e.getMessage());
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-//         BaseMod.logger.error(sw.toString());
     }
 }

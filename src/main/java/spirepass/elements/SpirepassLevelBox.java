@@ -12,7 +12,8 @@ import spirepass.spirepassutil.SkinManager;
 import spirepass.spirepassutil.SpirepassRewardData;
 
 public class SpirepassLevelBox {
-    // Constants
+    // ==================== CONSTANTS ====================
+
     private static final float BOX_SIZE = 120.0f * Settings.scale;
     private static final float BUTTON_Y = Settings.HEIGHT * 0.6f;
     private static final float BUTTON_WIDTH = 160.0f * Settings.scale;
@@ -21,26 +22,30 @@ public class SpirepassLevelBox {
     private static final float STAR_Y_OFFSET = -10.0f * Settings.scale;
     private static final float STARWALKER_CHANCE = 0.005f; // 1 in 200 chance
 
-    // State
+    // ==================== STATE VARIABLES ====================
+
     private int level;
     private float x;
     private float y;
     private boolean isSelected;
     private boolean isUnlocked;
-    private boolean useStarwalker; // New field to store which star texture to use
+    private boolean useStarwalker;
 
-    // Visual elements
+    // ==================== VISUAL ELEMENTS ====================
+
     private Texture boxTexture;
     private Texture rewardTexture;
-    private static Texture starTexture;  // Static - shared by all instances
-    private static Texture starwalkerTexture;  // Easter egg texture
+    private static Texture starTexture;
+    private static Texture starwalkerTexture;
     private SpirepassRewardData rewardData;
 
-    // Interaction
+    // ==================== INTERACTION ====================
+
     private Hitbox boxHitbox;
     private Hitbox buttonHitbox;
 
-    // Static initializer to load the star textures once
+    // ==================== INITIALIZATION ====================
+
     static {
         try {
             starTexture = ImageMaster.loadImage("spirepass/images/starbage.png");
@@ -59,14 +64,14 @@ public class SpirepassLevelBox {
         this.boxTexture = boxTexture;
         this.rewardTexture = rewardTexture;
 
-        // Determine if this level box should use the starwalker
         this.useStarwalker = MathUtils.randomBoolean(STARWALKER_CHANCE);
 
-        // Create hitboxes
         this.boxHitbox = new Hitbox(BOX_SIZE, BOX_SIZE);
         this.buttonHitbox = new Hitbox(BUTTON_WIDTH, BUTTON_HEIGHT);
         updateHitboxPositions();
     }
+
+    // ==================== UPDATE METHODS ====================
 
     public void update(float newX) {
         this.x = newX;
@@ -83,27 +88,7 @@ public class SpirepassLevelBox {
         this.buttonHitbox.move(Settings.WIDTH / 2.0f, BUTTON_Y);
     }
 
-    // Helper method to check if reward is currently equipped
-    private boolean isRewardEquipped() {
-        if (rewardData == null) {
-            return false;
-        }
-
-        if (rewardData.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
-            String entityId = rewardData.getEntityId();
-            String modelId = rewardData.getModelId();
-            String currentSkin = SkinManager.getInstance().getAppliedSkin(entityId);
-            return modelId.equals(currentSkin);
-        }
-        else if (rewardData.getType() == SpirepassRewardData.RewardType.CARDBACK) {
-            String cardbackType = rewardData.getCardbackType();
-            String cardbackId = rewardData.getCardbackId();
-            String currentCardback = SkinManager.getInstance().getAppliedCardback(cardbackType);
-            return cardbackId.equals(currentCardback);
-        }
-
-        return false;
-    }
+    // ==================== RENDER METHODS ====================
 
     public void render(SpriteBatch sb) {
         // Render box with appropriate color
@@ -142,12 +127,35 @@ public class SpirepassLevelBox {
         }
     }
 
-    // Data methods
+    // ==================== HELPER METHODS ====================
+
+    private boolean isRewardEquipped() {
+        if (rewardData == null) {
+            return false;
+        }
+
+        if (rewardData.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
+            String entityId = rewardData.getEntityId();
+            String modelId = rewardData.getModelId();
+            String currentSkin = SkinManager.getInstance().getAppliedSkin(entityId);
+            return modelId.equals(currentSkin);
+        }
+        else if (rewardData.getType() == SpirepassRewardData.RewardType.CARDBACK) {
+            String cardbackType = rewardData.getCardbackType();
+            String cardbackId = rewardData.getCardbackId();
+            String currentCardback = SkinManager.getInstance().getAppliedCardback(cardbackType);
+            return cardbackId.equals(currentCardback);
+        }
+
+        return false;
+    }
+
+    // ==================== GETTERS & SETTERS ====================
+
     public void setRewardData(SpirepassRewardData rewardData) {
         this.rewardData = rewardData;
     }
 
-    // Getters and setters
     public SpirepassRewardData getRewardData() {
         return this.rewardData;
     }

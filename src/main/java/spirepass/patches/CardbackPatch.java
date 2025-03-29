@@ -23,40 +23,44 @@ import java.util.HashMap;
         method = "renderCardBg"
 )
 public class CardbackPatch {
-    // Cache textures to avoid reloading
+    // ==================== TEXTURE CACHING ====================
+
     private static HashMap<String, Texture> cardbackTextureCache = new HashMap<>();
+
+    // ==================== PATCH METHODS ====================
 
     @SpirePrefixPatch
     public static SpireReturn<Void> Prefix(AbstractCard __instance, SpriteBatch sb, float x, float y) {
         // Only apply for colorless (excluding status) and curse cards
         if ((__instance.color == AbstractCard.CardColor.COLORLESS && __instance.type != AbstractCard.CardType.STATUS) ||
                 __instance.color == AbstractCard.CardColor.CURSE) {
+
             String cardbackType = __instance.color == AbstractCard.CardColor.COLORLESS ?
                     SkinManager.CARDBACK_COLORLESS : SkinManager.CARDBACK_CURSE;
             String cardbackId = SkinManager.getInstance().getAppliedCardback(cardbackType);
+
             if (cardbackId != null && !cardbackId.isEmpty()) {
                 try {
-                    // Get the path for the cardback texture
                     String texturePath = getCardbackTexturePath(cardbackType, cardbackId, __instance);
                     if (texturePath == null) {
                         return SpireReturn.Continue();
                     }
-                    // Get or load the texture
+
                     Texture cardbackTexture = getOrLoadTexture(texturePath);
                     if (cardbackTexture == null) {
                         return SpireReturn.Continue();
                     }
-                    // Create a temporary AtlasRegion from our texture
+
                     TextureAtlas.AtlasRegion cardbackRegion = new TextureAtlas.AtlasRegion(
                             cardbackTexture, 0, 0, cardbackTexture.getWidth(), cardbackTexture.getHeight());
-                    // Get the renderColor using reflection
+
                     Color renderColor = (Color)ReflectionHacks.getPrivate(__instance, AbstractCard.class, "renderColor");
-                    // Render the custom cardback
-                    // We need to call renderHelper which is a private method in AbstractCard
+
                     ReflectionHacks.privateMethod(AbstractCard.class, "renderHelper",
                                     SpriteBatch.class, Color.class, TextureAtlas.AtlasRegion.class,
                                     float.class, float.class)
                             .invoke(__instance, sb, renderColor, cardbackRegion, x, y);
+
                     return SpireReturn.Return();
                 } catch (Exception e) {
                     logError(e, cardbackType, cardbackId);
@@ -66,11 +70,12 @@ public class CardbackPatch {
         return SpireReturn.Continue();
     }
 
+    // ==================== HELPER METHODS ====================
+
     private static String getCardbackTexturePath(String cardbackType, String cardbackId, AbstractCard card) {
         if (cardbackType.equals(SkinManager.CARDBACK_COLORLESS)) {
             String cardType = "";
 
-            // Determine card type
             if (card.type == AbstractCard.CardType.ATTACK) {
                 cardType = "Attack";
             } else if (card.type == AbstractCard.CardType.SKILL) {
@@ -78,8 +83,7 @@ public class CardbackPatch {
             } else if (card.type == AbstractCard.CardType.POWER) {
                 cardType = "Power";
             } else {
-                // Use Skill as default for STATUS and other types
-                cardType = "Skill";
+                cardType = "Skill"; // Default for STATUS and other types
             }
 
             if (cardbackId.equals("COLORLESS_SPONSORED")) {
@@ -97,7 +101,6 @@ public class CardbackPatch {
             if (cardbackId.equals("COLORLESS_JIMBO")) {
                 return "spirepass/images/rewards/cardbacks/colorless/jimbo/Jimbo" + cardType + ".png";
             }
-            // Add other colorless cardbacks here
         } else if (cardbackType.equals(SkinManager.CARDBACK_CURSE)) {
             if (cardbackId.equals("CURSE_HAROLD")) {
                 return "spirepass/images/rewards/cardbacks/curse/Harold.png";
@@ -106,7 +109,6 @@ public class CardbackPatch {
             if (cardbackId.equals("CURSE_NOTSTONKS")) {
                 return "spirepass/images/rewards/cardbacks/curse/NotStonks.png";
             }
-            // Add other curse cardbacks here
         }
         return null; // Unknown format or default cardback
     }
@@ -118,11 +120,9 @@ public class CardbackPatch {
                 if (fileHandle.exists()) {
                     cardbackTextureCache.put(path, new Texture(fileHandle));
                 } else {
-//                     Spirepass.logger.error("Cardback texture not found: " + path);
                     return null;
                 }
             } catch (Exception e) {
-//                 Spirepass.logger.error("Failed to load cardback texture: " + path);
                 e.printStackTrace();
                 return null;
             }
@@ -131,10 +131,8 @@ public class CardbackPatch {
     }
 
     private static void logError(Exception e, String cardbackType, String cardbackId) {
-//         Spirepass.logger.error("ERROR APPLYING CARDBACK " + cardbackId + " TO " + cardbackType + ": " + e.getMessage());
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-//         Spirepass.logger.error(sw.toString());
     }
 }

@@ -21,34 +21,28 @@ import java.util.Set;
 import static spirepass.Spirepass.makeID;
 
 public class SpirepassRewardManager implements Disposable {
+    // ==================== STATIC & MEMBER VARIABLES ====================
+
     private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID(""));
-    // Maps to hold our reward data and textures
     private HashMap<Integer, SpirepassRewardData> rewardData;
     private HashMap<Integer, Texture> rewardTextures;
     private HashMap<String, Texture> backgroundTextures;
-    private Texture lockTexture; // <-- Added: Load lock texture once
-
-    // Animation manager for rendering character models
+    private Texture lockTexture;
     private SpirepassAnimationManager animationManager;
+
+    // ==================== INITIALIZATION ====================
 
     public SpirepassRewardManager() {
         this.rewardData = new HashMap<>();
         this.rewardTextures = new HashMap<>();
         this.backgroundTextures = new HashMap<>();
-
-        // Initialize the animation manager
         this.animationManager = new SpirepassAnimationManager();
 
-        // Load background textures (including lock texture now)
-        loadManagedTextures(); // Renamed for clarity
-
-        // Initialize reward data and textures
+        loadManagedTextures();
         initializeRewardData();
     }
 
-    // Renamed method to reflect it loads more than just backgrounds
     private void loadManagedTextures() {
-        // Load the background textures for different rarities
         String[] backgroundPaths = {
                 "spirepass/images/screen/CommonRewardBackground.png",
                 "spirepass/images/screen/UncommonRewardBackground.png",
@@ -64,16 +58,16 @@ public class SpirepassRewardManager implements Disposable {
             }
         }
 
-        // Load the lock texture once
         try {
             this.lockTexture = ImageMaster.loadImage("spirepass/images/screen/lock.png");
         } catch (Exception e) {
             System.err.println("Failed to load lock texture: " + e.getMessage());
-            this.lockTexture = null; // Ensure it's null on failure
+            this.lockTexture = null;
         }
     }
 
-    // Modified renderLockedReward to use the member variable
+    // ==================== RENDERING METHODS ====================
+
     private void renderLockedReward(SpriteBatch sb) {
         Texture lockedBackgroundTexture = backgroundTextures.get("spirepass/images/screen/LockedRewardBackground.png");
 
@@ -90,22 +84,19 @@ public class SpirepassRewardManager implements Disposable {
             );
         }
 
-        // Use the pre-loaded lockTexture
         if (this.lockTexture != null) {
             float lockSize = 120.0f * Settings.scale;
             sb.setColor(Color.WHITE);
             sb.draw(
-                    this.lockTexture, // Use the member variable
+                    this.lockTexture,
                     Settings.WIDTH / 2.0f - lockSize / 2.0f,
                     SpirepassPositionSettings.REWARD_PREVIEW_Y - lockSize / 4.0f,
                     lockSize,
                     lockSize
             );
         } else {
-            // Optional: Render fallback text if lock texture failed to load
             FontHelper.renderFontCentered(sb, FontHelper.tipBodyFont, "[X]", Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y, Color.RED);
         }
-
 
         FontHelper.renderFontCentered(
                 sb,
@@ -115,418 +106,6 @@ public class SpirepassRewardManager implements Disposable {
                 SpirepassPositionSettings.REWARD_PREVIEW_Y - 80.0f * Settings.scale,
                 Color.WHITE
         );
-    }
-
-
-    // --- NEW dispose() method ---
-    @Override // From Disposable interface
-    public void dispose() {
-        System.out.println("Disposing SpirepassRewardManager resources...");
-
-        // Use a Set to track unique textures and avoid double disposal,
-        // especially important for the badgeTexture shared across multiple levels.
-        Set<Texture> uniqueTextures = new HashSet<>();
-
-        // Collect unique textures from backgroundTextures
-        if (backgroundTextures != null) {
-            for (Texture texture : backgroundTextures.values()) {
-                if (texture != null) {
-                    uniqueTextures.add(texture);
-                }
-            }
-            backgroundTextures.clear(); // Clear map after collecting
-        }
-
-        // Collect unique textures from rewardTextures
-        if (rewardTextures != null) {
-            for (Texture texture : rewardTextures.values()) {
-                if (texture != null) {
-                    uniqueTextures.add(texture);
-                }
-            }
-            rewardTextures.clear(); // Clear map after collecting
-        }
-
-        // Dispose the single lock texture instance
-        if (this.lockTexture != null) {
-            uniqueTextures.add(this.lockTexture); // Add it to the set just in case it overlaps somehow
-        }
-
-        // Dispose all collected unique textures
-        for (Texture texture : uniqueTextures) {
-            try {
-                // System.out.println("Disposing texture: " + texture.toString()); // Optional debug log
-                texture.dispose();
-            } catch (Exception e) {
-                System.err.println("Error disposing texture: " + e.getMessage());
-            }
-        }
-        uniqueTextures.clear(); // Clear the helper set
-
-        // Set references to null after disposal
-        backgroundTextures = null;
-        rewardTextures = null;
-        lockTexture = null;
-        animationManager = null; // Nullify reference, but don't dispose here
-
-        System.out.println("SpirepassRewardManager disposal complete.");
-    }
-
-
-    // --- Rest of the SpirepassRewardManager class ---
-    // (initializeRewardData, renderReward, renderTextReward, renderRewardWithData,
-    // renderDefaultReward, renderFallbackText, isRewardEquipped, toggleRewardEquipped,
-    // createReward methods, getters remain the same)
-    // ...
-    private void initializeRewardData() {
-
-        rewardData.put(0, new SpirepassRewardData(
-                0,
-                "",
-                "",
-                SpirepassRewardData.RewardRarity.COMMON,
-                SpirepassRewardData.RewardType.TEXT
-        ));
-
-        // Law Abiding Citizen (level 1)
-        rewardData.put(1, createReward(
-                1,
-                "LawAbidingCitizen",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_DEFECT,
-                "DEFECT_LAWABIDINGCITIZEN"
-        ));
-
-// Giantama (level 2)
-        rewardData.put(2, createReward(
-                2,
-                "Giantama",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_GIANT_HEAD,
-                "GIANT_HEAD_GIANTAMA"
-        ));
-
-// Space Blanket (level 3)
-        rewardData.put(3, createReward(
-                3,
-                "SpaceBlanket",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_SILENT,
-                "SILENT_SPACEBLANKET"
-        ));
-
-// My Cat Background (level 4)
-        rewardData.put(4, createReward(
-                4,
-                "MyCatBackground",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.IMAGE,
-                "spirepass/images/screen/SpirepassCatBackground.png"
-        ));
-
-// Sponsored (level 5)
-        rewardData.put(5, createReward(
-                5,
-                "Sponsored",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CARDBACK,
-                SkinManager.CARDBACK_COLORLESS,
-                "COLORLESS_SPONSORED",
-                "spirepass/images/rewards/cardbacks/colorless/sponsored/RAIDSkillLarge.png"
-        ));
-
-// Donut (level 6)
-        rewardData.put(6, createReward(
-                6,
-                "Donut",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_DONU,
-                "DONU_DONUT"
-        ));
-
-// Lovestruck (level 7)
-        rewardData.put(7, createReward(
-                7,
-                "Lovestruck",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_CENTURION,
-                "CENTURION_LOVESTRUCK"
-        ));
-
-// Bear (level 8)
-        rewardData.put(8, createReward(
-                8,
-                "Bear",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_BEAR,
-                "BEAR_ACTUALBEAR"
-        ));
-
-// Blue (level 9)
-        rewardData.put(9, createReward(
-                9,
-                "Blue",
-                SpirepassRewardData.RewardRarity.COMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_RED_SLAVER,
-                "RED_SLAVER_BLUE"
-        ));
-
-// Red (level 10)
-        rewardData.put(10, createReward(
-                10,
-                "Red",
-                SpirepassRewardData.RewardRarity.COMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_BLUE_SLAVER,
-                "BLUE_SLAVER_RED"
-        ));
-
-// Blissful (level 11)
-        rewardData.put(11, createReward(
-                11,
-                "Blissful",
-                SpirepassRewardData.RewardRarity.COMMON,
-                SpirepassRewardData.RewardType.CARDBACK,
-                SkinManager.CARDBACK_COLORLESS,
-                "COLORLESS_BLISSFUL",
-                "spirepass/images/rewards/cardbacks/colorless/blissful/BlissSkillLarge.png"
-        ));
-
-// Slendernob (level 12)
-        rewardData.put(12, createReward(
-                12,
-                "Slendernob",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_GREMLIN_NOB,
-                "GREMLIN_NOB_URBANLEGEND"
-        ));
-
-// Colgate (level 13)
-        rewardData.put(13, createReward(
-                13,
-                "Colgate",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_SNECKO,
-                "SNECKO_COLGATE"
-        ));
-
-// Purple Guy (level 14)
-        rewardData.put(14, createReward(
-                14,
-                "PurpleGuy",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_ROMEO,
-                "ROMEO_PURPLEGUY"
-        ));
-
-// Downtrend (level 15)
-        rewardData.put(15, createReward(
-                15,
-                "Downtrend",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CARDBACK,
-                SkinManager.CARDBACK_CURSE,
-                "CURSE_NOTSTONKS",
-                "spirepass/images/rewards/cardbacks/curse/NotStonksLarge.png"
-        ));
-
-// Invisible Man (level 16)
-        rewardData.put(16, createReward(
-                16,
-                "InvisibleMan",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_IRONCLAD,
-                "IRONCLAD_INVISIBLEMAN"
-        ));
-
-// Chalkboard (level 17)
-        rewardData.put(17, createReward(
-                17,
-                "Chalkboard",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_DECA,
-                "DECA_CHALKBOARD"
-        ));
-
-// avwejkanaklwjv e (level 18)
-        rewardData.put(18, createReward(
-                18,
-                "avwejkanaklwjve",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_DEFECT,
-                "DEFECT_GARBLE"
-        ));
-
-// kris deltarune (level 19)
-        rewardData.put(19, createReward(
-                19,
-                "krisdeltarune",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_WATCHER,
-                "WATCHER_DREEMURR"
-        ));
-
-// Disarmed (level 20)
-        rewardData.put(20, createReward(
-                20,
-                "Disarmed",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_CULTIST,
-                "CULTIST_DISARMED"
-        ));
-
-// Pajama Sam (level 21)
-        rewardData.put(21, createReward(
-                21,
-                "PajamaSam",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_DEFECT,
-                "DEFECT_PAJAMASAM"
-        ));
-
-// Big Bird (level 22)
-        rewardData.put(22, createReward(
-                22,
-                "BigBird",
-                SpirepassRewardData.RewardRarity.COMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_AWAKENED_ONE,
-                "AWAKENED_ONE_BIGBIRD"
-        ));
-
-// Prismatic (level 23)
-        rewardData.put(23, createReward(
-                23,
-                "Prismatic",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_SENTRY,
-                "SENTRY_PRISMATIC"
-        ));
-
-// Blurry (level 24)
-        rewardData.put(24, createReward(
-                24,
-                "Blurry",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_SILENT,
-                "SILENT_BLURRY"
-        ));
-
-// Harold Curse Cardback (level 25)
-        rewardData.put(25, createReward(
-                25,
-                "HaroldCurseCardback",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CARDBACK,
-                SkinManager.CARDBACK_CURSE,
-                "CURSE_HAROLD",
-                "spirepass/images/rewards/cardbacks/curse/HaroldLarge.png"
-        ));
-
-// Spaghetti & Meatballs (level 26)
-        rewardData.put(26, createReward(
-                26,
-                "SpaghettiMeatballs",
-                SpirepassRewardData.RewardRarity.COMMON,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_WRITHING_MASS,
-                "WRITHING_MASS_SPAGHETTI"
-        ));
-
-// Favorite Customer (level 27)
-        rewardData.put(27, createReward(
-                27,
-                "FavoriteCustomer",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CARDBACK,
-                SkinManager.CARDBACK_COLORLESS,
-                "COLORLESS_FAVORITECUSTOMER",
-                "spirepass/images/rewards/cardbacks/colorless/favoritecustomer/FavoriteCustomerSkillLarge.png"
-        ));
-
-// Weaponized 115 (level 28)
-        rewardData.put(28, createReward(
-                28,
-                "Weaponized115",
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_IRONCLAD,
-                "IRONCLAD_WEAPONIZED115"
-        ));
-
-// Jimbo Joker (level 29)
-        rewardData.put(29, createReward(
-                29,
-                "JimboJoker",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
-                SpirepassRewardData.RewardType.CARDBACK,
-                SkinManager.CARDBACK_COLORLESS,
-                "COLORLESS_JIMBO",
-                "spirepass/images/rewards/cardbacks/colorless/jimbo/JimboSkillLarge.png"
-        ));
-
-
-        // Level 30: Final reward with rare border
-        rewardData.put(30, new SpirepassRewardData(
-                30,
-                "", // Empty title
-                "", // Empty description
-                SpirepassRewardData.RewardRarity.RARE,
-                SpirepassRewardData.RewardType.TEXT
-        ));
-
-        // Default reward for all other levels (badge image)
-        // Now need to handle this badgeTexture disposal correctly
-        Texture badgeTexture = null;
-        try {
-            badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
-        } catch (Exception e) {
-            System.err.println("Failed to load badge texture: " + e.getMessage());
-        }
-
-
-        // Load the image textures for any image-type or cardback-type rewards
-        for (Integer level : rewardData.keySet()) {
-            SpirepassRewardData data = rewardData.get(level);
-            if (data.getImagePath() != null) {
-                try {
-                    rewardTextures.put(level, ImageMaster.loadImage(data.getImagePath()));
-                } catch (Exception e) {
-                    System.err.println("Failed to load reward texture for level " + level);
-                }
-            }
-        }
-
-        // For any unspecified levels, use the badge texture as a fallback
-        // Only add if badgeTexture loaded successfully
-        if (badgeTexture != null) {
-            for (int i = 0; i <= 30; i++) {
-                if (!rewardTextures.containsKey(i) && !rewardData.containsKey(i)) {
-                    // Put the SAME badgeTexture instance for all fallback levels
-                    rewardTextures.put(i, badgeTexture);
-                }
-            }
-        } else {
-            // Handle case where badge texture failed to load if necessary
-        }
     }
 
     public void renderReward(SpriteBatch sb, int level, boolean isUnlocked) {
@@ -541,6 +120,7 @@ public class SpirepassRewardManager implements Disposable {
             renderDefaultReward(sb, level);
         }
     }
+
     private void renderTextReward(SpriteBatch sb, SpirepassRewardData reward) {
         String backgroundPath = reward.getBackgroundTexturePath();
         Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
@@ -579,6 +159,7 @@ public class SpirepassRewardManager implements Disposable {
             );
         }
     }
+
     private void renderRewardWithData(SpriteBatch sb, int level, boolean isUnlocked, SpirepassRewardData reward) {
         String backgroundPath = reward.getBackgroundTexturePath();
         Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
@@ -621,9 +202,16 @@ public class SpirepassRewardManager implements Disposable {
         }
         Color titleColor;
         switch (reward.getRarity()) {
-            case UNCOMMON: titleColor = new Color(0.5058f, 0.8862f, 0.9098f, 1.0f); break;
-            case RARE: titleColor = new Color(0.9804f, 0.7333f, 0.2627f, 1.0f); break;
-            case COMMON: default: titleColor = Color.WHITE; break;
+            case UNCOMMON:
+                titleColor = new Color(0.5058f, 0.8862f, 0.9098f, 1.0f);
+                break;
+            case RARE:
+                titleColor = new Color(0.9804f, 0.7333f, 0.2627f, 1.0f);
+                break;
+            case COMMON:
+            default:
+                titleColor = Color.WHITE;
+                break;
         }
         FontHelper.renderFontCentered(
                 sb, FontHelper.tipBodyFont, reward.getName(), Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_NAME_Y, titleColor
@@ -632,6 +220,7 @@ public class SpirepassRewardManager implements Disposable {
                 sb, FontHelper.tipBodyFont, reward.getDescription(), Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_DESCRIPTION_Y, Color.LIGHT_GRAY
         );
     }
+
     private void renderDefaultReward(SpriteBatch sb, int level) {
         Texture rewardTexture = getRewardTexture(level);
         if (rewardTexture != null) {
@@ -653,11 +242,380 @@ public class SpirepassRewardManager implements Disposable {
                 sb, FontHelper.tipBodyFont, "Level " + level + " Reward", Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_NAME_Y, Color.WHITE
         );
     }
+
     private void renderFallbackText(SpriteBatch sb, String text, Color color) {
         FontHelper.renderFontCentered(
                 sb, FontHelper.tipBodyFont, text, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y, color
         );
     }
+
+    // ==================== REWARD MANAGEMENT ====================
+
+    private void initializeRewardData() {
+        rewardData.put(0, new SpirepassRewardData(
+                0,
+                "",
+                "",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.TEXT
+        ));
+
+        // Law Abiding Citizen (level 1)
+        rewardData.put(1, createReward(
+                1,
+                "LawAbidingCitizen",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_DEFECT,
+                "DEFECT_LAWABIDINGCITIZEN"
+        ));
+
+        // Giantama (level 2)
+        rewardData.put(2, createReward(
+                2,
+                "Giantama",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_GIANT_HEAD,
+                "GIANT_HEAD_GIANTAMA"
+        ));
+
+        // Space Blanket (level 3)
+        rewardData.put(3, createReward(
+                3,
+                "SpaceBlanket",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_SILENT,
+                "SILENT_SPACEBLANKET"
+        ));
+
+        // My Cat Background (level 4)
+        rewardData.put(4, createReward(
+                4,
+                "MyCatBackground",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.IMAGE,
+                "spirepass/images/screen/SpirepassCatBackground.png"
+        ));
+
+        // Sponsored (level 5)
+        rewardData.put(5, createReward(
+                5,
+                "Sponsored",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CARDBACK,
+                SkinManager.CARDBACK_COLORLESS,
+                "COLORLESS_SPONSORED",
+                "spirepass/images/rewards/cardbacks/colorless/sponsored/RAIDSkillLarge.png"
+        ));
+
+        // Donut (level 6)
+        rewardData.put(6, createReward(
+                6,
+                "Donut",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_DONU,
+                "DONU_DONUT"
+        ));
+
+        // Lovestruck (level 7)
+        rewardData.put(7, createReward(
+                7,
+                "Lovestruck",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_CENTURION,
+                "CENTURION_LOVESTRUCK"
+        ));
+
+        // Bear (level 8)
+        rewardData.put(8, createReward(
+                8,
+                "Bear",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_BEAR,
+                "BEAR_ACTUALBEAR"
+        ));
+
+        // Blue (level 9)
+        rewardData.put(9, createReward(
+                9,
+                "Blue",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_RED_SLAVER,
+                "RED_SLAVER_BLUE"
+        ));
+
+        // Red (level 10)
+        rewardData.put(10, createReward(
+                10,
+                "Red",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_BLUE_SLAVER,
+                "BLUE_SLAVER_RED"
+        ));
+
+        // Blissful (level 11)
+        rewardData.put(11, createReward(
+                11,
+                "Blissful",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.CARDBACK,
+                SkinManager.CARDBACK_COLORLESS,
+                "COLORLESS_BLISSFUL",
+                "spirepass/images/rewards/cardbacks/colorless/blissful/BlissSkillLarge.png"
+        ));
+
+        // Slendernob (level 12)
+        rewardData.put(12, createReward(
+                12,
+                "Slendernob",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_GREMLIN_NOB,
+                "GREMLIN_NOB_URBANLEGEND"
+        ));
+
+        // Colgate (level 13)
+        rewardData.put(13, createReward(
+                13,
+                "Colgate",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_SNECKO,
+                "SNECKO_COLGATE"
+        ));
+
+        // Purple Guy (level 14)
+        rewardData.put(14, createReward(
+                14,
+                "PurpleGuy",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_ROMEO,
+                "ROMEO_PURPLEGUY"
+        ));
+
+        // Downtrend (level 15)
+        rewardData.put(15, createReward(
+                15,
+                "Downtrend",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CARDBACK,
+                SkinManager.CARDBACK_CURSE,
+                "CURSE_NOTSTONKS",
+                "spirepass/images/rewards/cardbacks/curse/NotStonksLarge.png"
+        ));
+
+        // Invisible Man (level 16)
+        rewardData.put(16, createReward(
+                16,
+                "InvisibleMan",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_IRONCLAD,
+                "IRONCLAD_INVISIBLEMAN"
+        ));
+
+        // Chalkboard (level 17)
+        rewardData.put(17, createReward(
+                17,
+                "Chalkboard",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_DECA,
+                "DECA_CHALKBOARD"
+        ));
+
+        // avwejkanaklwjv e (level 18)
+        rewardData.put(18, createReward(
+                18,
+                "avwejkanaklwjve",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_DEFECT,
+                "DEFECT_GARBLE"
+        ));
+
+        // kris deltarune (level 19)
+        rewardData.put(19, createReward(
+                19,
+                "krisdeltarune",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_WATCHER,
+                "WATCHER_DREEMURR"
+        ));
+
+        // Disarmed (level 20)
+        rewardData.put(20, createReward(
+                20,
+                "Disarmed",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_CULTIST,
+                "CULTIST_DISARMED"
+        ));
+
+        // Pajama Sam (level 21)
+        rewardData.put(21, createReward(
+                21,
+                "PajamaSam",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_DEFECT,
+                "DEFECT_PAJAMASAM"
+        ));
+
+        // Big Bird (level 22)
+        rewardData.put(22, createReward(
+                22,
+                "BigBird",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_AWAKENED_ONE,
+                "AWAKENED_ONE_BIGBIRD"
+        ));
+
+        // Prismatic (level 23)
+        rewardData.put(23, createReward(
+                23,
+                "Prismatic",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_SENTRY,
+                "SENTRY_PRISMATIC"
+        ));
+
+        // Blurry (level 24)
+        rewardData.put(24, createReward(
+                24,
+                "Blurry",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_SILENT,
+                "SILENT_BLURRY"
+        ));
+
+        // Harold Curse Cardback (level 25)
+        rewardData.put(25, createReward(
+                25,
+                "HaroldCurseCardback",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CARDBACK,
+                SkinManager.CARDBACK_CURSE,
+                "CURSE_HAROLD",
+                "spirepass/images/rewards/cardbacks/curse/HaroldLarge.png"
+        ));
+
+        // Spaghetti & Meatballs (level 26)
+        rewardData.put(26, createReward(
+                26,
+                "SpaghettiMeatballs",
+                SpirepassRewardData.RewardRarity.COMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_WRITHING_MASS,
+                "WRITHING_MASS_SPAGHETTI"
+        ));
+
+        // Favorite Customer (level 27)
+        rewardData.put(27, createReward(
+                27,
+                "FavoriteCustomer",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CARDBACK,
+                SkinManager.CARDBACK_COLORLESS,
+                "COLORLESS_FAVORITECUSTOMER",
+                "spirepass/images/rewards/cardbacks/colorless/favoritecustomer/FavoriteCustomerSkillLarge.png"
+        ));
+
+        // Weaponized 115 (level 28)
+        rewardData.put(28, createReward(
+                28,
+                "Weaponized115",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_IRONCLAD,
+                "IRONCLAD_WEAPONIZED115"
+        ));
+
+        // Jimbo Joker (level 29)
+        rewardData.put(29, createReward(
+                29,
+                "JimboJoker",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CARDBACK,
+                SkinManager.CARDBACK_COLORLESS,
+                "COLORLESS_JIMBO",
+                "spirepass/images/rewards/cardbacks/colorless/jimbo/JimboSkillLarge.png"
+        ));
+
+        // Level 30: Final reward with rare border
+        rewardData.put(30, new SpirepassRewardData(
+                30,
+                "",
+                "",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.TEXT
+        ));
+
+        // Default reward for all other levels (badge image)
+        Texture badgeTexture = null;
+        try {
+            badgeTexture = ImageMaster.loadImage("spirepass/images/badge.png");
+        } catch (Exception e) {
+            System.err.println("Failed to load badge texture: " + e.getMessage());
+        }
+
+        // Load the image textures for any image-type or cardback-type rewards
+        for (Integer level : rewardData.keySet()) {
+            SpirepassRewardData data = rewardData.get(level);
+            if (data.getImagePath() != null) {
+                try {
+                    rewardTextures.put(level, ImageMaster.loadImage(data.getImagePath()));
+                } catch (Exception e) {
+                    System.err.println("Failed to load reward texture for level " + level);
+                }
+            }
+        }
+
+        // For any unspecified levels, use the badge texture as a fallback
+        if (badgeTexture != null) {
+            for (int i = 0; i <= 30; i++) {
+                if (!rewardTextures.containsKey(i) && !rewardData.containsKey(i)) {
+                    rewardTextures.put(i, badgeTexture);
+                }
+            }
+        }
+    }
+
+    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type) {
+        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
+        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type);
+    }
+
+    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entityOrPath) {
+        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
+        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entityOrPath);
+    }
+
+    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entity, String skin) {
+        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
+        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entity, skin);
+    }
+
+    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entity, String skin, String imagePath) {
+        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
+        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entity, skin, imagePath);
+    }
+
+    // ==================== REWARD STATE MANAGEMENT ====================
+
     public boolean isRewardEquipped(SpirepassRewardData reward) {
         if (reward == null) return false;
         if (reward.isBackgroundReward()) {
@@ -676,6 +634,7 @@ public class SpirepassRewardManager implements Disposable {
         }
         return false;
     }
+
     public void toggleRewardEquipped(SpirepassRewardData reward) {
         if (reward == null) return;
         boolean stateChanged = false;
@@ -696,7 +655,7 @@ public class SpirepassRewardManager implements Disposable {
             if (!newValue.equals(currentSkin)) {
                 SkinManager.getInstance().setAppliedSkin(entityId, newValue);
                 stateChanged = true;
-                // Sound logic could go here if needed
+                // Sound stuff can go here if needed
             }
         } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
             String cardbackType = reward.getCardbackType();
@@ -713,39 +672,64 @@ public class SpirepassRewardManager implements Disposable {
             Spirepass.saveConfig();
         }
     }
-    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type) {
-        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
-        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type);
-    }
-    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entityOrPath) {
-        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
-        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entityOrPath);
-    }
-    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entity, String skin) {
-        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
-        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entity, skin);
-    }
-    private SpirepassRewardData createReward(int id, String nameKey, SpirepassRewardData.RewardRarity rarity, SpirepassRewardData.RewardType type, String entity, String skin, String imagePath) {
-        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassReward" + nameKey));
-        return new SpirepassRewardData(id, strings.TEXT[0], strings.TEXT[1], rarity, type, entity, skin, imagePath);
-    }
+
+    // ==================== GETTERS ====================
+
     public SpirepassRewardData getRewardData(int level) {
         return rewardData.getOrDefault(level, null);
     }
+
     public Texture getRewardTexture(int level) {
-        // Ensure rewardTextures map exists before accessing
         if (rewardTextures != null && rewardTextures.containsKey(level)) {
             return rewardTextures.get(level);
         } else if (rewardTextures != null) {
-            // Fallback logic might need adjustment depending on how badge texture is handled
-            // This simplified version just returns the first texture found if the specific level isn't there.
-            // A better approach might be to specifically fetch the badge texture if needed.
             for (Texture texture : rewardTextures.values()) {
-                if (texture != null) return texture; // Return the first valid one found (likely badge)
+                if (texture != null) return texture;
             }
         }
-        return null; // Ultimate fallback
+        return null;
     }
 
+    // ==================== CLEANUP ====================
 
-} // End of SpirepassRewardManager class
+    @Override
+    public void dispose() {
+        Set<Texture> uniqueTextures = new HashSet<>();
+
+        if (backgroundTextures != null) {
+            for (Texture texture : backgroundTextures.values()) {
+                if (texture != null) {
+                    uniqueTextures.add(texture);
+                }
+            }
+            backgroundTextures.clear();
+        }
+
+        if (rewardTextures != null) {
+            for (Texture texture : rewardTextures.values()) {
+                if (texture != null) {
+                    uniqueTextures.add(texture);
+                }
+            }
+            rewardTextures.clear();
+        }
+
+        if (this.lockTexture != null) {
+            uniqueTextures.add(this.lockTexture);
+        }
+
+        for (Texture texture : uniqueTextures) {
+            try {
+                texture.dispose();
+            } catch (Exception e) {
+                System.err.println("Error disposing texture: " + e.getMessage());
+            }
+        }
+        uniqueTextures.clear();
+
+        backgroundTextures = null;
+        rewardTextures = null;
+        lockTexture = null;
+        animationManager = null;
+    }
+}

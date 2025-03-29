@@ -43,41 +43,48 @@ public class Spirepass implements
         EditStringsSubscriber,
         PostInitializeSubscriber,
         OnCardUseSubscriber,
-        OnStartBattleSubscriber,
         OnPlayerTurnStartSubscriber,
         PostUpdateSubscriber {
+    // ==================== METADATA & STATIC CONSTANTS ====================
+
     public static ModInfo info;
     public static String modID;
     static { loadModInfo(); }
     private static final String resourcesFolder = checkResourcesPath();
-     public static final Logger logger = LogManager.getLogger(modID);
-    private float saveTimer = 0f;
-    private static final float SAVE_INTERVAL = 10f; // Save every 10 seconds
+    public static final Logger logger = LogManager.getLogger(modID);
 
-    // Challenge system related constants
-    private static final int NUM_DAILY_CHALLENGES = 3;
-    private static final int NUM_WEEKLY_CHALLENGES = 3;
-    private static final int REFRESH_HOUR_EST = 12; // 12 PM EST
-    // Keys for config file
+    // ==================== CONFIG CONSTANTS ====================
+
     private static final String JUMP_TO_LEVEL_KEY = "jumpToCurrentLevel";
     private static final String ENABLE_MENU_ELEMENTS_KEY = "enableMainMenuElements";
     private static final String PLAY_CHALLENGE_SOUND_KEY = "playChallengeCompleteSound";
-
-    // Static fields to hold current config values
-    public static boolean jumpToCurrentLevel;
-    public static boolean enableMainMenuElements;
-    public static boolean playChallengeCompleteSound;
-
-    // XP and level system constants
     private static final String TOTAL_XP_KEY = "totalXP";
+
+    // ==================== LEVEL & CHALLENGE CONSTANTS ====================
+
     public static final int XP_PER_LEVEL = 50;
     public static final int DAILY_CHALLENGE_XP = 25;
     public static final int WEEKLY_CHALLENGE_XP = 75;
     public static final int MAX_LEVEL = 30;
-    private static int totalXP = 0;
     public static final int REFRESH_HOUR_LOCAL = 12;
     public static final int REFRESH_MINUTE_LOCAL = 00;
+
+    private static final int NUM_DAILY_CHALLENGES = 3;
+    private static final int NUM_WEEKLY_CHALLENGES = 3;
+    private static final int REFRESH_HOUR_EST = 12; // 12 PM EST
+
+    // ==================== STATE VARIABLES ====================
+
+    public static boolean jumpToCurrentLevel;
+    public static boolean enableMainMenuElements;
+    public static boolean playChallengeCompleteSound;
+    private static int totalXP = 0;
     public static SpireConfig config;
+
+    private float saveTimer = 0f;
+    private static final float SAVE_INTERVAL = 10f; // Save every 10 seconds
+
+    // ==================== INITIALIZATION ====================
 
     public static String makeID(String id) {
         return modID + ":" + id;
@@ -85,66 +92,62 @@ public class Spirepass implements
 
     public static void initialize() {
         try {
-            // Simple config to store skin and cardback preferences
             Properties defaults = new Properties();
+
             // Get manager instances
             SkinManager skinManager = SkinManager.getInstance();
-            // Add default properties for skins
             skinManager.addDefaultProperties(defaults);
+
             // Challenge system default timestamps
             defaults.setProperty(LAST_DAILY_REFRESH, String.valueOf(0));
             defaults.setProperty(LAST_WEEKLY_REFRESH, String.valueOf(0));
+
             // Add XP default
             defaults.setProperty(TOTAL_XP_KEY, "0");
 
-            // --- NEW CONFIG OPTIONS DEFAULTS ---
-            defaults.setProperty(JUMP_TO_LEVEL_KEY, "true"); // Default enabled
-            defaults.setProperty(ENABLE_MENU_ELEMENTS_KEY, "true"); // Default enabled
-            defaults.setProperty(PLAY_CHALLENGE_SOUND_KEY, "false"); // Default disabled
-            // --- END NEW CONFIG OPTIONS DEFAULTS ---
+            // Config options defaults
+            defaults.setProperty(JUMP_TO_LEVEL_KEY, "true");
+            defaults.setProperty(ENABLE_MENU_ELEMENTS_KEY, "true");
+            defaults.setProperty(PLAY_CHALLENGE_SOUND_KEY, "false");
 
             // Initialize config with defaults
             config = new SpireConfig(modID, "config", defaults);
 
-            // --- LOAD NEW CONFIG VALUES ---
+            // Load config values
             jumpToCurrentLevel = config.getBool(JUMP_TO_LEVEL_KEY);
             enableMainMenuElements = config.getBool(ENABLE_MENU_ELEMENTS_KEY);
             playChallengeCompleteSound = config.getBool(PLAY_CHALLENGE_SOUND_KEY);
-            // --- END LOAD NEW CONFIG VALUES ---
-
 
             // Load XP data after config is initialized
             if (config.has(TOTAL_XP_KEY)) {
                 totalXP = config.getInt(TOTAL_XP_KEY);
-//                 logger.info("Loaded battle pass XP: " + totalXP);
             }
-
 
             // Load skin data AFTER config is fully initialized
             skinManager.loadData(config);
 
-
             // Initialize challenge manager and load challenge data
             ChallengeManager challengeManager = ChallengeManager.getInstance();
-            // Load challenge data
             challengeManager.loadData(config);
+
             // Check if we need to generate/refresh challenges
             checkAndRefreshChallenges();
 
-
-            // Important: Save the config after everything is loaded
-            // This ensures any missing properties get saved with defaults
+            // Save the config after everything is loaded
             config.save();
 
-
         } catch (Exception e) {
-//             logger.error("Failed to load config: " + e.getMessage());
             e.printStackTrace();
         }
         new Spirepass();
     }
 
-    // Update saveConfig method to use SkinManager
+    public Spirepass() {
+        BaseMod.subscribe(this);
+    }
+
+    // ==================== CONFIG MANAGEMENT ====================
+
     public static void saveConfig() {
         try {
             // Save skin data
@@ -158,15 +161,12 @@ public class Spirepass implements
             config.setInt(TOTAL_XP_KEY, totalXP);
 
             config.save();
-//             logger.info("Saved all config data");
         } catch (Exception e) {
-//             logger.error("Failed to save config: " + e.getMessage());
+            // Error handling
         }
     }
 
-    public Spirepass() {
-        BaseMod.subscribe(this);
-    }
+    // ==================== UI SETUP ====================
 
     @Override
     public void receivePostInitialize() {
@@ -278,9 +278,9 @@ public class Spirepass implements
                     if (config != null) {
                         config.setInt(TOTAL_XP_KEY, 0);
                         saveConfig();
-                        logger.info("Reset XP to 0 via secret button"); // Left logger intentionally, remove if unwanted
+                        logger.info("Reset XP to 0 via secret button");
                     } else {
-                        logger.error("Config not initialized when trying to reset XP!"); // Left logger intentionally, remove if unwanted
+                        logger.error("Config not initialized when trying to reset XP!");
                     }
                 }
         );
@@ -288,7 +288,7 @@ public class Spirepass implements
         settingsPanel.addUIElement(xpButton);
         settingsPanel.addUIElement(resetXpButton);
 
-// Create a secret area detector that exactly matches button hitboxes
+        // Create a secret area detector that exactly matches button hitboxes
         class SecretAreaElement implements IUIElement {
             private final float BUTTON_X = Settings.WIDTH / Settings.scale - 650.0f;
             private final float BUTTON_Y_BOTTOM = 250.0f;
@@ -343,10 +343,6 @@ public class Spirepass implements
                 if (isHoveringOverButtonArea != areButtonsVisible) {
                     areButtonsVisible = isHoveringOverButtonArea;
                     if (isHoveringOverButtonArea) {
-                        // These button variables (xpButton, resetXpButton) must be accessible
-                        // from the outer scope where SecretAreaElement is instantiated.
-                        // Assuming xpButton and resetXpButton are fields or effectively final
-                        // local variables in receivePostInitialize.
                         xpButton.set(BUTTON_X, BUTTON_Y_TOP);
                         resetXpButton.set(BUTTON_X, BUTTON_Y_BOTTOM);
                     } else {
@@ -367,11 +363,8 @@ public class Spirepass implements
                 info.Description, settingsPanel);
     }
 
+    // ==================== CHALLENGE MANAGEMENT ====================
 
-    /**
-     * Check if challenge lists need to be generated or refreshed based on time
-     */
-    // Replace the existing checkAndRefreshChallenges method with this one
     private static void checkAndRefreshChallenges() {
         ChallengeManager manager = ChallengeManager.getInstance();
 
@@ -380,7 +373,6 @@ public class Spirepass implements
                 manager.getWeeklyChallenges().isEmpty();
 
         if (needInitialChallenges) {
-//             logger.info("No challenges found, generating initial set");
             generateInitialChallenges();
             return;
         }
@@ -407,8 +399,6 @@ public class Spirepass implements
         lastWeeklyRefreshDate.setTimeInMillis(lastWeeklyRefresh);
 
         // Check if we need to refresh daily challenges
-        // This happens if we've passed the refresh time today AND
-        // the last refresh was before today or before today's refresh time
         boolean needsDailyRefresh = passedRefreshTime &&
                 (isSameDay(now, lastDailyRefreshDate) ?
                         (lastDailyRefreshDate.get(Calendar.HOUR_OF_DAY) < REFRESH_HOUR_LOCAL ||
@@ -417,13 +407,10 @@ public class Spirepass implements
                         true);
 
         if (needsDailyRefresh) {
-//             logger.info("Daily challenges need refresh");
             generateDailyChallenges();
         }
 
         // Check if we need to refresh weekly challenges
-        // This happens if it's Monday, we've passed the refresh time,
-        // and the last refresh was earlier this Monday or before this Monday
         boolean isMonday = currentDayOfWeek == Calendar.MONDAY;
         boolean needsWeeklyRefresh = isMonday && passedRefreshTime &&
                 (isSameDay(now, lastWeeklyRefreshDate) ?
@@ -433,7 +420,6 @@ public class Spirepass implements
                         !isMonday(lastWeeklyRefreshDate) || !isSameWeek(now, lastWeeklyRefreshDate));
 
         if (needsWeeklyRefresh) {
-//             logger.info("Weekly challenges need refresh");
             generateWeeklyChallenges();
         }
 
@@ -441,31 +427,11 @@ public class Spirepass implements
         saveConfig();
     }
 
-    // Helper methods for date comparison
-    private static boolean isSameDay(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
-    }
-
-    private static boolean isMonday(Calendar cal) {
-        return cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY;
-    }
-
-    private static boolean isSameWeek(Calendar cal1, Calendar cal2) {
-        // Check if same year and week
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR);
-    }
-
-    /**
-     * Generate initial set of challenges
-     */
     private static void generateInitialChallenges() {
         generateDailyChallenges();
         generateWeeklyChallenges();
     }
 
-    // Fix the generateDailyChallenges method in Spirepass
     public static void generateDailyChallenges() {
         ChallengeManager manager = ChallengeManager.getInstance();
 
@@ -498,11 +464,8 @@ public class Spirepass implements
 
         // Save data after generating new challenges
         saveConfig();
-
-//         logger.info("Generated " + selectedChallenges.size() + " new daily challenges");
     }
 
-    // Similarly fix the generateWeeklyChallenges method in Spirepass
     public static void generateWeeklyChallenges() {
         ChallengeManager manager = ChallengeManager.getInstance();
 
@@ -535,13 +498,8 @@ public class Spirepass implements
 
         // Save data after generating new challenges
         saveConfig();
-
-//         logger.info("Generated " + selectedChallenges.size() + " new weekly challenges");
     }
 
-    /**
-     * Helper method to select random challenges from a list
-     */
     private static List<Challenge> selectRandomChallenges(List<Challenge> allChallenges, int count) {
         List<Challenge> result = new ArrayList<>();
 
@@ -561,54 +519,62 @@ public class Spirepass implements
         return result;
     }
 
-    // Get current level based on XP
+    // ==================== DATE HELPERS ====================
+
+    private static boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private static boolean isMonday(Calendar cal) {
+        return cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY;
+    }
+
+    private static boolean isSameWeek(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    // ==================== XP MANAGEMENT ====================
+
     public static int getCurrentLevel() {
         int level = totalXP / XP_PER_LEVEL;
         return Math.min(level, MAX_LEVEL);
     }
 
-    // Get XP needed for next level
     public static int getXPForNextLevel() {
         if (getCurrentLevel() >= MAX_LEVEL) {
-            return 0; // At max level
+            return 0;
         }
         return ((getCurrentLevel() + 1) * XP_PER_LEVEL) - totalXP;
     }
 
-    // Add XP and save
     public static void addXP(int amount) {
         int oldLevel = getCurrentLevel();
         totalXP += amount;
 
-        // Add null check to prevent NPE
         if (config != null) {
             config.setInt(TOTAL_XP_KEY, totalXP);
             saveConfig();
-        } else {
-//             logger.error("Cannot save XP: config is null");
         }
 
-        // Log level up events
         int newLevel = getCurrentLevel();
         if (newLevel > oldLevel) {
-//             logger.info("Level up! " + oldLevel + " -> " + newLevel);
+            // Level up event
         }
-
-//         logger.info("Added " + amount + " XP. Total: " + totalXP + ", Level: " + getCurrentLevel());
     }
 
-    /*----------Localization----------*/
+    // ==================== LOCALIZATION ====================
 
-    //This is used to load the appropriate localization files based on language.
-    private static String getLangString()
-    {
+    private static String getLangString() {
         return Settings.language.name().toLowerCase();
     }
+
     private static final String defaultLanguage = "eng";
 
     @Override
     public void receiveEditStrings() {
-        loadLocalization(defaultLanguage); //no exception catching for default localization; you better have at least one that works.
+        loadLocalization(defaultLanguage);
         if (!defaultLanguage.equals(getLangString())) {
             try {
                 loadLocalization(getLangString());
@@ -632,11 +598,10 @@ public class Spirepass implements
         return resourcesFolder + "/images/" + file;
     }
 
-    /**
-     * Checks the expected resources path based on the package name.
-     */
+    // ==================== RESOURCE LOADING ====================
+
     private static String checkResourcesPath() {
-        String name = Spirepass.class.getName(); //getPackage can be iffy with patching, so class name is used instead.
+        String name = Spirepass.class.getName();
         int separator = name.indexOf('.');
         if (separator > 0)
             name = name.substring(0, separator);
@@ -652,9 +617,6 @@ public class Spirepass implements
                 "\tat the top of the " + Spirepass.class.getSimpleName() + " java file.");
     }
 
-    /**
-     * This determines the mod's ID based on information stored by ModTheSpire.
-     */
     private static void loadModInfo() {
         Optional<ModInfo> infos = Arrays.stream(Loader.MODINFOS).filter((modInfo)->{
             AnnotationDB annotationDB = Patcher.annotationDBMap.get(modInfo.jarURL);
@@ -672,11 +634,13 @@ public class Spirepass implements
         }
     }
 
+    // ==================== GAME EVENT HOOKS ====================
+
     @Override
     public void receiveCardUsed(AbstractCard abstractCard) {
         // First check if the challenge is active and incomplete
         if (!ChallengeHelper.isActiveChallengeIncomplete("daily_setup")) {
-            return; // Skip all processing if challenge is inactive or already completed
+            return;
         }
 
         // Check if the card is a Power card
@@ -690,17 +654,9 @@ public class Spirepass implements
                 if (ChallengeVariables.dailySetupPowersPlayed >= 2) {
                     // Complete the challenge
                     ChallengeHelper.completeChallenge("daily_setup");
-
-                    // Optional: Log the completion
-//                     logger.info("Daily Setup challenge completed! Played 2 power cards on turn 1.");
                 }
             }
         }
-    }
-
-    @Override
-    public void receiveOnBattleStart(AbstractRoom abstractRoom) {
-
     }
 
     @Override
@@ -720,8 +676,6 @@ public class Spirepass implements
 
             // Check if challenges need to be refreshed
             checkAndRefreshChallenges();
-
-            // No need to call saveConfig() here as it's already called in checkAndRefreshChallenges()
         }
     }
 }

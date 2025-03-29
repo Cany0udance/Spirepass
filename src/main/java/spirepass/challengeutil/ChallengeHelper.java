@@ -118,12 +118,9 @@ public class ChallengeHelper {
         }
 
         if (completed) {
-            // --- Add sound logic here ---
             if (Spirepass.enableMainMenuElements && Spirepass.playChallengeCompleteSound) {
                 CardCrawlGame.sound.play("UNLOCK_PING");
-                // Spirepass.logger.info("Played challenge complete sound for: " + challengeId);
             }
-            // --- End sound logic ---
 
             manager.saveData(Spirepass.config);
             try {
