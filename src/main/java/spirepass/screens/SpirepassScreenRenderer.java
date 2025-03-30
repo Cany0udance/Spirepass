@@ -81,6 +81,12 @@ public class SpirepassScreenRenderer {
     }
 
     private void initializePremiumButton() {
+        // Don't initialize if premium button is hidden in settings
+        if (Spirepass.hideSpirepassPremium) {
+            this.premiumButton = null;
+            return;
+        }
+
         float textWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, PREMIUM_BUTTON_TEXT, 9999f, 0f);
         float estimatedButtonWidth = textWidth + 80.0f * Settings.scale;
         float buttonX = (Settings.WIDTH / 2.0f) - (estimatedButtonWidth / 2.0f);
@@ -133,20 +139,21 @@ public class SpirepassScreenRenderer {
         if (equipButton != null) {
             equipButton.update();
         }
-        if (premiumButton != null) {
+        if (premiumButton != null && !Spirepass.hideSpirepassPremium) {
             premiumButton.update();
         }
     }
 
     public void renderUIElements(SpriteBatch sb) {
-        if (premiumButton != null) {
+        if (premiumButton != null && !Spirepass.hideSpirepassPremium) {
             premiumButton.render(sb);
+            renderPremiumTooltip();
         }
-        renderPremiumTooltip();
     }
 
     private void renderPremiumTooltip() {
-        if (premiumButton == null) return;
+        if (premiumButton == null || Spirepass.hideSpirepassPremium) return;
+
         try {
             Field hbField = ModLabeledButton.class.getDeclaredField("hb");
             hbField.setAccessible(true);

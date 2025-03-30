@@ -393,7 +393,9 @@
     "TEXT": [
       "Jump to current level when opening Spirepass screen",
       "Show main menu elements (challenge list, Spirepass progress)",
-      "If main menu elements are shown, play a sound notification when a challenge is completed"
+      "If main menu elements are shown, play a sound notification when a challenge is completed",
+      "Hide Spirepass Premium button",
+      "marcus"
     ]
   }
 }

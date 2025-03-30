@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static spirepass.Spirepass.DRUM_KEY;
 import static spirepass.Spirepass.makeID;
 
 public class SpirepassRewardManager implements Disposable {
@@ -163,31 +164,52 @@ public class SpirepassRewardManager implements Disposable {
     private void renderRewardWithData(SpriteBatch sb, int level, boolean isUnlocked, SpirepassRewardData reward) {
         String backgroundPath = reward.getBackgroundTexturePath();
         Texture backgroundTexture = backgroundPath != null ? backgroundTextures.get(backgroundPath) : null;
+
         if (reward.getType() == SpirepassRewardData.RewardType.TEXT) {
             renderTextReward(sb, reward);
             return;
         }
+
         if (backgroundTexture != null) {
-            float previewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
-            float previewWidth = previewHeight * (backgroundTexture.getWidth() / (float) backgroundTexture.getHeight());
+            float bgPreviewHeight = SpirepassPositionSettings.REWARD_PREVIEW_HEIGHT * SpirepassPositionSettings.REWARD_BACKGROUND_SCALE;
+            float bgPreviewWidth = bgPreviewHeight * (backgroundTexture.getWidth() / (float) backgroundTexture.getHeight());
             sb.setColor(Color.WHITE);
             sb.draw(
                     backgroundTexture,
-                    Settings.WIDTH / 2.0f - previewWidth / 2.0f,
-                    SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
-                    previewWidth,
-                    previewHeight
+                    Settings.WIDTH / 2.0f - bgPreviewWidth / 2.0f,
+                    SpirepassPositionSettings.REWARD_PREVIEW_Y - bgPreviewHeight / 2.0f,
+                    bgPreviewWidth,
+                    bgPreviewHeight
             );
         }
+
         if (reward.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
             String modelId = reward.getModelId();
             String entityId = reward.getEntityId();
             String variant = SpirepassAnimationManager.getVariantFromModelId(entityId, modelId);
             animationManager.renderAnimationPreview(sb, entityId, variant);
-        } else if (reward.getType() == SpirepassRewardData.RewardType.IMAGE || reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
+
+        } else if (reward.getType() == SpirepassRewardData.RewardType.IMAGE) {
             Texture rewardTexture = getRewardTexture(level);
             if (rewardTexture != null) {
-                float previewHeight = SpirepassPositionSettings.REWARD_IMAGE_HEIGHT * SpirepassPositionSettings.REWARD_CONTENT_SCALE;
+                float scale = SpirepassPositionSettings.REWARD_CONTENT_SCALE;
+                float previewHeight = SpirepassPositionSettings.REWARD_IMAGE_HEIGHT * scale;
+                float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
+                float previewWidth = previewHeight * aspectRatio;
+                sb.setColor(Color.WHITE);
+                sb.draw(
+                        rewardTexture,
+                        Settings.WIDTH / 2.0f - previewWidth / 2.0f,
+                        SpirepassPositionSettings.REWARD_PREVIEW_Y - previewHeight / 2.0f,
+                        previewWidth,
+                        previewHeight
+                );
+            }
+        } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
+            Texture rewardTexture = getRewardTexture(level);
+            if (rewardTexture != null) {
+                float scale = SpirepassPositionSettings.CARDBACK_CONTENT_SCALE;
+                float previewHeight = SpirepassPositionSettings.REWARD_IMAGE_HEIGHT * scale;
                 float aspectRatio = rewardTexture.getWidth() / (float) rewardTexture.getHeight();
                 float previewWidth = previewHeight * aspectRatio;
                 sb.setColor(Color.WHITE);
@@ -200,6 +222,7 @@ public class SpirepassRewardManager implements Disposable {
                 );
             }
         }
+
         Color titleColor;
         switch (reward.getRarity()) {
             case UNCOMMON:
@@ -656,6 +679,10 @@ public class SpirepassRewardManager implements Disposable {
                 SkinManager.getInstance().setAppliedSkin(entityId, newValue);
                 stateChanged = true;
                 // Sound stuff can go here if needed
+                if (!shouldUnequip && reward.getLevel() == 12) {
+                    float volumeMultiplier = 4.0f;
+                    CardCrawlGame.sound.playV(DRUM_KEY, volumeMultiplier);
+                }
             }
         } else if (reward.getType() == SpirepassRewardData.RewardType.CARDBACK) {
             String cardbackType = reward.getCardbackType();

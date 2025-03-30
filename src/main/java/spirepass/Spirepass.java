@@ -44,6 +44,7 @@ public class Spirepass implements
         PostInitializeSubscriber,
         OnCardUseSubscriber,
         OnPlayerTurnStartSubscriber,
+        AddAudioSubscriber,
         PostUpdateSubscriber {
     // ==================== METADATA & STATIC CONSTANTS ====================
 
@@ -58,7 +59,13 @@ public class Spirepass implements
     private static final String JUMP_TO_LEVEL_KEY = "jumpToCurrentLevel";
     private static final String ENABLE_MENU_ELEMENTS_KEY = "enableMainMenuElements";
     private static final String PLAY_CHALLENGE_SOUND_KEY = "playChallengeCompleteSound";
+    private static final String HIDE_SPIREPASS_PREMIUM = "hideSpirepassPremium";
+    private static final String MARCUS = "marcus";
     private static final String TOTAL_XP_KEY = "totalXP";
+    // ==================== AUDIO ====================
+
+    public static final String DRUM_KEY = "Drum";
+    public static final String DRUM_OGG = "spirepass/audio/Drum.ogg";
 
     // ==================== LEVEL & CHALLENGE CONSTANTS ====================
 
@@ -76,8 +83,10 @@ public class Spirepass implements
     // ==================== STATE VARIABLES ====================
 
     public static boolean jumpToCurrentLevel;
+    public static boolean hideSpirepassPremium;
     public static boolean enableMainMenuElements;
     public static boolean playChallengeCompleteSound;
+    public static boolean marcus;
     private static int totalXP = 0;
     public static SpireConfig config;
 
@@ -107,16 +116,20 @@ public class Spirepass implements
 
             // Config options defaults
             defaults.setProperty(JUMP_TO_LEVEL_KEY, "true");
+            defaults.setProperty(HIDE_SPIREPASS_PREMIUM, "false");
             defaults.setProperty(ENABLE_MENU_ELEMENTS_KEY, "true");
             defaults.setProperty(PLAY_CHALLENGE_SOUND_KEY, "false");
+            defaults.setProperty(MARCUS, "false");
 
             // Initialize config with defaults
             config = new SpireConfig(modID, "config", defaults);
 
             // Load config values
             jumpToCurrentLevel = config.getBool(JUMP_TO_LEVEL_KEY);
+            hideSpirepassPremium = config.getBool(HIDE_SPIREPASS_PREMIUM);
             enableMainMenuElements = config.getBool(ENABLE_MENU_ELEMENTS_KEY);
             playChallengeCompleteSound = config.getBool(PLAY_CHALLENGE_SOUND_KEY);
+            marcus = config.getBool(MARCUS);
 
             // Load XP data after config is initialized
             if (config.has(TOTAL_XP_KEY)) {
@@ -194,8 +207,22 @@ public class Spirepass implements
         });
         settingsPanel.addUIElement(jumpToggle);
 
-        ModLabeledToggleButton menuElementsToggle = new ModLabeledToggleButton(TEXT[1],
+        ModLabeledToggleButton hideSpirepassPremiumToggle = new ModLabeledToggleButton(TEXT[3],
                 toggleX, toggleStartY - toggleSpacing, Settings.CREAM_COLOR, FontHelper.charDescFont,
+                hideSpirepassPremium,
+                settingsPanel, (label) -> {}, (button) -> {
+            hideSpirepassPremium = button.enabled;
+            try {
+                config.setBool(HIDE_SPIREPASS_PREMIUM, hideSpirepassPremium);
+                config.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        settingsPanel.addUIElement(hideSpirepassPremiumToggle);
+
+        ModLabeledToggleButton menuElementsToggle = new ModLabeledToggleButton(TEXT[1],
+                toggleX, toggleStartY - (toggleSpacing * 2), Settings.CREAM_COLOR, FontHelper.charDescFont,
                 enableMainMenuElements,
                 settingsPanel, (label) -> {}, (button) -> {
             boolean nowEnabled = button.enabled;
@@ -221,7 +248,7 @@ public class Spirepass implements
         menuToggleRef[0] = menuElementsToggle;
 
         ModLabeledToggleButton playSoundToggle = new ModLabeledToggleButton(TEXT[2],
-                toggleX, toggleStartY - (toggleSpacing * 2), Settings.CREAM_COLOR, FontHelper.charDescFont,
+                toggleX, toggleStartY - (toggleSpacing * 3), Settings.CREAM_COLOR, FontHelper.charDescFont,
                 enableMainMenuElements && playChallengeCompleteSound,
                 settingsPanel, (label) -> {}, (button) -> {
             boolean nowEnabled = button.enabled;
@@ -245,6 +272,20 @@ public class Spirepass implements
         });
         settingsPanel.addUIElement(playSoundToggle);
         soundToggleRef[0] = playSoundToggle;
+
+        ModLabeledToggleButton marcusToggle = new ModLabeledToggleButton(TEXT[4],
+                toggleX, toggleStartY - (toggleSpacing * 4), Settings.CREAM_COLOR, FontHelper.charDescFont,
+                marcus,
+                settingsPanel, (label) -> {}, (button) -> {
+            marcus = button.enabled;
+            try {
+                config.setBool(MARCUS, marcus);
+                config.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        settingsPanel.addUIElement(marcusToggle);
 
         if (!menuElementsToggle.toggle.enabled && playSoundToggle.toggle.enabled) {
             playSoundToggle.toggle.enabled = false;
@@ -276,7 +317,7 @@ public class Spirepass implements
                     if (config != null) {
                         config.setInt(TOTAL_XP_KEY, 0);
                         saveConfig();
-                        logger.info("Reset XP to 0 via secret button");
+                       // logger.info("Reset XP to 0 via secret button");
                     } else {
                         logger.error("Config not initialized when trying to reset XP!");
                     }
@@ -678,5 +719,10 @@ public class Spirepass implements
             // Check if challenges need to be refreshed
             checkAndRefreshChallenges();
         }
+    }
+
+    @Override
+    public void receiveAddAudio() {
+        BaseMod.addAudio(DRUM_KEY, DRUM_OGG);
     }
 }

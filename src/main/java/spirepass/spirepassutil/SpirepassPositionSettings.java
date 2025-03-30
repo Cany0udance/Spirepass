@@ -21,6 +21,7 @@ public class SpirepassPositionSettings {
     // Reward preview sizes and scaling
     public static final float REWARD_BACKGROUND_SCALE = 1.4f;  // Single scale factor for all backgrounds
     public static final float REWARD_CONTENT_SCALE = 1.4f;     // Single scale factor for all reward content
+    public static final float CARDBACK_CONTENT_SCALE = 2.0f;
     public static final float CHARACTER_MODEL_SCALE = 1.3f;    // Scale factor for character models
     public static final float MONSTER_MODEL_SCALE = 1.3f; // Adjust this value as needed for monsters
 
