@@ -34,16 +34,11 @@ public class SpirepassScreenRenderer {
     // ==================== CONSTANTS & STATIC VARIABLES ====================
 
     private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassScreen"));
+    private static final String[] TEXT = uiStrings.TEXT;
     private static Float cachedBoxW = null;
     private static final float TOOLTIP_RIGHT_PADDING = 15.0f * Settings.scale;
     private static final float EQUIP_BUTTON_PADDING = 80.0f * Settings.scale;
     private static final float PREMIUM_BUTTON_Y = 40.0f * Settings.scale;
-    private static final String PREMIUM_BUTTON_TEXT = "BUY SPIREPASS PREMIUM@!!!1!";
-    private static final String PREMIUM_TOOLTIP_HEADER = "Why buy Premium? Great question. Here are some great answers:";
-    private static final String PREMIUM_TOOLTIP_BODY = "- Unlock microtransactions (your favorite!) NL NL - Unlock macrotransactions NL NL - Unlock SBMM NL NL - Unlock the krabby patty secret formula NL NL - Unlock more unlocks " +
-            "NL NL - Unlock an embarrassing picture of Defect at the Christmas party NL NL - Unlock a new synonym for the word \"Unlock\". i guess they call that a thesaurus hold on let me buy one from amazon EDIT: hey guys it's been 4 business days and i'm back with a brand new thesauraus NL NL - UnLEASH new...cards? Depends on your definition of cards NL NL - Activate hidden neurons inside your brain that" +
-            "you didn't even know existed for maximum spireslaying 1000 NL NL - Unlock beta access to Half-Life 3 (note to future Spirepass enjoyers: if Half-Life 3 actually releases (it won't lol), this joke becomes a bit outdated so yo ucan safely ignore this" +
-            "entire bullet point thanks! NL NL - Learn why kids love the taste of Cinnamon Toast Crunch NL NL - Learn why kids don't lvoe the taste of Cinnamon Toast Squares NL NL - Learn why adults hate that kids love the taste of Cinnamon Toast Crunch";
     private static final String PREMIUM_TARGET_URL = "https://store.steampowered.com/app/2868840/Slay_the_Spire_2/";
 
     // ==================== INSTANCE VARIABLES ====================
@@ -87,7 +82,7 @@ public class SpirepassScreenRenderer {
             return;
         }
 
-        float textWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, PREMIUM_BUTTON_TEXT, 9999f, 0f);
+        float textWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, TEXT[4], 9999f, 0f);
         float estimatedButtonWidth = textWidth + 80.0f * Settings.scale;
         float buttonX = (Settings.WIDTH / 2.0f) - (estimatedButtonWidth / 2.0f);
         float buttonY = PREMIUM_BUTTON_Y;
@@ -109,7 +104,7 @@ public class SpirepassScreenRenderer {
         };
 
         this.premiumButton = new ModLabeledButton(
-                PREMIUM_BUTTON_TEXT,
+                TEXT[4],
                 buttonX,
                 buttonY,
                 Color.YELLOW,
@@ -174,7 +169,7 @@ public class SpirepassScreenRenderer {
                 tipX = Math.min(tipX, Settings.WIDTH - boxWidth - TOOLTIP_RIGHT_PADDING);
                 tipX = Math.max(tipX, TOOLTIP_RIGHT_PADDING);
                 float tipY = Settings.HEIGHT - 50.0f * Settings.scale;
-                TipHelper.renderGenericTip(tipX, tipY, PREMIUM_TOOLTIP_HEADER, PREMIUM_TOOLTIP_BODY);
+                TipHelper.renderGenericTip(tipX, tipY, TEXT[5], TEXT[6]);
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
             // Error logging omitted
@@ -208,7 +203,7 @@ public class SpirepassScreenRenderer {
                     currentBackground.getWidth(), currentBackground.getHeight(), false, false);
         }
 
-        FontHelper.renderFontCentered(sb, FontHelper.bannerNameFont, uiStrings.TEXT[0],
+        FontHelper.renderFontCentered(sb, FontHelper.bannerNameFont, TEXT[0],
                 Settings.WIDTH / 2.0f, SpirepassPositionSettings.TITLE_Y, Color.WHITE);
 
         renderLevelBoxes(sb, screen, scrollX, edgePadding, levelBoxes);
@@ -293,7 +288,7 @@ public class SpirepassScreenRenderer {
     // ==================== BUTTON MANAGEMENT ====================
 
     private void updateLockedEquipButton(SpriteBatch sb) {
-        String buttonText = uiStrings.TEXT[3];
+        String buttonText = TEXT[3];
         Color buttonColor = Color.GRAY;
         Color hoverColor = Color.DARK_GRAY;
         float buttonY = SpirepassPositionSettings.REWARD_BUTTON_Y - 25.0f;
@@ -338,7 +333,7 @@ public class SpirepassScreenRenderer {
         boolean isUnlocked = selectedBox.isUnlocked();
         boolean isEquipped = reward != null && rewardManager.isRewardEquipped(reward);
 
-        String buttonText = isEquipped ? uiStrings.TEXT[2] : uiStrings.TEXT[1];
+        String buttonText = isEquipped ? TEXT[2] : TEXT[1];
         Color buttonColor = isEquipped ? Color.ORANGE : Color.WHITE;
         Color hoverColor = isEquipped ? Color.YELLOW : Color.GREEN;
         float buttonY = SpirepassPositionSettings.REWARD_BUTTON_Y - 25.0f;

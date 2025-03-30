@@ -10,10 +10,17 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import spirepass.Spirepass;
 
+import static spirepass.Spirepass.makeID;
+
 public class MainMenuLevelDisplayPatch {
+
+    // Add UIStrings for localization
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("MainMenuLevelDisplay"));
+    private static final String[] TEXT = uiStrings.TEXT;
 
     // Keep references to the desired fonts (now potentially smaller ones)
     private static BitmapFont titleFont;
@@ -64,8 +71,8 @@ public class MainMenuLevelDisplayPatch {
                 int currentLevel = Spirepass.getCurrentLevel();
                 int maxLevel = Spirepass.MAX_LEVEL;
                 String xpText = getXpText(currentLevel, maxLevel);
-                String levelText = "LEVEL " + currentLevel + "/" + maxLevel;
-                String titleText = "SPIREPASS";
+                String levelText = TEXT[0] + " " + currentLevel + "/" + maxLevel; // "LEVEL "
+                String titleText = TEXT[1]; // "SPIREPASS"
 
                 // Width calculation uses the assigned fonts
                 float xpTextWidth = FontHelper.getSmartWidth(bodyFont, xpText, Settings.WIDTH, 0f);
@@ -112,11 +119,11 @@ public class MainMenuLevelDisplayPatch {
 
     private static String getXpText(int currentLevel, int maxLevel) {
         if (currentLevel >= maxLevel) {
-            return "MAX LEVEL REACHED!";
+            return TEXT[2]; // "MAX LEVEL REACHED!"
         } else {
             int xpForNextLevel = Spirepass.getXPForNextLevel();
             int nextLevel = currentLevel + 1;
-            return "XP NEEDED FOR LEVEL " + nextLevel + ": " + xpForNextLevel;
+            return TEXT[3] + " " + nextLevel + ": " + xpForNextLevel; // "XP NEEDED FOR LEVEL "
         }
     }
 

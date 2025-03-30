@@ -182,17 +182,13 @@ public class Spirepass implements
     public void receivePostInitialize() {
         checkAndRefreshChallenges();
         ModPanel settingsPanel = new ModPanel();
-
         UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ConfigMenuText"));
         String[] TEXT = uiStrings.TEXT;
-
         float toggleX = 350.0f;
         float toggleStartY = 750.0f;
         float toggleSpacing = 50.0f;
-
         final ModLabeledToggleButton[] menuToggleRef = new ModLabeledToggleButton[1];
         final ModLabeledToggleButton[] soundToggleRef = new ModLabeledToggleButton[1];
-
         ModLabeledToggleButton jumpToggle = new ModLabeledToggleButton(TEXT[0],
                 toggleX, toggleStartY, Settings.CREAM_COLOR, FontHelper.charDescFont,
                 jumpToCurrentLevel,
@@ -206,7 +202,6 @@ public class Spirepass implements
             }
         });
         settingsPanel.addUIElement(jumpToggle);
-
         ModLabeledToggleButton hideSpirepassPremiumToggle = new ModLabeledToggleButton(TEXT[3],
                 toggleX, toggleStartY - toggleSpacing, Settings.CREAM_COLOR, FontHelper.charDescFont,
                 hideSpirepassPremium,
@@ -220,17 +215,14 @@ public class Spirepass implements
             }
         });
         settingsPanel.addUIElement(hideSpirepassPremiumToggle);
-
         ModLabeledToggleButton menuElementsToggle = new ModLabeledToggleButton(TEXT[1],
                 toggleX, toggleStartY - (toggleSpacing * 2), Settings.CREAM_COLOR, FontHelper.charDescFont,
                 enableMainMenuElements,
                 settingsPanel, (label) -> {}, (button) -> {
             boolean nowEnabled = button.enabled;
             enableMainMenuElements = nowEnabled;
-
             try {
                 config.setBool(ENABLE_MENU_ELEMENTS_KEY, nowEnabled);
-
                 if (!nowEnabled) {
                     ModLabeledToggleButton soundToggle = soundToggleRef[0];
                     if (soundToggle != null && soundToggle.toggle.enabled) {
@@ -246,17 +238,14 @@ public class Spirepass implements
         });
         settingsPanel.addUIElement(menuElementsToggle);
         menuToggleRef[0] = menuElementsToggle;
-
         ModLabeledToggleButton playSoundToggle = new ModLabeledToggleButton(TEXT[2],
                 toggleX, toggleStartY - (toggleSpacing * 3), Settings.CREAM_COLOR, FontHelper.charDescFont,
                 enableMainMenuElements && playChallengeCompleteSound,
                 settingsPanel, (label) -> {}, (button) -> {
             boolean nowEnabled = button.enabled;
             playChallengeCompleteSound = nowEnabled;
-
             try {
                 config.setBool(PLAY_CHALLENGE_SOUND_KEY, nowEnabled);
-
                 if (nowEnabled) {
                     ModLabeledToggleButton menuToggle = menuToggleRef[0];
                     if (menuToggle != null && !menuToggle.toggle.enabled) {
@@ -272,7 +261,6 @@ public class Spirepass implements
         });
         settingsPanel.addUIElement(playSoundToggle);
         soundToggleRef[0] = playSoundToggle;
-
         ModLabeledToggleButton marcusToggle = new ModLabeledToggleButton(TEXT[4],
                 toggleX, toggleStartY - (toggleSpacing * 4), Settings.CREAM_COLOR, FontHelper.charDescFont,
                 marcus,
@@ -286,13 +274,11 @@ public class Spirepass implements
             }
         });
         settingsPanel.addUIElement(marcusToggle);
-
         if (!menuElementsToggle.toggle.enabled && playSoundToggle.toggle.enabled) {
             playSoundToggle.toggle.enabled = false;
         }
-
         ModLabeledButton xpButton = new ModLabeledButton(
-                "Add 10,000 XP",
+                TEXT[5], // "Add 10,000 XP"
                 9999.0f,
                 9999.0f,
                 Settings.GOLD_COLOR,
@@ -303,9 +289,8 @@ public class Spirepass implements
                     addXP(10000);
                 }
         );
-
         ModLabeledButton resetXpButton = new ModLabeledButton(
-                "Reset XP to 0",
+                TEXT[6], // "Reset XP to 0"
                 9999.0f,
                 9999.0f,
                 Settings.RED_TEXT_COLOR,
@@ -317,50 +302,41 @@ public class Spirepass implements
                     if (config != null) {
                         config.setInt(TOTAL_XP_KEY, 0);
                         saveConfig();
-                       // logger.info("Reset XP to 0 via secret button");
+                        // logger.info("Reset XP to 0 via secret button");
                     } else {
                         logger.error("Config not initialized when trying to reset XP!");
                     }
                 }
         );
-
         settingsPanel.addUIElement(xpButton);
         settingsPanel.addUIElement(resetXpButton);
-
         // Create a secret area detector that exactly matches button hitboxes
         class SecretAreaElement implements IUIElement {
             private final float BUTTON_X = Settings.WIDTH / Settings.scale - 650.0f;
             private final float BUTTON_Y_BOTTOM = 250.0f;
             private final float BUTTON_Y_SPACING = 70.0f;
             private final float BUTTON_Y_TOP = BUTTON_Y_BOTTOM + BUTTON_Y_SPACING;
-
             private boolean areButtonsVisible = false;
             private Hitbox topButtonHitbox;
             private Hitbox bottomButtonHitbox;
-
             public SecretAreaElement() {
-                String topButtonText = "Add 10,000 XP";
-                String bottomButtonText = "Reset XP to 0";
-
+                String topButtonText = TEXT[5]; // "Add 10,000 XP"
+                String bottomButtonText = TEXT[6]; // "Reset XP to 0"
                 Texture textureLeft = ImageMaster.loadImage("img/ButtonLeft.png");
                 Texture textureRight = ImageMaster.loadImage("img/ButtonRight.png");
                 float buttonHeight = textureLeft.getHeight() * Settings.scale;
-
                 float topTextWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, topButtonText, 9999.0f, 0.0f);
                 float topMiddleWidth = Math.max(0.0f, topTextWidth - 18.0f * Settings.scale);
                 float topButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + topMiddleWidth;
-
                 topButtonHitbox = new Hitbox(
                         BUTTON_X * Settings.scale + 1.0f * Settings.scale,
                         BUTTON_Y_TOP * Settings.scale + 1.0f * Settings.scale,
                         topButtonWidth - 2.0f * Settings.scale,
                         buttonHeight - 2.0f * Settings.scale
                 );
-
                 float bottomTextWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, bottomButtonText, 9999.0f, 0.0f);
                 float bottomMiddleWidth = Math.max(0.0f, bottomTextWidth - 18.0f * Settings.scale);
                 float bottomButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + bottomMiddleWidth;
-
                 bottomButtonHitbox = new Hitbox(
                         BUTTON_X * Settings.scale + 1.0f * Settings.scale,
                         BUTTON_Y_BOTTOM * Settings.scale + 1.0f * Settings.scale,
@@ -368,17 +344,14 @@ public class Spirepass implements
                         buttonHeight - 2.0f * Settings.scale
                 );
             }
-
             @Override
             public void render(SpriteBatch sb) {
             }
-
             @Override
             public void update() {
                 topButtonHitbox.update();
                 bottomButtonHitbox.update();
                 boolean isHoveringOverButtonArea = topButtonHitbox.hovered || bottomButtonHitbox.hovered;
-
                 if (isHoveringOverButtonArea != areButtonsVisible) {
                     areButtonsVisible = isHoveringOverButtonArea;
                     if (isHoveringOverButtonArea) {
@@ -390,13 +363,10 @@ public class Spirepass implements
                     }
                 }
             }
-
             @Override public int renderLayer() { return 1; }
             @Override public int updateOrder() { return 1; }
         }
-
         settingsPanel.addUIElement(new SecretAreaElement());
-
         Texture badgeTexture = TextureLoader.getTexture(imagePath("badge.png"));
         BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors),
                 info.Description, settingsPanel);

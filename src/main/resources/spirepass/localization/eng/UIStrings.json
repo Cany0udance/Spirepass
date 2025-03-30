@@ -386,7 +386,10 @@
       "SPIREPASS",
       "EQUIP",
       "UNEQUIP",
-      "LOCKED"
+      "LOCKED",
+      "BUY SPIREPASS PREMIUM@!!!1!",
+      "Why buy Premium? Great question. Here are some great answers:",
+      "- Unlock microtransactions (your favorite!) NL NL - Unlock macrotransactions NL NL - Unlock SBMM NL NL - Unlock the krabby patty secret formula NL NL - Unlock more unlocks NL NL - Unlock an embarrassing picture of Defect at the Christmas party NL NL - Unlock a new synonym for the word \"Unlock\". i guess they call that a thesaurus hold on let me buy one from amazon EDIT: hey guys it's been 4 business days and i'm back with a brand new thesauraus NL NL - UnLEASH new...cards? Depends on your definition of cards NL NL - Activate hidden neurons inside your brain thatyou didn't even know existed for maximum spireslaying 1000 NL NL - Unlock beta access to Half-Life 3 (note to future Spirepass enjoyers: if Half-Life 3 actually releases (it won't lol), this joke becomes a bit outdated so yo ucan safely ignore thisentire bullet point thanks! NL NL - Learn why kids love the taste of Cinnamon Toast Crunch NL NL - Learn why kids don't lvoe the taste of Cinnamon Toast Squares NL NL - Learn why adults hate that kids love the taste of Cinnamon Toast Crunch"
     ]
   },
   "${modID}:ConfigMenuText": {
@@ -395,7 +398,32 @@
       "Show main menu elements (challenge list, Spirepass progress)",
       "If main menu elements are shown, play a sound notification when a challenge is completed",
       "Hide Spirepass Premium button",
-      "marcus"
+      "marcus",
+      "Add 10,000 XP",
+      "Reset XP to 0"
+    ]
+  },
+  "${modID}:MainMenuChallengeDisplay": {
+    "TEXT": [
+      "Watch Ad To Refresh Challenges",
+      "No active daily challenges.",
+      " #g(Complete)",
+      "  Progress: #gDone!",
+      "  Progress: #b",
+      "/LOL",
+      "Daily challenges grant 25 Spirepass XP when completed.",
+      "No active weekly challenges.",
+      "Weekly challenges grant 75 Spirepass XP when completed.",
+      "Daily Challenges (",
+      "Weekly Challenges ("
+    ]
+  },
+  "${modID}:MainMenuLevelDisplay": {
+    "TEXT": [
+      "LEVEL ",
+      "SPIREPASS",
+      "MAX LEVEL REACHED!",
+      "XP NEEDED FOR LEVEL "
     ]
   }
 }

@@ -10,6 +10,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.TipHelper;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import org.apache.logging.log4j.LogManager;
 // import org.apache.logging.log4j.Logger;
@@ -28,12 +29,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import static spirepass.Spirepass.makeID;
+
 public class MainMenuChallengePatch {
     // private static final Logger logger = LogManager.getLogger(Spirepass.modID);
 
+    // Add UIStrings for localization
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("MainMenuChallengeDisplay"));
+    private static final String[] TEXT = uiStrings.TEXT;
+
     private static ModLabeledButton dailyButton;
     private static ModLabeledButton weeklyButton;
-    // private static ModLabeledButton devRefreshButton;
     private static ModLabeledButton adButton;
     private static boolean initialized = false;
 
@@ -74,7 +80,6 @@ public class MainMenuChallengePatch {
                 sb.setColor(Color.WHITE);
                 if (weeklyButton != null) weeklyButton.render(sb);
                 if (dailyButton != null) dailyButton.render(sb);
-                // if (devRefreshButton != null) devRefreshButton.render(sb);
                 if (adButton != null && isAdButtonVisible) adButton.render(sb);
                 sb.setColor(Color.WHITE);
             }
@@ -111,7 +116,6 @@ public class MainMenuChallengePatch {
 
                 if (dailyButton != null) dailyButton.update();
                 if (weeklyButton != null) weeklyButton.update();
-                // if (devRefreshButton != null) devRefreshButton.update();
                 if (adButton != null && isAdButtonVisible) adButton.update();
 
                 checkAndRenderTooltips();
@@ -135,8 +139,7 @@ public class MainMenuChallengePatch {
 
         dailyButton = new ModLabeledButton(getDailyButtonText(), dailyButtonX, dailyButtonY, Settings.CREAM_COLOR, Color.GREEN, FontHelper.buttonLabelFont, null, (button) -> CardCrawlGame.sound.play("UI_CLICK_1"));
         weeklyButton = new ModLabeledButton(getWeeklyButtonText(), weeklyButtonX, weeklyButtonY, Settings.CREAM_COLOR, Color.GREEN, FontHelper.buttonLabelFont, null, (button) -> CardCrawlGame.sound.play("UI_CLICK_1"));
-    //    devRefreshButton = new ModLabeledButton("DEV: Refresh Challenges", devButtonX, devButtonY, Color.ORANGE, Color.RED, FontHelper.buttonLabelFont, null, (button) -> { CardCrawlGame.sound.play("UI_CLICK_2"); refreshAllChallenges(); });
-        adButton = new ModLabeledButton("Watch Ad To Refresh Challenges", adButtonX, adButtonY, Color.GOLD, Color.YELLOW, FontHelper.buttonLabelFont, null, (button) -> { CardCrawlGame.sound.play("UI_CLICK_2"); openRandomPrankVideo(); });
+        adButton = new ModLabeledButton(TEXT[0], adButtonX, adButtonY, Color.GOLD, Color.YELLOW, FontHelper.buttonLabelFont, null, (button) -> { CardCrawlGame.sound.play("UI_CLICK_2"); openRandomPrankVideo(); });
 
         try {
             Field hbField = ModLabeledButton.class.getDeclaredField("hb");
@@ -167,14 +170,6 @@ public class MainMenuChallengePatch {
             if (weeklyButton != null && ((Hitbox) hbField.get(weeklyButton)).hovered) {
                 renderWeeklyChallengeTooltip(weeklyButtonX + tooltipOffsetX, weeklyButtonY + tooltipOffsetY);
             }
-
-            // Tooltip for Ad button has been removed.
-
-            // Optional: Tooltip for Dev button (remains commented out unless needed)
-            // if (devRefreshButton != null && ((Hitbox) hbField.get(devRefreshButton)).hovered) {
-            //     // Render tooltip to the left of the dev button due to its position
-            //     TipHelper.renderGenericTip(devButtonX - 350f * Settings.scale, devButtonY + tooltipOffsetY, "Developer Tool", "Instantly refreshes Daily and Weekly challenges.");
-            // }
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
             // logger.error("Reflection failed for Hitbox in checkAndRenderTooltips: " + e.getMessage());
@@ -214,12 +209,12 @@ public class MainMenuChallengePatch {
         StringBuilder tipBody = new StringBuilder();
 
         if (dailyChallenges.isEmpty()) {
-            tipBody.append("No active daily challenges.");
+            tipBody.append(TEXT[1]); // "No active daily challenges."
         } else {
             for (int i = 0; i < dailyChallenges.size(); i++) {
                 Challenge challenge = dailyChallenges.get(i);
                 boolean completed = manager.isCompleted(challenge.getId());
-                String completionMarker = completed ? " #g(Complete)" : "";
+                String completionMarker = completed ? TEXT[2] : ""; // " #g(Complete)"
                 String coloredName = colorEveryWord(challenge.getName(), "#y");
 
                 tipBody.append("- ")
@@ -230,12 +225,15 @@ public class MainMenuChallengePatch {
                         .append(" NL ");
 
                 if (completed) {
-                    tipBody.append("  Progress: #gDone!");
+                    tipBody.append(TEXT[3]); // "  Progress: #gDone!"
                 } else {
                     if ("daily_unbeatable".equals(challenge.getId())) {
-                        tipBody.append("  Progress: #b").append(challenge.getCurrentProgress()).append("/LOL");
+                        tipBody.append(TEXT[4]) // "  Progress: #b"
+                                .append(challenge.getCurrentProgress())
+                                .append(TEXT[5]); // "/LOL"
                     } else {
-                        tipBody.append("  Progress: #b").append(challenge.getCurrentProgress())
+                        tipBody.append(TEXT[4]) // "  Progress: #b"
+                                .append(challenge.getCurrentProgress())
                                 .append("/").append(challenge.getMaxProgress());
                     }
                 }
@@ -247,7 +245,7 @@ public class MainMenuChallengePatch {
         }
 
         TipHelper.renderGenericTip(tipX, tipY,
-                "Daily challenges grant 25 Spirepass XP when completed.",
+                TEXT[6], // "Daily challenges grant 25 Spirepass XP when completed."
                 tipBody.toString()
         );
     }
@@ -259,12 +257,12 @@ public class MainMenuChallengePatch {
         StringBuilder tipBody = new StringBuilder();
 
         if (weeklyChallenges.isEmpty()) {
-            tipBody.append("No active weekly challenges.");
+            tipBody.append(TEXT[7]); // "No active weekly challenges."
         } else {
             for (int i = 0; i < weeklyChallenges.size(); i++) {
                 Challenge challenge = weeklyChallenges.get(i);
                 boolean completed = manager.isCompleted(challenge.getId());
-                String completionMarker = completed ? " #g(Complete)" : "";
+                String completionMarker = completed ? TEXT[2] : ""; // " #g(Complete)"
 
                 // Color every word of the challenge name yellow
                 String coloredName = colorEveryWord(challenge.getName(), "#y");
@@ -279,9 +277,10 @@ public class MainMenuChallengePatch {
 
                 // Progress line
                 if (completed) {
-                    tipBody.append("  Progress: #gDone!");
+                    tipBody.append(TEXT[3]); // "  Progress: #gDone!"
                 } else {
-                    tipBody.append("  Progress: #b").append(challenge.getCurrentProgress())
+                    tipBody.append(TEXT[4]) // "  Progress: #b"
+                            .append(challenge.getCurrentProgress())
                             .append("/").append(challenge.getMaxProgress());
                 }
 
@@ -292,7 +291,7 @@ public class MainMenuChallengePatch {
         }
 
         TipHelper.renderGenericTip(tipX, tipY,
-                "Weekly challenges grant 75 Spirepass XP when completed.", // Header
+                TEXT[8], // "Weekly challenges grant 75 Spirepass XP when completed."
                 tipBody.toString()
         );
     }
@@ -316,9 +315,7 @@ public class MainMenuChallengePatch {
     /** Updates visibility and color of the 'Watch Ad' button. */
     private static void updateAdButtonVisibility() {
         if (adButton == null) return;
-         boolean shouldShowButton = areAllChallengesCompleted();
-        // DEV OVERRIDE:
-        // boolean shouldShowButton = true;
+        boolean shouldShowButton = areAllChallengesCompleted();
         isAdButtonVisible = shouldShowButton;
 
         try {
@@ -357,8 +354,8 @@ public class MainMenuChallengePatch {
         } catch (Exception e) { /* Failed to open URL or refresh */ }
     }
 
-    private static String getDailyButtonText() { return "Daily Challenges (" + getTimeUntilDailyReset() + ")"; }
-    private static String getWeeklyButtonText() { return "Weekly Challenges (" + getTimeUntilWeeklyReset() + ")"; }
+    private static String getDailyButtonText() { return TEXT[9] + getTimeUntilDailyReset() + ")"; } // "Daily Challenges ("
+    private static String getWeeklyButtonText() { return TEXT[10] + getTimeUntilWeeklyReset() + ")"; } // "Weekly Challenges ("
 
     // --- Time Formatting ---
 
