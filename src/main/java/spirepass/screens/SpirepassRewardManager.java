@@ -319,7 +319,7 @@ public class SpirepassRewardManager implements Disposable {
                 "MyCatBackground",
                 SpirepassRewardData.RewardRarity.RARE,
                 SpirepassRewardData.RewardType.IMAGE,
-                "spirepass/images/screen/SpirepassCatBackground.png"
+                "spirepass/images/screen/SpirepassCatBackground.jpg"
         ));
 
         // Sponsored (level 5)
