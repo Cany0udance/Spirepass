@@ -1,3 +1,7 @@
 # Project exclude paths
 /target/
 /.idea/
+pom.xml
+LICENSE
+README.md
+.gitignore
