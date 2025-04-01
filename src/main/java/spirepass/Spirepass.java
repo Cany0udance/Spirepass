@@ -289,27 +289,29 @@ public class Spirepass implements
                     addXP(10000);
                 }
         );
-        ModLabeledButton resetXpButton = new ModLabeledButton(
-                TEXT[6], // "Reset XP to 0"
-                9999.0f,
-                9999.0f,
-                Settings.RED_TEXT_COLOR,
-                Settings.RED_TEXT_COLOR,
-                FontHelper.buttonLabelFont,
-                settingsPanel,
-                (button) -> {
-                    totalXP = 0;
-                    if (config != null) {
-                        config.setInt(TOTAL_XP_KEY, 0);
-                        saveConfig();
-                        // logger.info("Reset XP to 0 via secret button");
-                    } else {
-                        logger.error("Config not initialized when trying to reset XP!");
-                    }
+    /* Dev feature - commented out
+    ModLabeledButton resetXpButton = new ModLabeledButton(
+            TEXT[6], // "Reset XP to 0"
+            9999.0f,
+            9999.0f,
+            Settings.RED_TEXT_COLOR,
+            Settings.RED_TEXT_COLOR,
+            FontHelper.buttonLabelFont,
+            settingsPanel,
+            (button) -> {
+                totalXP = 0;
+                if (config != null) {
+                    config.setInt(TOTAL_XP_KEY, 0);
+                    saveConfig();
+                    // logger.info("Reset XP to 0 via secret button");
+                } else {
+                    logger.error("Config not initialized when trying to reset XP!");
                 }
-        );
+            }
+    );
+    settingsPanel.addUIElement(resetXpButton);
+    */
         settingsPanel.addUIElement(xpButton);
-        settingsPanel.addUIElement(resetXpButton);
         // Create a secret area detector that exactly matches button hitboxes
         class SecretAreaElement implements IUIElement {
             private final float BUTTON_X = Settings.WIDTH / Settings.scale - 650.0f;
@@ -318,10 +320,14 @@ public class Spirepass implements
             private final float BUTTON_Y_TOP = BUTTON_Y_BOTTOM + BUTTON_Y_SPACING;
             private boolean areButtonsVisible = false;
             private Hitbox topButtonHitbox;
+            /* Dev feature - commented out
             private Hitbox bottomButtonHitbox;
+            */
             public SecretAreaElement() {
                 String topButtonText = TEXT[5]; // "Add 10,000 XP"
-                String bottomButtonText = TEXT[6]; // "Reset XP to 0"
+            /* Dev feature - commented out
+            String bottomButtonText = TEXT[6]; // "Reset XP to 0"
+            */
                 Texture textureLeft = ImageMaster.loadImage("img/ButtonLeft.png");
                 Texture textureRight = ImageMaster.loadImage("img/ButtonRight.png");
                 float buttonHeight = textureLeft.getHeight() * Settings.scale;
@@ -334,15 +340,17 @@ public class Spirepass implements
                         topButtonWidth - 2.0f * Settings.scale,
                         buttonHeight - 2.0f * Settings.scale
                 );
-                float bottomTextWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, bottomButtonText, 9999.0f, 0.0f);
-                float bottomMiddleWidth = Math.max(0.0f, bottomTextWidth - 18.0f * Settings.scale);
-                float bottomButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + bottomMiddleWidth;
-                bottomButtonHitbox = new Hitbox(
-                        BUTTON_X * Settings.scale + 1.0f * Settings.scale,
-                        BUTTON_Y_BOTTOM * Settings.scale + 1.0f * Settings.scale,
-                        bottomButtonWidth - 2.0f * Settings.scale,
-                        buttonHeight - 2.0f * Settings.scale
-                );
+            /* Dev feature - commented out
+            float bottomTextWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, bottomButtonText, 9999.0f, 0.0f);
+            float bottomMiddleWidth = Math.max(0.0f, bottomTextWidth - 18.0f * Settings.scale);
+            float bottomButtonWidth = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + bottomMiddleWidth;
+            bottomButtonHitbox = new Hitbox(
+                    BUTTON_X * Settings.scale + 1.0f * Settings.scale,
+                    BUTTON_Y_BOTTOM * Settings.scale + 1.0f * Settings.scale,
+                    bottomButtonWidth - 2.0f * Settings.scale,
+                    buttonHeight - 2.0f * Settings.scale
+            );
+            */
             }
             @Override
             public void render(SpriteBatch sb) {
@@ -350,16 +358,23 @@ public class Spirepass implements
             @Override
             public void update() {
                 topButtonHitbox.update();
-                bottomButtonHitbox.update();
-                boolean isHoveringOverButtonArea = topButtonHitbox.hovered || bottomButtonHitbox.hovered;
+            /* Dev feature - commented out
+            bottomButtonHitbox.update();
+            boolean isHoveringOverButtonArea = topButtonHitbox.hovered || bottomButtonHitbox.hovered;
+            */
+                boolean isHoveringOverButtonArea = topButtonHitbox.hovered;
                 if (isHoveringOverButtonArea != areButtonsVisible) {
                     areButtonsVisible = isHoveringOverButtonArea;
                     if (isHoveringOverButtonArea) {
                         xpButton.set(BUTTON_X, BUTTON_Y_TOP);
-                        resetXpButton.set(BUTTON_X, BUTTON_Y_BOTTOM);
+                    /* Dev feature - commented out
+                    resetXpButton.set(BUTTON_X, BUTTON_Y_BOTTOM);
+                    */
                     } else {
                         xpButton.set(9999.0f, 9999.0f);
-                        resetXpButton.set(9999.0f, 9999.0f);
+                    /* Dev feature - commented out
+                    resetXpButton.set(9999.0f, 9999.0f);
+                    */
                     }
                 }
             }

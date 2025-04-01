@@ -1,0 +1,429 @@
+{
+  "${modID}:SpirepassWelcomeMessage": {
+    "TEXT": [
+      "欢迎来到尖塔通行证！完成挑战并提升等级吧！"
+    ]
+  },
+  "${modID}:SpirepassMaxLevelMessage": {
+    "TEXT": [
+      "已达到最高等级！",
+      "你解锁了...一种骄傲和成就感！！！"
+    ]
+  },
+  "${modID}:SpirepassRewardLawAbidingCitizen": {
+    "TEXT": [
+      "\"守法公民\" 故障机器人",
+      "造成3点伤害。在本场战斗中使所有爪牌的伤害提高2点。"
+    ]
+  },
+  "${modID}:SpirepassRewardGiantama": {
+    "TEXT": [
+      "\"巨型头\" 巨型头",
+      "\"不\""
+    ]
+  },
+  "${modID}:SpirepassRewardSpaceBlanket": {
+    "TEXT": [
+      "\"太空毯\" 静默猎手",
+      "你是在告诉我我的随机数生成就这么不幸？不！他策划了这一切！凯西！！！"
+    ]
+  },
+  "${modID}:SpirepassRewardMyCatBackground": {
+    "TEXT": [
+      "\"我的猫\" 尖塔通行证屏幕背景",
+      "你永远猜不到这是什么图像。"
+    ]
+  },
+  "${modID}:SpirepassRewardSponsored": {
+    "TEXT": [
+      "\"赞助\" 无色卡背",
+      "法律声明：此卡背不代表与任何品牌的官方合作关系。"
+    ]
+  },
+  "${modID}:SpirepassRewardDonut": {
+    "TEXT": [
+      "\"甜甜圈\" 甜圈",
+      "如果不是为了让人吃，那为什么这些宏伟的构造体看起来这么美味呢？？？"
+    ]
+  },
+  "${modID}:SpirepassRewardLovestruck": {
+    "TEXT": [
+      "\"陷入爱河\" 百夫长",
+      "是的，我的女王 <3"
+    ]
+  },
+  "${modID}:SpirepassRewardBear": {
+    "TEXT": [
+      "\"熊\" 熊",
+      "不知怎的，红面具帮的其他成员仍然没有注意到。"
+    ]
+  },
+  "${modID}:SpirepassRewardBlue": {
+    "TEXT": [
+      "\"蓝色\" 红色奴隶贩子",
+      "他是蓝色的，da ba dee da ba di"
+    ]
+  },
+  "${modID}:SpirepassRewardRed": {
+    "TEXT": [
+      "\"红色\" 蓝色奴隶贩子",
+      "家里有红色奴隶贩子"
+    ]
+  },
+  "${modID}:SpirepassRewardBlissful": {
+    "TEXT": [
+      "\"幸福\" 无色卡背",
+      "恭喜获得解锁这个卡背所需的经验值"
+    ]
+  },
+  "${modID}:SpirepassRewardSlendernob": {
+    "TEXT": [
+      "\"瘦长诺布\" 地精诺布",
+      "第3/8页"
+    ]
+  },
+  "${modID}:SpirepassRewardColgate": {
+    "TEXT": [
+      "\"高露洁\" 异蛇",
+      "尖塔中最清新的生物。"
+    ]
+  },
+  "${modID}:SpirepassRewardPurpleGuy": {
+    "TEXT": [
+      "\"紫色家伙\" 罗密欧",
+      "屠杀背后的强盗"
+    ]
+  },
+  "${modID}:SpirepassRewardDowntrend": {
+    "TEXT": [
+      "\"下跌趋势\" 诅咒卡背",
+      "股票不涨"
+    ]
+  },
+  "${modID}:SpirepassRewardInvisibleMan": {
+    "TEXT": [
+      "\"隐形人\" 铁甲战士",
+      "他实际上只是站得非常静止"
+    ]
+  },
+  "${modID}:SpirepassRewardChalkboard": {
+    "TEXT": [
+      "\"黑板\" 德卡",
+      "\"呃，我们的黑板刚长出腿自己走掉了。今天课程取消！\""
+    ]
+  },
+  "${modID}:SpirepassRewardavwejkanaklwjve": {
+    "TEXT": [
+      "avwejkanaklwjv e",
+      "是的"
+    ]
+  },
+  "${modID}:SpirepassRewardkrisdeltarune": {
+    "TEXT": [
+      "\"克里斯三角符文\" 观者",
+      "LV2 苔藓寻找者"
+    ]
+  },
+  "${modID}:SpirepassRewardDisarmed": {
+    "TEXT": [
+      "\"缴械\" 邪教徒",
+      "就像那个测试版艺术一样"
+    ]
+  },
+  "${modID}:SpirepassRewardPajamaSam": {
+    "TEXT": [
+      "\"睡衣萨姆\" 故障机器人",
+      "黑暗球体真的开始影响我了。"
+    ]
+  },
+  "${modID}:SpirepassRewardBigBird": {
+    "TEXT": [
+      "\"大鸟\" 觉醒者",
+      "他很大"
+    ]
+  },
+  "${modID}:SpirepassRewardPrismatic": {
+    "TEXT": [
+      "\"棱镜\" 哨卫",
+      "让我想起了你应该从商店买的碎片，特别是如果你是个主播的话。眨眼眨眼"
+    ]
+  },
+  "${modID}:SpirepassRewardBlurry": {
+    "TEXT": [
+      "\"模糊\" 静默猎手",
+      "我的眼镜在哪里？？"
+    ]
+  },
+  "${modID}:SpirepassRewardHaroldCurseCardback": {
+    "TEXT": [
+      "\"隐藏痛苦\" 诅咒卡背",
+      ":)"
+    ]
+  },
+  "${modID}:SpirepassRewardSpaghettiMeatballs": {
+    "TEXT": [
+      "\"意大利面和肉丸\" 扭动团块",
+      "配有寄生虫配菜。"
+    ]
+  },
+  "${modID}:SpirepassRewardFavoriteCustomer": {
+    "TEXT": [
+      "\"最喜欢的顾客\" 无色卡背",
+      "你喜欢这个卡背吗？它不出售"
+    ]
+  },
+  "${modID}:SpirepassRewardWeaponized115": {
+    "TEXT": [
+      "\"来自热门第一人称射击游戏《使命召唤®：黑色行动II》的武器化115，《使命召唤®》系列的一部分\" 铁甲战士",
+      "武器化115个性化包将僵尸的力量带入任何多人游戏。用全新的《使命召唤：黑色行动II》起源灵感迷彩、一系列瞄准镜和不死生物动画名片来武装你的武器。"
+    ]
+  },
+  "${modID}:SpirepassRewardJimboJoker": {
+    "TEXT": [
+      "\"吉姆伯小丑\" 无色卡背",
+      "\"也许钓鱼更适合我们的速度...\""
+    ]
+  },
+  "${modID}:Challengedaily_setup": {
+    "TEXT": [
+      "设置",
+      "在战斗的第一回合使用两张能力牌。"
+    ]
+  },
+  "${modID}:Challengedaily_thanks": {
+    "TEXT": [
+      "谢谢啦",
+      "从商人处购买一件商店级别的遗物。"
+    ]
+  },
+  "${modID}:Challengedaily_best": {
+    "TEXT": [
+      "最好中的最好",
+      "在休息点升级一张稀有牌。"
+    ]
+  },
+  "${modID}:Challengedaily_purification": {
+    "TEXT": [
+      "净化",
+      "在商人处移除一张诅咒牌。"
+    ]
+  },
+  "${modID}:Challengedaily_exquisite": {
+    "TEXT": [
+      "精致",
+      "使用一瓶稀有药水。"
+    ]
+  },
+  "${modID}:Challengedaily_hobbyist": {
+    "TEXT": [
+      "爱好者",
+      "向你的牌组添加15张牌。"
+    ]
+  },
+  "${modID}:Challengedaily_punchingup": {
+    "TEXT": [
+      "挑战强者",
+      "赢得5场精英战斗。"
+    ]
+  },
+  "${modID}:Challengedaily_buff": {
+    "TEXT": [
+      "增益爱好者",
+      "同时拥有5个或更多增益效果。"
+    ]
+  },
+  "${modID}:Challengedaily_debuff": {
+    "TEXT": [
+      "减益爱好者",
+      "同时拥有4个或更多减益效果。"
+    ]
+  },
+  "${modID}:Challengedaily_backtobasics": {
+    "TEXT": [
+      "回归基础",
+      "在休息点升级一张基础牌。"
+    ]
+  },
+  "${modID}:Challengedaily_combo": {
+    "TEXT": [
+      "连击",
+      "在一个回合内使用10张或更多的牌。"
+    ]
+  },
+  "${modID}:Challengedaily_risktaker": {
+    "TEXT": [
+      "冒险者",
+      "在剩余20或更少生命值的情况下进入Boss战斗。"
+    ]
+  },
+  "${modID}:Challengedaily_notevenclose": {
+    "TEXT": [
+      "差一点",
+      "在剩余10或更少生命值的情况下赢得战斗。"
+    ]
+  },
+  "${modID}:Challengedaily_bossswap": {
+    "TEXT": [
+      "异蛇？金字塔？？",
+      "在涅奥处放弃你的初始遗物以换取一件Boss遗物。"
+    ]
+  },
+  "${modID}:Challengedaily_unbeatable": {
+    "TEXT": [
+      "你抽到了糟糕的牌",
+      "哦不！！这个挑战无法完成！明天再好运吧 :)"
+    ]
+  },
+  "${modID}:Challengedaily_youarewinner": {
+    "TEXT": [
+      "胜利者",
+      "赢得一次游戏。"
+    ]
+  },
+  "${modID}:Challengedaily_tagalong": {
+    "TEXT": [
+      "跟随者",
+      "完成其他2个每日挑战。"
+    ]
+  },
+  "${modID}:Challengedaily_silent": {
+    "TEXT": [
+      "静默猎手",
+      "体验寂静。"
+    ]
+  },
+  "${modID}:Challengeweekly_hair": {
+    "TEXT": [
+      "漂亮的发型",
+      "让商人赞美你的发型。"
+    ]
+  },
+  "${modID}:Challengeweekly_strong_start": {
+    "TEXT": [
+      "强势开局",
+      "在第一幕收集翡翠钥匙。"
+    ]
+  },
+  "${modID}:Challengeweekly_hoarder": {
+    "TEXT": [
+      "囤积者",
+      "一次性拥有至少600金币。"
+    ]
+  },
+  "${modID}:Challengeweekly_collector": {
+    "TEXT": [
+      "收集者",
+      "向你的牌组添加100张牌。"
+    ]
+  },
+  "${modID}:Challengeweekly_chonky": {
+    "TEXT": [
+      "壮实",
+      "在一次游戏中拥有至少110点最大生命值。"
+    ]
+  },
+  "${modID}:Challengeweekly_slayer": {
+    "TEXT": [
+      "杀手",
+      "击败150个敌人。"
+    ]
+  },
+  "${modID}:Challengeweekly_biggame": {
+    "TEXT": [
+      "大型猎手",
+      "击败30个精英敌人。"
+    ]
+  },
+  "${modID}:Challengeweekly_chugger": {
+    "TEXT": [
+      "豪饮者",
+      "使用75瓶药水。"
+    ]
+  },
+  "${modID}:Challengeweekly_unknown": {
+    "TEXT": [
+      "进入未知",
+      "访问30个未知节点。"
+    ]
+  },
+  "${modID}:Challengeweekly_smith": {
+    "TEXT": [
+      "铁匠",
+      "在休息点锻造50次。"
+    ]
+  },
+  "${modID}:Challengeweekly_snooze": {
+    "TEXT": [
+      "瞌睡虫",
+      "在休息点休息25次。"
+    ]
+  },
+  "${modID}:Challengeweekly_ghostbuster": {
+    "TEXT": [
+      "捉鬼敢死队",
+      "在午夜至凌晨6点之间击败六边形幽灵。"
+    ]
+  },
+  "${modID}:Challengeweekly_freeloader": {
+    "TEXT": [
+      "搭便车者",
+      "完成其他2个每周挑战。"
+    ]
+  },
+  "${modID}:Challengeweekly_dailymaster": {
+    "TEXT": [
+      "每日大师",
+      "同时完成所有3个每日挑战。"
+    ]
+  },
+  "${modID}:MainMenuButton": {
+    "TEXT": [
+      "尖塔通行证"
+    ]
+  },
+  "${modID}:SpirepassScreen": {
+    "TEXT": [
+      "尖塔通行证",
+      "装备",
+      "卸下",
+      "已锁定",
+      "购买尖塔通行证高级版@!!!1!",
+      "为什么要购买高级版？好问题。这里有一些很棒的答案：",
+      "- 解锁微交易（你最喜欢的！）NL NL - 解锁宏交易 NL NL - 解锁基于技术的匹配系统 NL NL - 解锁蟹堡秘方 NL NL - 解锁更多解锁内容 NL NL - 解锁故障机器人在圣诞派对上的尴尬照片 NL NL - 解锁\"解锁\"一词的新同义词。我想他们称之为同义词词典等我从亚马逊买一本 编辑：嘿，各位，已经过了4个工作日，我回来了，带着全新的同义词词典 NL NL - 释放新的...卡牌？取决于你对卡牌的定义 NL NL - 激活你脑中隐藏的神经元，这些神经元是你甚至不知道存在的，以达到最大的尖塔征服者1000 NL NL - 解锁半条命3的测试版访问权限（给未来尖塔通行证享用者的提示：如果半条命3真的发布了（它不会，哈哈），这个笑话就有点过时了，所以你可以安全地忽略这整个要点，谢谢！ NL NL - 了解为什么孩子们喜欢肉桂吐司脆片的味道 NL NL - 了解为什么孩子们不喜欢肉桂吐司方块的味道 NL NL - 了解为什么成年人讨厌孩子们喜欢肉桂吐司脆片的味道"
+    ]
+  },
+  "${modID}:ConfigMenuText": {
+    "TEXT": [
+      "打开尖塔通行证屏幕时跳转到当前等级",
+      "显示主菜单元素（挑战列表，尖塔通行证进度）",
+      "如果显示主菜单元素，当挑战完成时播放声音提示",
+      "隐藏尖塔通行证高级版按钮",
+      "马库斯",
+      "添加10,000经验值",
+      "重置经验值为0"
+    ]
+  },
+  "${modID}:MainMenuChallengeDisplay": {
+    "TEXT": [
+      "观看广告刷新挑战",
+      "没有活跃的每日挑战。",
+      " #g(已完成)",
+      "  进度：#g已完成！",
+      "  进度：#b",
+      "/LOL",
+      "完成每日挑战可获得25点尖塔通行证经验值。",
+      "没有活跃的每周挑战。",
+      "完成每周挑战可获得75点尖塔通行证经验值。",
+      "每日挑战 (",
+      "每周挑战 ("
+    ]
+  },
+  "${modID}:MainMenuLevelDisplay": {
+    "TEXT": [
+      "等级 ",
+      "尖塔通行证",
+      "已达到最高等级！",
+      "需要的经验值以达到等级 "
+    ]
+  }
+}

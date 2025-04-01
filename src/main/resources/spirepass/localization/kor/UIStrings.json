@@ -1,0 +1,429 @@
+{
+  "${modID}:SpirepassWelcomeMessage": {
+    "TEXT": [
+      "스파이어패스에 오신 것을 환영합니다! 도전과제를 완료하고 레벨을 올려보세요!"
+    ]
+  },
+  "${modID}:SpirepassMaxLevelMessage": {
+    "TEXT": [
+      "최대 레벨 도달!",
+      "당신은...자부심과 성취감을 획득했습니다!!!"
+    ]
+  },
+  "${modID}:SpirepassRewardLawAbidingCitizen": {
+    "TEXT": [
+      "\"준법시민\" 결함",
+      "3 피해를 줍니다. 이번 전투에서 모든 갈고리 카드의 피해를 2 증가시킵니다."
+    ]
+  },
+  "${modID}:SpirepassRewardGiantama": {
+    "TEXT": [
+      "\"거대다마\" 거대 머리",
+      "\"아니\""
+    ]
+  },
+  "${modID}:SpirepassRewardSpaceBlanket": {
+    "TEXT": [
+      "\"우주 담요\" 침묵",
+      "내 RNG가 그냥 우연히 이렇게 운이 나빴다고 말하는 거야? 아니! 그가 이걸 조율했어! 케이시!!!"
+    ]
+  },
+  "${modID}:SpirepassRewardMyCatBackground": {
+    "TEXT": [
+      "\"내 고양이\" 스파이어패스 화면 배경",
+      "이 이미지가 무엇인지 절대 맞추지 못할 거예요."
+    ]
+  },
+  "${modID}:SpirepassRewardSponsored": {
+    "TEXT": [
+      "\"스폰서\" 무색 카드 뒷면",
+      "법적 고지: 이 카드 뒷면은 브랜드와의 공식적인 제휴를 나타내지 않습니다."
+    ]
+  },
+  "${modID}:SpirepassRewardDonut": {
+    "TEXT": [
+      "\"도넛\" 도누",
+      "대형 구조물이 먹히도록 만들어지지 않았다면, 왜 그렇게 맛있어 보이나요???"
+    ]
+  },
+  "${modID}:SpirepassRewardLovestruck": {
+    "TEXT": [
+      "\"사랑에 빠진\" 백부장",
+      "네, 여왕님 <3"
+    ]
+  },
+  "${modID}:SpirepassRewardBear": {
+    "TEXT": [
+      "\"곰\" 곰",
+      "어째서인지, 레드 마스크 갱단의 나머지 멤버들은 아직 눈치채지 못했습니다."
+    ]
+  },
+  "${modID}:SpirepassRewardBlue": {
+    "TEXT": [
+      "\"파란\" 붉은 노예상인",
+      "그는 파랗고, da ba dee da ba di"
+    ]
+  },
+  "${modID}:SpirepassRewardRed": {
+    "TEXT": [
+      "\"빨간\" 파란 노예상인",
+      "집에 빨간 노예상인이 있어요"
+    ]
+  },
+  "${modID}:SpirepassRewardBlissful": {
+    "TEXT": [
+      "\"행복한\" 무색 카드 뒷면",
+      "이 카드 뒷면을 얻기 위한 필요 경험치를 획득한 것을 축하합니다"
+    ]
+  },
+  "${modID}:SpirepassRewardSlendernob": {
+    "TEXT": [
+      "\"슬렌더놉\" 그렘린 놉",
+      "페이지 3/8"
+    ]
+  },
+  "${modID}:SpirepassRewardColgate": {
+    "TEXT": [
+      "\"콜게이트\" 스네코",
+      "스파이어에서 가장 상쾌한 생물."
+    ]
+  },
+  "${modID}:SpirepassRewardPurpleGuy": {
+    "TEXT": [
+      "\"보라색 녀석\" 로미오",
+      "학살 뒤에 있는 도적"
+    ]
+  },
+  "${modID}:SpirepassRewardDowntrend": {
+    "TEXT": [
+      "\"하락세\" 저주 카드 뒷면",
+      "스톡스 아님"
+    ]
+  },
+  "${modID}:SpirepassRewardInvisibleMan": {
+    "TEXT": [
+      "\"투명인간\" 아이언클래드",
+      "그는 사실 아주 가만히 서 있는 것뿐입니다"
+    ]
+  },
+  "${modID}:SpirepassRewardChalkboard": {
+    "TEXT": [
+      "\"칠판\" 데카",
+      "\"으음, 우리 칠판이 방금 다리가 생겨서 걸어갔어요. 수업 취소!\""
+    ]
+  },
+  "${modID}:SpirepassRewardavwejkanaklwjve": {
+    "TEXT": [
+      "avwejkanaklwjv e",
+      "네"
+    ]
+  },
+  "${modID}:SpirepassRewardkrisdeltarune": {
+    "TEXT": [
+      "\"크리스 델타룬\" 왓처",
+      "LV2 이끼 찾기꾼"
+    ]
+  },
+  "${modID}:SpirepassRewardDisarmed": {
+    "TEXT": [
+      "\"무장해제\" 광신자",
+      "그 베타 아트처럼 생겼어요"
+    ]
+  },
+  "${modID}:SpirepassRewardPajamaSam": {
+    "TEXT": [
+      "\"파자마 샘\" 결함",
+      "어둠 구슬이 정말 나에게 영향을 미치기 시작했어."
+    ]
+  },
+  "${modID}:SpirepassRewardBigBird": {
+    "TEXT": [
+      "\"큰 새\" 깨어난 자",
+      "그는 커요"
+    ]
+  },
+  "${modID}:SpirepassRewardPrismatic": {
+    "TEXT": [
+      "\"프리즘\" 보초",
+      "상점에서 사야 할 조각이 생각나네요, 특히 스트리머라면. 윙크 윙크"
+    ]
+  },
+  "${modID}:SpirepassRewardBlurry": {
+    "TEXT": [
+      "\"흐릿한\" 침묵",
+      "내 안경 어디 있어??"
+    ]
+  },
+  "${modID}:SpirepassRewardHaroldCurseCardback": {
+    "TEXT": [
+      "\"고통을 숨기는\" 저주 카드 뒷면",
+      ":)"
+    ]
+  },
+  "${modID}:SpirepassRewardSpaghettiMeatballs": {
+    "TEXT": [
+      "\"스파게티와 미트볼\" 꿈틀거리는 덩어리",
+      "기생충 사이드 메뉴가 함께 제공됩니다."
+    ]
+  },
+  "${modID}:SpirepassRewardFavoriteCustomer": {
+    "TEXT": [
+      "\"단골 고객\" 무색 카드 뒷면",
+      "이 카드 뒷면이 마음에 드세요? 판매용이 아닙니다"
+    ]
+  },
+  "${modID}:SpirepassRewardWeaponized115": {
+    "TEXT": [
+      "\"콜 오브 듀티® 시리즈의 일부인 인기 일인칭 슈팅 게임 콜 오브 듀티®: 블랙 옵스 II에서 무기화된 115\" 아이언클래드",
+      "무기화된 115 개인화 팩은 좀비의 힘을 모든 멀티플레이어 매치에 가져옵니다. 모든 새로운 콜 오브 듀티: 블랙 옵스 II 오리진에서 영감을 받은 위장, 다양한 조준선, 그리고 언데드 애니메이션 콜링 카드로 당신의 무기를 포장하세요."
+    ]
+  },
+  "${modID}:SpirepassRewardJimboJoker": {
+    "TEXT": [
+      "\"짐보 조커\" 무색 카드 뒷면",
+      "\"아마도 고피쉬가 우리 속도에 더 맞을 거야...\""
+    ]
+  },
+  "${modID}:Challengedaily_setup": {
+    "TEXT": [
+      "설정",
+      "전투 첫 턴에 파워 카드 두 장을 플레이하세요."
+    ]
+  },
+  "${modID}:Challengedaily_thanks": {
+    "TEXT": [
+      "감사합니다",
+      "상인에게서 상점급 유물을 구매하세요."
+    ]
+  },
+  "${modID}:Challengedaily_best": {
+    "TEXT": [
+      "최고 중의 최고",
+      "휴식 지점에서 희귀 카드를 강화하세요."
+    ]
+  },
+  "${modID}:Challengedaily_purification": {
+    "TEXT": [
+      "정화",
+      "상인에게서 저주를 제거하세요."
+    ]
+  },
+  "${modID}:Challengedaily_exquisite": {
+    "TEXT": [
+      "정교함",
+      "희귀 물약을 사용하세요."
+    ]
+  },
+  "${modID}:Challengedaily_hobbyist": {
+    "TEXT": [
+      "취미가",
+      "덱에 카드 15장을 추가하세요."
+    ]
+  },
+  "${modID}:Challengedaily_punchingup": {
+    "TEXT": [
+      "상향 타격",
+      "5번의 정예 전투에서 승리하세요."
+    ]
+  },
+  "${modID}:Challengedaily_buff": {
+    "TEXT": [
+      "버프 애호가",
+      "한 번에 5개 이상의 버프를 활성화하세요."
+    ]
+  },
+  "${modID}:Challengedaily_debuff": {
+    "TEXT": [
+      "디버프 애호가",
+      "한 번에 4개 이상의 디버프를 활성화하세요."
+    ]
+  },
+  "${modID}:Challengedaily_backtobasics": {
+    "TEXT": [
+      "기본으로 돌아가기",
+      "휴식 지점에서 기본 카드를 강화하세요."
+    ]
+  },
+  "${modID}:Challengedaily_combo": {
+    "TEXT": [
+      "콤보",
+      "한 턴에 10장 이상의 카드를 플레이하세요."
+    ]
+  },
+  "${modID}:Challengedaily_risktaker": {
+    "TEXT": [
+      "위험 감수",
+      "체력이 20 이하인 상태로 보스 전투에 진입하세요."
+    ]
+  },
+  "${modID}:Challengedaily_notevenclose": {
+    "TEXT": [
+      "근접하지도 않음",
+      "체력이 10 이하로 남은 상태에서 전투에서 승리하세요."
+    ]
+  },
+  "${modID}:Challengedaily_bossswap": {
+    "TEXT": [
+      "스네코? 피라미드??",
+      "네오우에게서 시작 유물을 보스 유물과 교환하세요."
+    ]
+  },
+  "${modID}:Challengedaily_unbeatable": {
+    "TEXT": [
+      "운이 안 좋았네요",
+      "오 이런!! 이 도전은 이길 수 없어요! 내일 더 행운을 빌어요 :)"
+    ]
+  },
+  "${modID}:Challengedaily_youarewinner": {
+    "TEXT": [
+      "승리자",
+      "게임에서 승리하세요."
+    ]
+  },
+  "${modID}:Challengedaily_tagalong": {
+    "TEXT": [
+      "따라가기",
+      "다른 2개의 일일 도전을 완료하세요."
+    ]
+  },
+  "${modID}:Challengedaily_silent": {
+    "TEXT": [
+      "침묵",
+      "침묵을 경험하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_hair": {
+    "TEXT": [
+      "멋진 머리",
+      "상인에게 머리 스타일에 대한 칭찬을 받으세요."
+    ]
+  },
+  "${modID}:Challengeweekly_strong_start": {
+    "TEXT": [
+      "강력한 시작",
+      "첫 번째 막에서 에메랄드 열쇠를 획득하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_hoarder": {
+    "TEXT": [
+      "수집가",
+      "한 번에 최소 600 골드를 보유하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_collector": {
+    "TEXT": [
+      "카드 수집가",
+      "덱에 카드 100장을 추가하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_chonky": {
+    "TEXT": [
+      "거대한",
+      "게임 중 최대 체력이 최소 110이 되세요."
+    ]
+  },
+  "${modID}:Challengeweekly_slayer": {
+    "TEXT": [
+      "학살자",
+      "150명의 적을 처치하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_biggame": {
+    "TEXT": [
+      "큰 사냥꾼",
+      "30명의 정예 적을 처치하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_chugger": {
+    "TEXT": [
+      "물약 마시기",
+      "75개의 물약을 사용하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_unknown": {
+    "TEXT": [
+      "미지의 영역으로",
+      "30개의 미지 노드를 방문하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_smith": {
+    "TEXT": [
+      "대장장이",
+      "휴식 지점에서 50번 단조하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_snooze": {
+    "TEXT": [
+      "낮잠쟁이",
+      "휴식 지점에서 25번 휴식하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_ghostbuster": {
+    "TEXT": [
+      "고스트버스터",
+      "자정부터 오전 6시 사이에 헥사고스트를 처치하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_freeloader": {
+    "TEXT": [
+      "무임승차자",
+      "다른 2개의 주간 도전을 완료하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_dailymaster": {
+    "TEXT": [
+      "일일 마스터",
+      "모든 3개의 일일 도전을 한 번에 완료하세요."
+    ]
+  },
+  "${modID}:MainMenuButton": {
+    "TEXT": [
+      "스파이어패스"
+    ]
+  },
+  "${modID}:SpirepassScreen": {
+    "TEXT": [
+      "스파이어패스",
+      "장착",
+      "해제",
+      "잠김",
+      "스파이어패스 프리미엄 구매@!!!1!",
+      "왜 프리미엄을 구매해야 할까요? 좋은 질문입니다. 여기 몇 가지 훌륭한 답변이 있습니다:",
+      "- 마이크로트랜잭션 해금 (당신이 가장 좋아하는!) NL NL - 매크로트랜잭션 해금 NL NL - 기술 기반 매치메이킹 해금 NL NL - 크래비 패티 비밀 공식 해금 NL NL - 더 많은 해금 요소 해금 NL NL - 크리스마스 파티에서 결함의 당황스러운 사진 해금 NL NL - \"해금\"이라는 단어의 새 동의어 해금. 그걸 동의어 사전이라고 부르는 것 같은데 아마존에서 하나 구매해 볼게요 편집: 안녕 여러분 4영업일이 지났고 저는 완전히 새로운 동의어 사전과 함께 돌아왔습니다 NL NL - 새로운...카드를 풀어라? 카드의 정의에 따라 다르죠 NL NL - 당신의 뇌 속에 숨겨진 뉴런을 활성화하여 최대 스파이어 정복 1000을 위해 당신이 존재한다는 것조차 몰랐던 뉴런을 활성화하세요 NL NL - 하프라이프 3의 베타 액세스 해금 (미래의 스파이어패스 즐기는 사람들에게 알림: 만약 하프라이프 3가 실제로 출시된다면 (그렇지 않을 거야 ㅋㅋ), 이 농담은 약간 구식이 되니까 이 전체 요점을 안전하게 무시해도 돼요 감사합니다! NL NL - 아이들이 시나몬 토스트 크런치의 맛을 좋아하는 이유 알아보기 NL NL - 아이들이 시나몬 토스트 스퀘어의 맛을 좋아하지 않는 이유 알아보기 NL NL - 어른들이 아이들이 시나몬 토스트 크런치의 맛을 좋아하는 것을 싫어하는 이유 알아보기"
+    ]
+  },
+  "${modID}:ConfigMenuText": {
+    "TEXT": [
+      "스파이어패스 화면을 열 때 현재 레벨로 이동",
+      "메인 메뉴 요소 표시 (도전 목록, 스파이어패스 진행상황)",
+      "메인 메뉴 요소가 표시된 경우, 도전이 완료되면 소리 알림 재생",
+      "스파이어패스 프리미엄 버튼 숨기기",
+      "마커스",
+      "10,000 경험치 추가",
+      "경험치를 0으로 재설정"
+    ]
+  },
+  "${modID}:MainMenuChallengeDisplay": {
+    "TEXT": [
+      "광고를 보고 도전 새로고침",
+      "활성화된 일일 도전이 없습니다.",
+      " #g(완료)",
+      "  진행: #g완료!",
+      "  진행: #b",
+      "/LOL",
+      "일일 도전을 완료하면 스파이어패스 경험치 25를 획득합니다.",
+      "활성화된 주간 도전이 없습니다.",
+      "주간 도전을 완료하면 스파이어패스 경험치 75를 획득합니다.",
+      "일일 도전 (",
+      "주간 도전 ("
+    ]
+  },
+  "${modID}:MainMenuLevelDisplay": {
+    "TEXT": [
+      "레벨 ",
+      "스파이어패스",
+      "최대 레벨 도달!",
+      "레벨에 필요한 경험치 "
+    ]
+  }
+}
