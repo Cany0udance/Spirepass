@@ -35,6 +35,8 @@ public class ChallengeDefinitions {
         challenges.add(createChallenge("daily_youarewinner", Challenge.ChallengeType.DAILY));
         challenges.add(createChallenge("daily_tagalong", Challenge.ChallengeType.DAILY));
         challenges.add(createChallenge("daily_silent", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_cactus", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_lightsout", Challenge.ChallengeType.DAILY, 5));
 
         return challenges;
     }

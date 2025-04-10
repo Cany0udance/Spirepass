@@ -38,6 +38,7 @@ public class SpirepassScreenRenderer {
     private static Float cachedBoxW = null;
     private static final float TOOLTIP_RIGHT_PADDING = 15.0f * Settings.scale;
     private static final float EQUIP_BUTTON_PADDING = 80.0f * Settings.scale;
+    private static final float FIXED_BUTTON_WIDTH = 200.0f;
     private static final float PREMIUM_BUTTON_Y = 40.0f * Settings.scale;
     private static final String PREMIUM_TARGET_URL = "https://store.steampowered.com/app/2868840/Slay_the_Spire_2/";
 
@@ -82,10 +83,13 @@ public class SpirepassScreenRenderer {
             return;
         }
 
+        // Calculate text width without scaling for accurate measurement
         float textWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, TEXT[4], 9999f, 0f);
-        float estimatedButtonWidth = textWidth + 80.0f * Settings.scale;
-        float buttonX = (Settings.WIDTH / 2.0f) - (estimatedButtonWidth / 2.0f);
-        float buttonY = PREMIUM_BUTTON_Y;
+
+        // Calculate button position - CRITICAL: divide by Settings.scale because ModLabeledButton applies it internally
+        float estimatedButtonWidth = textWidth + 80.0f; // No scaling - ModLabeledButton handles it
+        float buttonX = ((Settings.WIDTH / 2.0f) - (estimatedButtonWidth / 2.0f)) / Settings.scale;
+        float buttonY = PREMIUM_BUTTON_Y / Settings.scale; // Remove scaling as ModLabeledButton will apply it
 
         Consumer<ModLabeledButton> clickConsumer = (button) -> {
             try {
@@ -114,18 +118,7 @@ public class SpirepassScreenRenderer {
                 clickConsumer
         );
 
-        try {
-            Field hbField = ModLabeledButton.class.getDeclaredField("hb");
-            hbField.setAccessible(true);
-            Hitbox buttonHb = (Hitbox) hbField.get(this.premiumButton);
-            if (buttonHb != null && buttonHb.width > 0) {
-                float actualButtonWidth = buttonHb.width;
-                float correctButtonX = (Settings.WIDTH / 2.0f) - (actualButtonWidth / 2.0f);
-                this.premiumButton.set(correctButtonX, buttonY);
-            }
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            System.err.println("Failed reflection for premium button hitbox adjustment: " + e.getMessage());
-        }
+        // No need for additional centering - button should be properly positioned now
     }
 
     // ==================== UPDATE & RENDER METHODS ====================
@@ -153,6 +146,7 @@ public class SpirepassScreenRenderer {
             Field hbField = ModLabeledButton.class.getDeclaredField("hb");
             hbField.setAccessible(true);
             Hitbox buttonHb = (Hitbox) hbField.get(premiumButton);
+
             if (buttonHb != null && buttonHb.hovered) {
                 if (cachedBoxW == null) {
                     try {
@@ -164,11 +158,17 @@ public class SpirepassScreenRenderer {
                         cachedBoxW = 320.0f * Settings.scale;
                     }
                 }
+
                 float boxWidth = cachedBoxW;
+
+                // Use relative positioning instead of fixed coordinates
                 float tipX = Settings.WIDTH * 0.75f;
                 tipX = Math.min(tipX, Settings.WIDTH - boxWidth - TOOLTIP_RIGHT_PADDING);
                 tipX = Math.max(tipX, TOOLTIP_RIGHT_PADDING);
-                float tipY = Settings.HEIGHT - 50.0f * Settings.scale;
+
+                // Use relative height instead of fixed coordinates
+                float tipY = Settings.HEIGHT - (50.0f * Settings.scale);
+
                 TipHelper.renderGenericTip(tipX, tipY, TEXT[5], TEXT[6]);
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -288,27 +288,37 @@ public class SpirepassScreenRenderer {
     // ==================== BUTTON MANAGEMENT ====================
 
     private void updateLockedEquipButton(SpriteBatch sb) {
-        String buttonText = TEXT[3];
+        String buttonText = TEXT[3]; // "Locked"
         Color buttonColor = Color.GRAY;
         Color hoverColor = Color.DARK_GRAY;
-        float buttonY = SpirepassPositionSettings.REWARD_BUTTON_Y - 25.0f;
 
-        float textWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, buttonText, 9999f, 0f);
-        float estimatedButtonWidth = textWidth + EQUIP_BUTTON_PADDING;
-        float buttonX = (Settings.WIDTH / 2.0f) - (estimatedButtonWidth / 2.0f);
+        // Remove scaling from button position - ModLabeledButton will apply it
+        float buttonY = (SpirepassPositionSettings.REWARD_BUTTON_Y - 25.0f) / Settings.scale;
+
+        // Use fixed width instead of calculating based on text
+        float buttonX = ((Settings.WIDTH / 2.0f) - (FIXED_BUTTON_WIDTH / 2.0f)) / Settings.scale;
 
         Consumer<ModLabeledButton> clickConsumer = (button) -> {
             CardCrawlGame.sound.play("UI_CLICK_2");
         };
 
         if (equipButton == null) {
+            // Create new button
             equipButton = new ModLabeledButton(buttonText, buttonX, buttonY,
                     buttonColor, hoverColor, FontHelper.buttonLabelFont, null, clickConsumer);
+
+            // Force fixed width after creation
+            setButtonFixedWidth(equipButton, FIXED_BUTTON_WIDTH);
         } else {
+            // Update existing button
             equipButton.label = buttonText;
             equipButton.color = buttonColor;
             equipButton.colorHover = hoverColor;
             equipButton.set(buttonX, buttonY);
+
+            // Force fixed width after update
+            setButtonFixedWidth(equipButton, FIXED_BUTTON_WIDTH);
+
             try {
                 Field clickField = ModLabeledButton.class.getDeclaredField("click");
                 clickField.setAccessible(true);
@@ -317,14 +327,11 @@ public class SpirepassScreenRenderer {
                 e.printStackTrace();
             }
         }
-
-        adjustButtonCentering(equipButton, buttonY);
     }
 
     private void updateEquipButton(SpriteBatch sb, SpirepassLevelBox selectedBox) {
         int level = selectedBox.getLevel();
         SpirepassRewardData reward = rewardManager.getRewardData(level);
-
         if (reward != null && reward.getType() == SpirepassRewardData.RewardType.TEXT) {
             equipButton = null;
             return;
@@ -332,15 +339,15 @@ public class SpirepassScreenRenderer {
 
         boolean isUnlocked = selectedBox.isUnlocked();
         boolean isEquipped = reward != null && rewardManager.isRewardEquipped(reward);
-
-        String buttonText = isEquipped ? TEXT[2] : TEXT[1];
+        String buttonText = isEquipped ? TEXT[2] : TEXT[1]; // "Unequip" or "Equip"
         Color buttonColor = isEquipped ? Color.ORANGE : Color.WHITE;
         Color hoverColor = isEquipped ? Color.YELLOW : Color.GREEN;
-        float buttonY = SpirepassPositionSettings.REWARD_BUTTON_Y - 25.0f;
 
-        float textWidth = FontHelper.getSmartWidth(FontHelper.buttonLabelFont, buttonText, 9999f, 0f);
-        float estimatedButtonWidth = textWidth + EQUIP_BUTTON_PADDING;
-        float buttonX = (Settings.WIDTH / 2.0f) - (estimatedButtonWidth / 2.0f);
+        // Remove scaling from button position - ModLabeledButton will apply it
+        float buttonY = (SpirepassPositionSettings.REWARD_BUTTON_Y - 25.0f) / Settings.scale;
+
+        // Use fixed width instead of calculating based on text
+        float buttonX = ((Settings.WIDTH / 2.0f) - (FIXED_BUTTON_WIDTH / 2.0f)) / Settings.scale;
 
         Consumer<ModLabeledButton> clickConsumer = (button) -> {
             if (isUnlocked && reward != null) {
@@ -352,13 +359,22 @@ public class SpirepassScreenRenderer {
         };
 
         if (equipButton == null) {
+            // Create new button
             equipButton = new ModLabeledButton(buttonText, buttonX, buttonY,
                     buttonColor, hoverColor, FontHelper.buttonLabelFont, null, clickConsumer);
+
+            // Force fixed width after creation
+            setButtonFixedWidth(equipButton, FIXED_BUTTON_WIDTH);
         } else {
+            // Update existing button
             equipButton.label = buttonText;
             equipButton.color = buttonColor;
             equipButton.colorHover = hoverColor;
             equipButton.set(buttonX, buttonY);
+
+            // Force fixed width after update
+            setButtonFixedWidth(equipButton, FIXED_BUTTON_WIDTH);
+
             try {
                 Field clickField = ModLabeledButton.class.getDeclaredField("click");
                 clickField.setAccessible(true);
@@ -367,8 +383,46 @@ public class SpirepassScreenRenderer {
                 e.printStackTrace();
             }
         }
+    }
 
-        adjustButtonCentering(equipButton, buttonY);
+    private void setButtonFixedWidth(ModLabeledButton button, float fixedWidth) {
+        if (button == null) return;
+
+        try {
+            // Access button's width and middle_width fields
+            Field wField = ModLabeledButton.class.getDeclaredField("w");
+            Field middleWidthField = ModLabeledButton.class.getDeclaredField("middle_width");
+            Field hbField = ModLabeledButton.class.getDeclaredField("hb");
+
+            wField.setAccessible(true);
+            middleWidthField.setAccessible(true);
+            hbField.setAccessible(true);
+
+            // Calculate middle_width based on desired total width
+            // The original button width is calculated as:
+            // w = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + middle_width
+            float textureWidth = ((float)ImageMaster.loadImage("img/ButtonLeft.png").getWidth() +
+                    (float)ImageMaster.loadImage("img/ButtonRight.png").getWidth()) *
+                    Settings.scale;
+
+            // Force the new width
+            float newMiddleWidth = fixedWidth - textureWidth;
+            if (newMiddleWidth < 0) newMiddleWidth = 0;
+
+            // Set the width fields
+            wField.set(button, fixedWidth);
+            middleWidthField.set(button, newMiddleWidth);
+
+            // Update hitbox width
+            Hitbox hb = (Hitbox) hbField.get(button);
+            if (hb != null) {
+                hb.width = fixedWidth - 2.0f * Settings.scale;
+                hb.cX = hb.x + hb.width / 2.0f;
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to set fixed button width: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void adjustButtonCentering(ModLabeledButton button, float buttonY) {

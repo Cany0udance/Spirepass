@@ -12,17 +12,13 @@ import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.TipHelper;
 import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
-import org.apache.logging.log4j.LogManager;
-// import org.apache.logging.log4j.Logger;
 import spirepass.Spirepass;
 import spirepass.challengeutil.Challenge;
-import spirepass.challengeutil.ChallengeHelper;
 import spirepass.challengeutil.ChallengeManager;
 
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -126,21 +122,36 @@ public class MainMenuChallengePatch {
     // --- Initialization ---
 
     private static void initializeButtons() {
-        float buttonY = Settings.HEIGHT * 0.8f;
-        float buttonX = Settings.WIDTH * 0.2f;
-        float buttonSpacing = 120.0f * Settings.scale;
+        // Critical insight: ModLabeledButton applies Settings.scale internally,
+        // so we need to provide unscaled coordinates
 
+        // Calculate positions as percentages of screen dimensions
+        // But divide by Settings.scale because ModLabeledButton will multiply by it
+        float buttonY = (Settings.HEIGHT * 0.8f) / Settings.scale;
+        float buttonX = (Settings.WIDTH * 0.2f) / Settings.scale;
+        float buttonSpacing = (Settings.HEIGHT * 0.09f) / Settings.scale;
+
+        // Store the positions (these will be scaled when passed to ModLabeledButton)
         dailyButtonX = buttonX; dailyButtonY = buttonY + buttonSpacing;
         weeklyButtonX = buttonX; weeklyButtonY = buttonY;
         adButtonX = buttonX; adButtonY = buttonY - buttonSpacing;
-        devButtonX = Settings.WIDTH * 0.8f; devButtonY = buttonY - buttonSpacing;
+        devButtonX = (Settings.WIDTH * 0.8f) / Settings.scale;
+        devButtonY = buttonY - buttonSpacing;
 
-        buttonWidth = 300.0f * Settings.scale; buttonHeight = 40.0f * Settings.scale;
+        // Create buttons (ModLabeledButton will internally scale coordinates and calculate dimensions)
+        dailyButton = new ModLabeledButton(getDailyButtonText(), dailyButtonX, dailyButtonY,
+                Settings.CREAM_COLOR, Color.GREEN, FontHelper.buttonLabelFont, null,
+                (button) -> CardCrawlGame.sound.play("UI_CLICK_1"));
 
-        dailyButton = new ModLabeledButton(getDailyButtonText(), dailyButtonX, dailyButtonY, Settings.CREAM_COLOR, Color.GREEN, FontHelper.buttonLabelFont, null, (button) -> CardCrawlGame.sound.play("UI_CLICK_1"));
-        weeklyButton = new ModLabeledButton(getWeeklyButtonText(), weeklyButtonX, weeklyButtonY, Settings.CREAM_COLOR, Color.GREEN, FontHelper.buttonLabelFont, null, (button) -> CardCrawlGame.sound.play("UI_CLICK_1"));
-        adButton = new ModLabeledButton(TEXT[0], adButtonX, adButtonY, Color.GOLD, Color.YELLOW, FontHelper.buttonLabelFont, null, (button) -> { CardCrawlGame.sound.play("UI_CLICK_2"); openRandomPrankVideo(); });
+        weeklyButton = new ModLabeledButton(getWeeklyButtonText(), weeklyButtonX, weeklyButtonY,
+                Settings.CREAM_COLOR, Color.GREEN, FontHelper.buttonLabelFont, null,
+                (button) -> CardCrawlGame.sound.play("UI_CLICK_1"));
 
+        adButton = new ModLabeledButton(TEXT[0], adButtonX, adButtonY,
+                Color.GOLD, Color.YELLOW, FontHelper.buttonLabelFont, null,
+                (button) -> { CardCrawlGame.sound.play("UI_CLICK_2"); openRandomPrankVideo(); });
+
+        // Get the hitbox dimensions after creation
         try {
             Field hbField = ModLabeledButton.class.getDeclaredField("hb");
             hbField.setAccessible(true);
@@ -149,32 +160,35 @@ public class MainMenuChallengePatch {
         } catch (Exception e) { /* Reflection failed, use defaults */ }
     }
 
-    // --- Tooltip Logic ---
-
+    // Update tooltip rendering to handle all resolutions correctly
     private static void checkAndRenderTooltips() {
         try {
             // Reflection to access hitbox for hover checks
             Field hbField = ModLabeledButton.class.getDeclaredField("hb");
             hbField.setAccessible(true);
 
-            // Calculate standard tooltip position offset
-            float tooltipOffsetX = buttonWidth + 20.0f * Settings.scale;
-            float tooltipOffsetY = buttonHeight / 2f; // Vertically center tooltip relative to button
+            // Get the actual rendered hitboxes from the buttons
+            if (dailyButton != null && weeklyButton != null) {
+                Hitbox dailyHb = (Hitbox) hbField.get(dailyButton);
+                Hitbox weeklyHb = (Hitbox) hbField.get(weeklyButton);
 
-            // Render tooltip for Daily button if hovered
-            if (dailyButton != null && ((Hitbox) hbField.get(dailyButton)).hovered) {
-                renderDailyChallengeTooltip(dailyButtonX + tooltipOffsetX, dailyButtonY + tooltipOffsetY);
+                // Calculate tooltip offset using Settings.scale for consistent sizing
+                float tooltipOffsetX = buttonWidth + 20.0f * Settings.scale;
+                float tooltipOffsetY = buttonHeight / 2f; // Vertically center relative to button height
+
+                // Render tooltip for Daily button if hovered
+                if (dailyHb.hovered) {
+                    renderDailyChallengeTooltip(dailyHb.x + tooltipOffsetX, dailyHb.y + tooltipOffsetY);
+                }
+
+                // Render tooltip for Weekly button if hovered
+                if (weeklyHb.hovered) {
+                    renderWeeklyChallengeTooltip(weeklyHb.x + tooltipOffsetX, weeklyHb.y + tooltipOffsetY);
+                }
             }
-
-            // Render tooltip for Weekly button if hovered
-            if (weeklyButton != null && ((Hitbox) hbField.get(weeklyButton)).hovered) {
-                renderWeeklyChallengeTooltip(weeklyButtonX + tooltipOffsetX, weeklyButtonY + tooltipOffsetY);
-            }
-
         } catch (NoSuchFieldException | IllegalAccessException e) {
             // logger.error("Reflection failed for Hitbox in checkAndRenderTooltips: " + e.getMessage());
-            // Tooltips might not appear if reflection fails.
-        } catch (Exception e) { // Catch any other unexpected errors
+        } catch (Exception e) {
             // logger.error("Unexpected error in checkAndRenderTooltips: " + e.getMessage());
         }
     }

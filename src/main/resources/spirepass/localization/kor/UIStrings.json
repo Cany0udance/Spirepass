@@ -292,6 +292,18 @@
       "침묵을 경험하세요."
     ]
   },
+  "${modID}:Challengedaily_cactus": {
+    "TEXT": [
+      "선인장",
+      "가시를 획득하세요."
+    ]
+  },
+  "${modID}:Challengedaily_lightsout": {
+    "TEXT": [
+      "불 끄기",
+      "횃불 5개를 끄세요."
+    ]
+  },
   "${modID}:Challengeweekly_hair": {
     "TEXT": [
       "멋진 머리",

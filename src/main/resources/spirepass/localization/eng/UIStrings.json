@@ -292,6 +292,18 @@
       "Experience silence."
     ]
   },
+  "${modID}:Challengedaily_cactus": {
+    "TEXT": [
+      "Cactus",
+      "Gain any amount of Thorns."
+    ]
+  },
+  "${modID}:Challengedaily_lightsout": {
+    "TEXT": [
+      "Lights Out",
+      "Extinguish 5 torches."
+    ]
+  },
   "${modID}:Challengeweekly_hair": {
     "TEXT": [
       "Nice Hair",

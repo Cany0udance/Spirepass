@@ -292,6 +292,18 @@
       "体验静默。"
     ]
   },
+  "${modID}:Challengedaily_cactus": {
+    "TEXT": [
+      "仙人掌",
+      "获得荆棘。"
+    ]
+  },
+  "${modID}:Challengedaily_lightsout": {
+    "TEXT": [
+      "熄灯",
+      "熄灭5个火炬。"
+    ]
+  },
   "Spirepass:Challengeweekly_hair": {
     "TEXT": [
       "漂亮的发型",
