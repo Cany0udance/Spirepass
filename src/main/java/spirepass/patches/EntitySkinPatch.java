@@ -14,12 +14,14 @@ import com.megacrit.cardcrawl.characters.*;
 import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.beyond.*;
 import com.megacrit.cardcrawl.monsters.city.BanditBear;
 import com.megacrit.cardcrawl.monsters.city.BanditLeader;
 import com.megacrit.cardcrawl.monsters.city.Centurion;
 import com.megacrit.cardcrawl.monsters.city.Snecko;
 import com.megacrit.cardcrawl.monsters.exordium.*;
+import com.megacrit.cardcrawl.relics.PreservedInsect;
 import spirepass.spirepassutil.SkinManager;
 
 import java.io.PrintWriter;
@@ -87,7 +89,13 @@ public class EntitySkinPatch {
                         ReflectionHacks.setPrivate(__instance, AbstractCreature.class, "atlas", atlas);
 
                         SkeletonJson json = new SkeletonJson(atlas);
-                        json.setScale(Settings.renderScale / scale);
+                        float finalScale = scale;
+                        if (CardCrawlGame.dungeon != null && AbstractDungeon.player != null && AbstractDungeon.getCurrRoom() != null) {
+                            if (AbstractDungeon.player.hasRelic(PreservedInsect.ID) && !__instance.isPlayer && AbstractDungeon.getCurrRoom().eliteTrigger) {
+                                finalScale += 0.3F;
+                            }
+                        }
+                        json.setScale(Settings.renderScale / finalScale);
                         SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal(customSkeletonUrl));
 
                         Skeleton skeleton = new Skeleton(skeletonData);

@@ -133,21 +133,15 @@ public class SpirepassScreen {
                 boxTexture = renderer.getLevelBoxTexture();
             }
 
-            Texture rewardTexture = rewardManager.getRewardTexture(i);
-
             float boxX = (i * levelBoxSpacing) + edgePadding - scrollX;
             float boxY = SpirepassPositionSettings.LEVEL_BOX_Y;
             boolean isUnlocked = i <= currentLevel;
 
-            SpirepassLevelBox levelBox = new SpirepassLevelBox(i, boxX, boxY, isUnlocked, boxTexture, rewardTexture);
-
-            SpirepassRewardData rewardData = rewardManager.getRewardData(i);
-            if (rewardData != null) {
-                levelBox.setRewardData(rewardData);
-            }
+            SpirepassLevelBox levelBox = new SpirepassLevelBox(i, boxX, boxY, isUnlocked, boxTexture, this.rewardManager);
 
             levelBoxes.add(levelBox);
         }
+        updateLevelBoxPositions();
     }
 
     private void updateLevelBoxPositions() {

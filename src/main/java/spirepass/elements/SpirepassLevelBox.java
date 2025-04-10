@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
+import spirepass.screens.SpirepassRewardManager;
 import spirepass.spirepassutil.SkinManager;
 import spirepass.spirepassutil.SpirepassRewardData;
 
@@ -37,6 +38,7 @@ public class SpirepassLevelBox {
     private Texture rewardTexture;
     private static Texture starTexture;
     private static Texture starwalkerTexture;
+    private SpirepassRewardManager rewardManager;
     private SpirepassRewardData rewardData;
 
     // ==================== INTERACTION ====================
@@ -55,19 +57,20 @@ public class SpirepassLevelBox {
         }
     }
 
-    public SpirepassLevelBox(int level, float x, float y, boolean isUnlocked, Texture boxTexture, Texture rewardTexture) {
+    public SpirepassLevelBox(int level, float x, float y, boolean isUnlocked, Texture boxTexture, SpirepassRewardManager rewardManager) {
         this.level = level;
         this.x = x;
         this.y = y;
         this.isSelected = false;
         this.isUnlocked = isUnlocked;
         this.boxTexture = boxTexture;
-        this.rewardTexture = rewardTexture;
+        this.rewardManager = rewardManager;
+
+        // Fetch reward data using the manager
+        this.rewardData = this.rewardManager.getRewardData(level);
 
         this.useStarwalker = MathUtils.randomBoolean(STARWALKER_CHANCE);
-
         this.boxHitbox = new Hitbox(BOX_SIZE, BOX_SIZE);
-        this.buttonHitbox = new Hitbox(BUTTON_WIDTH, BUTTON_HEIGHT);
         updateHitboxPositions();
     }
 
@@ -85,7 +88,6 @@ public class SpirepassLevelBox {
 
     private void updateHitboxPositions() {
         this.boxHitbox.move(x, y);
-        this.buttonHitbox.move(Settings.WIDTH / 2.0f, BUTTON_Y);
     }
 
     // ==================== RENDER METHODS ====================
@@ -130,23 +132,10 @@ public class SpirepassLevelBox {
     // ==================== HELPER METHODS ====================
 
     private boolean isRewardEquipped() {
-        if (rewardData == null) {
-            return false;
+        // Delegate the check to the central reward manager
+        if (this.rewardManager != null && this.rewardData != null) {
+            return this.rewardManager.isRewardEquipped(this.rewardData);
         }
-
-        if (rewardData.getType() == SpirepassRewardData.RewardType.CHARACTER_MODEL) {
-            String entityId = rewardData.getEntityId();
-            String modelId = rewardData.getModelId();
-            String currentSkin = SkinManager.getInstance().getAppliedSkin(entityId);
-            return modelId.equals(currentSkin);
-        }
-        else if (rewardData.getType() == SpirepassRewardData.RewardType.CARDBACK) {
-            String cardbackType = rewardData.getCardbackType();
-            String cardbackId = rewardData.getCardbackId();
-            String currentCardback = SkinManager.getInstance().getAppliedCardback(cardbackType);
-            return cardbackId.equals(currentCardback);
-        }
-
         return false;
     }
 
