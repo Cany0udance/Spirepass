@@ -423,20 +423,32 @@ public class Spirepass implements
         saveConfig();
     }
 
-    // Helper method for daily refresh check
     private static boolean needsDailyRefresh(Calendar now, Calendar lastRefresh) {
-        // Get time at 12:00 PM today
-        Calendar todayRefreshTime = (Calendar) now.clone();
-        todayRefreshTime.set(Calendar.HOUR_OF_DAY, REFRESH_HOUR_LOCAL);
-        todayRefreshTime.set(Calendar.MINUTE, REFRESH_MINUTE_LOCAL);
-        todayRefreshTime.set(Calendar.SECOND, 0);
-        // No need to set milliseconds
+        // If lastRefresh is effectively zero (or very old), assume refresh is needed
+        // Note: Relies on initial generation setting a valid timestamp.
+        if (lastRefresh.getTimeInMillis() < 1000) { // Check against a small value to avoid issues with exact zero
+            // Consider if getDailyChallenges().isEmpty() is a better check for initial state
+            return true;
+        }
 
-        // If now is after today's refresh time AND last refresh was before today's refresh time
-        return now.after(todayRefreshTime) && lastRefresh.before(todayRefreshTime);
+        // Calculate the *next* noon that should have occurred after the last refresh.
+        Calendar nextPotentialRefreshTime = (Calendar) lastRefresh.clone();
+        nextPotentialRefreshTime.set(Calendar.HOUR_OF_DAY, REFRESH_HOUR_LOCAL);
+        nextPotentialRefreshTime.set(Calendar.MINUTE, REFRESH_MINUTE_LOCAL);
+        nextPotentialRefreshTime.set(Calendar.SECOND, 0);
+        nextPotentialRefreshTime.set(Calendar.MILLISECOND, 0);
+
+        // If the last refresh happened *at or after* noon on its day,
+        // the next refresh target is noon on the *following* day.
+        if (!lastRefresh.before(nextPotentialRefreshTime)) {
+            nextPotentialRefreshTime.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        // Refresh if the current time 'now' is after that next potential refresh time.
+        return now.after(nextPotentialRefreshTime);
     }
 
-    // Helper method for weekly refresh check
+    // Helper method for weekly refresh check (Unchanged - Logic appears correct)
     private static boolean needsWeeklyRefresh(Calendar now, Calendar lastRefresh) {
         // Find the date of this week's Monday at refresh time
         Calendar thisWeeksMonday = (Calendar) now.clone();
@@ -444,14 +456,17 @@ public class Spirepass implements
         thisWeeksMonday.set(Calendar.HOUR_OF_DAY, REFRESH_HOUR_LOCAL);
         thisWeeksMonday.set(Calendar.MINUTE, REFRESH_MINUTE_LOCAL);
         thisWeeksMonday.set(Calendar.SECOND, 0);
+        thisWeeksMonday.set(Calendar.MILLISECOND, 0); // Good practice to zero out ms too
 
-        // If we're earlier than Monday's refresh time, we need to go back to last week's Monday
+        // If 'now' is before this week's Monday noon (e.g., Sunday),
+        // the relevant boundary is *last* week's Monday noon.
         if (now.before(thisWeeksMonday)) {
             thisWeeksMonday.add(Calendar.DAY_OF_MONTH, -7);
         }
 
-        // If last refresh was before this week's Monday refresh time, we need to refresh
-        return lastRefresh.before(thisWeeksMonday);
+        // Refresh if the last refresh occurred before that calculated Monday noon boundary.
+        // Also handle the initial case where lastRefresh time might be 0.
+        return lastRefresh.getTimeInMillis() < 1000 || lastRefresh.before(thisWeeksMonday);
     }
 
     private static void generateInitialChallenges() {

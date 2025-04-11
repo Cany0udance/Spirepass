@@ -1,11 +1,12 @@
 package spirepass.challengeutil;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import spirepass.Spirepass;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
+import static basemod.BaseMod.logger;
 
 // import static basemod.BaseMod.logger;
 
@@ -32,6 +33,13 @@ public class ChallengeManager {
         lastDailyRefreshTime = 0;
         lastWeeklyRefreshTime = 0;
     }
+
+    // Define a set of challenge IDs that should NOT play the completion sound
+    private static final Set<String> META_CHALLENGE_IDS = new HashSet<>(Arrays.asList(
+            "daily_tagalong",
+            "weekly_freeloader",
+            "weekly_dailymaster"
+    ));
 
     // Singleton pattern getter
     public static ChallengeManager getInstance() {
@@ -89,21 +97,22 @@ public class ChallengeManager {
     }
 
 
-    // Method called when a challenge is completed
     public void onComplete(Challenge challenge) {
-        // If already completed, don't award XP again
         if (completedChallenges.containsKey(challenge.getId()) && completedChallenges.get(challenge.getId())) {
             return;
         }
-        // Mark the challenge as completed
         completedChallenges.put(challenge.getId(), true);
-        // Award XP based on challenge type
+
+        if (Spirepass.enableMainMenuElements &&
+                Spirepass.playChallengeCompleteSound &&
+                !META_CHALLENGE_IDS.contains(challenge.getId())) {
+            CardCrawlGame.sound.play("UNLOCK_PING");
+        }
+
         if (challenge.getType() == Challenge.ChallengeType.DAILY) {
             Spirepass.addXP(Spirepass.DAILY_CHALLENGE_XP);
-//             logger.info("Awarded " + Spirepass.DAILY_CHALLENGE_XP + " XP for completing daily challenge: " + challenge.getName());
         } else if (challenge.getType() == Challenge.ChallengeType.WEEKLY) {
             Spirepass.addXP(Spirepass.WEEKLY_CHALLENGE_XP);
-//             logger.info("Awarded " + Spirepass.WEEKLY_CHALLENGE_XP + " XP for completing weekly challenge: " + challenge.getName());
         }
 
         // Check if this completion should trigger the Tagalong challenge
@@ -222,9 +231,6 @@ public class ChallengeManager {
     // Save all challenge data to config
     public void saveData(SpireConfig config) {
         try {
-//             logger.info("Saving challenge data to config...");
-//             logger.info("Daily challenges to save: " + dailyChallenges.size());
-//             logger.info("Weekly challenges to save: " + weeklyChallenges.size());
 
             // Save the list of daily challenges
             saveChallengeList(config, dailyChallenges, "daily");
@@ -241,27 +247,15 @@ public class ChallengeManager {
                 config.setBool("completed_" + challengeId, completedChallenges.get(challengeId));
             }
 
-            // Save refresh timestamps
             config.setString(LAST_DAILY_REFRESH, String.valueOf(lastDailyRefreshTime));
             config.setString(LAST_WEEKLY_REFRESH, String.valueOf(lastWeeklyRefreshTime));
-
-//             logger.info("Saved " + dailyChallenges.size() + " daily challenges and " +
-//                    weeklyChallenges.size() + " weekly challenges");
-//             logger.info("Saved " + completedCount + " completed challenges");
-
-            // Force saving the config file immediately
             try {
                 config.save();
-//                 logger.info("Config file saved successfully");
             } catch (Exception e) {
-//                 logger.error("Error saving config file: " + e.getMessage());
             }
         } catch (Exception e) {
-//             logger.error("Failed to save challenge data: " + e.getMessage());
             e.printStackTrace();
         }
-//         logger.info("saveData: Completed challenges map contains " + completedChallenges.size() +
-//                " entries after saving");
     }
 
     // Helper method to save a list of challenges
@@ -339,7 +333,7 @@ public class ChallengeManager {
 
 //             logger.info("Loaded " + dailyChallenges.size() + " daily challenges and " +
 //                    weeklyChallenges.size() + " weekly challenges");
-//             logger.info("Last daily refresh: " + new java.util.Date(lastDailyRefreshTime));
+             logger.info("Last daily refresh: " + new java.util.Date(lastDailyRefreshTime));
 //             logger.info("Last weekly refresh: " + new java.util.Date(lastWeeklyRefreshTime));
         } catch (Exception e) {
 //             logger.error("Failed to load challenge data: " + e.getMessage());

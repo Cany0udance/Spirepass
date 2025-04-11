@@ -13,32 +13,29 @@ import spirepass.challengeutil.ChallengeManager;
 
 @SpirePatch(clz = FastCardObtainEffect.class, method = "update")
 public class FastObtainCardHobbyistPatch {
-    private static final Logger logger = LogManager.getLogger(Spirepass.modID);
 
     @SpireInsertPatch(
-            locator = ObtainCardLocator.class,
-            localvars = {"r"}
+            locator = PostSoulsObtainLocator.class
     )
-    public static void onCardObtain(FastCardObtainEffect __instance, AbstractRelic r) {
-        // Check for daily_hobbyist challenge
+    public static void insertAfterCardObtain(FastCardObtainEffect __instance) {
         if (ChallengeHelper.isActiveChallengeIncomplete("daily_hobbyist")) {
-            // Update the progress for the Hobbyist challenge
             ChallengeHelper.updateChallengeProgress("daily_hobbyist", 1);
         }
 
-        // Check for weekly_collector challenge
         if (ChallengeHelper.isActiveChallengeIncomplete("weekly_collector")) {
-            // Update the progress for the Collector challenge
             ChallengeHelper.updateChallengeProgress("weekly_collector", 1);
         }
     }
 
-    // Locator to find the spot right after the card obtain line
-    private static class ObtainCardLocator extends SpireInsertLocator {
+    private static class PostSoulsObtainLocator extends SpireInsertLocator {
         @Override
         public int[] Locate(CtBehavior ctMethodToPatch) throws Exception {
-            Matcher matcher = new Matcher.MethodCallMatcher(AbstractRelic.class, "onObtainCard");
-            return LineFinder.findInOrder(ctMethodToPatch, matcher);
+            Matcher iteratorMatcher = new Matcher.MethodCallMatcher(java.util.ArrayList.class, "iterator");
+            int[] allOccurrences = LineFinder.findAllInOrder(ctMethodToPatch, iteratorMatcher);
+
+            if (allOccurrences.length < 2) {
+            }
+            return new int[]{allOccurrences[1]};
         }
     }
 }

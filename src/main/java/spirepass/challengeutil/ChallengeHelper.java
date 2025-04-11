@@ -118,10 +118,6 @@ public class ChallengeHelper {
         }
 
         if (completed) {
-            if (Spirepass.enableMainMenuElements && Spirepass.playChallengeCompleteSound) {
-                CardCrawlGame.sound.play("UNLOCK_PING");
-            }
-
             manager.saveData(Spirepass.config);
             try {
                 Spirepass.config.save();
