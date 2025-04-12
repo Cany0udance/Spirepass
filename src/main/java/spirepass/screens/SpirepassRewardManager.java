@@ -143,7 +143,7 @@ public class SpirepassRewardManager implements Disposable {
             FontHelper.renderFontCentered(
                     sb, FontHelper.tipBodyFont, messageText, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y, Color.WHITE
             );
-        } else if (reward.getLevel() == 30) {
+        } else if (reward.getLevel() == 35) {
             UIStrings maxLevelStrings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassMaxLevelMessage"));
             String line1 = maxLevelStrings.TEXT[0];
             String line2 = maxLevelStrings.TEXT[1];
@@ -578,9 +578,53 @@ public class SpirepassRewardManager implements Disposable {
                 "spirepass/images/rewards/cardbacks/colorless/jimbo/JimboSkillLarge.png"
         ));
 
-        // Level 30: Final reward with rare border
-        rewardData.put(30, new SpirepassRewardData(
+        rewardData.put(30, createReward(
                 30,
+                "MagicConch",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_SHELLED_PARASITE,
+                "SHELLED_PARASITE_MAGICCONCH"
+        ));
+
+        rewardData.put(31, createReward(
+                31,
+                "Robot",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_SNEAKY_GREMLIN,
+                "SNEAKY_GREMLIN_ROBOT"
+        ));
+
+        rewardData.put(32, createReward(
+                32,
+                "Pretty",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_JAW_WORM,
+                "JAW_WORM_PRETTY"
+        ));
+
+        rewardData.put(33, createReward(
+                33,
+                "Slaverhot",
+                SpirepassRewardData.RewardRarity.UNCOMMON,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_RED_SLAVER,
+                "RED_SLAVER_SLAVERHOT"
+        ));
+
+        rewardData.put(34, createReward(
+                34,
+                "BlueBaby",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.CHARACTER_MODEL,
+                SkinManager.ENTITY_SLIME_BOSS,
+                "SLIME_BOSS_BLUEBABY"
+        ));
+
+        rewardData.put(35, new SpirepassRewardData(
+                35,
                 "",
                 "",
                 SpirepassRewardData.RewardRarity.RARE,
@@ -609,7 +653,7 @@ public class SpirepassRewardManager implements Disposable {
 
         // For any unspecified levels, use the badge texture as a fallback
         if (badgeTexture != null) {
-            for (int i = 0; i <= 30; i++) {
+            for (int i = 0; i <= 35; i++) {
                 if (!rewardTextures.containsKey(i) && !rewardData.containsKey(i)) {
                     rewardTextures.put(i, badgeTexture);
                 }

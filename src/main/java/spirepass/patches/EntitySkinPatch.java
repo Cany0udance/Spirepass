@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
 import com.esotericsoftware.spine.*;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
@@ -16,10 +17,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.beyond.*;
-import com.megacrit.cardcrawl.monsters.city.BanditBear;
-import com.megacrit.cardcrawl.monsters.city.BanditLeader;
-import com.megacrit.cardcrawl.monsters.city.Centurion;
-import com.megacrit.cardcrawl.monsters.city.Snecko;
+import com.megacrit.cardcrawl.monsters.city.*;
 import com.megacrit.cardcrawl.monsters.exordium.*;
 import com.megacrit.cardcrawl.relics.PreservedInsect;
 import spirepass.spirepassutil.SkinManager;
@@ -137,10 +135,16 @@ public class EntitySkinPatch {
             return SkinManager.ENTITY_BLUE_SLAVER;
         } else if (creature instanceof SlaverRed) {
             return SkinManager.ENTITY_RED_SLAVER;
+        } else if (creature instanceof GremlinThief) {
+            return SkinManager.ENTITY_SNEAKY_GREMLIN;
         } else if (creature instanceof Sentry) {
             return SkinManager.ENTITY_SENTRY;
         } else if (creature instanceof GremlinNob) {
             return SkinManager.ENTITY_GREMLIN_NOB;
+        } else if (creature instanceof SlimeBoss) {
+            return SkinManager.ENTITY_SLIME_BOSS;
+        } else if (creature instanceof ShelledParasite) {
+            return SkinManager.ENTITY_SHELLED_PARASITE;
         } else if (creature instanceof BanditLeader) {
             return SkinManager.ENTITY_ROMEO;
         } else if (creature instanceof BanditBear) {
@@ -194,10 +198,15 @@ public class EntitySkinPatch {
             }
         } else if (entityId.equals(SkinManager.ENTITY_JAW_WORM)) {
             if (skinId.equals("JAW_WORM")) {
-                return null;
+                return null; // Default Jaw Worm
             } else if (skinId.startsWith("JAW_WORM_")) {
                 String variant = skinId.substring("JAW_WORM_".length()).toLowerCase();
-                return "spirepass/images/skins/jaw_worm/" + variant + "/";
+                if (variant.equals("pretty")) {
+                    int randomVariantNum = MathUtils.random(1, 6);
+                    return "spirepass/images/skins/jaw_worm/pretty" + randomVariantNum + "/";
+                } else {
+                    return "spirepass/images/skins/jaw_worm/" + variant + "/";
+                }
             }
         } else if (entityId.equals(SkinManager.ENTITY_CULTIST)) {
             if (skinId.equals("CULTIST")) {
@@ -205,6 +214,13 @@ public class EntitySkinPatch {
             } else if (skinId.startsWith("CULTIST_")) {
                 String variant = skinId.substring("CULTIST_".length()).toLowerCase();
                 return "spirepass/images/skins/cultist/" + variant + "/";
+            }
+        } else if (entityId.equals(SkinManager.ENTITY_SNEAKY_GREMLIN)) {
+            if (skinId.equals("SNEAKY_GREMLIN")) {
+                return null;
+            } else if (skinId.startsWith("SNEAKY_GREMLIN_")) {
+                String variant = skinId.substring("SNEAKY_GREMLIN_".length()).toLowerCase();
+                return "spirepass/images/skins/sneaky_gremlin/" + variant + "/";
             }
         } else if (entityId.equals(SkinManager.ENTITY_SENTRY)) {
             if (skinId.equals("SENTRY")) {
@@ -219,6 +235,20 @@ public class EntitySkinPatch {
             } else if (skinId.startsWith("GREMLIN_NOB_")) {
                 String variant = skinId.substring("GREMLIN_NOB_".length()).toLowerCase();
                 return "spirepass/images/skins/gremlin_nob/" + variant + "/";
+            }
+        } else if (entityId.equals(SkinManager.ENTITY_SLIME_BOSS)) {
+            if (skinId.equals("SLIME_BOSS")) {
+                return null;
+            } else if (skinId.startsWith("SLIME_BOSS_")) {
+                String variant = skinId.substring("SLIME_BOSS_".length()).toLowerCase();
+                return "spirepass/images/skins/slime_boss/" + variant + "/";
+            }
+        } else if (entityId.equals(SkinManager.ENTITY_SHELLED_PARASITE)) {
+            if (skinId.equals("ENTITY_SHELLED_PARASITE")) {
+                return null;
+            } else if (skinId.startsWith("SHELLED_PARASITE_")) {
+                String variant = skinId.substring("SHELLED_PARASITE_".length()).toLowerCase();
+                return "spirepass/images/skins/shelled_parasite/" + variant + "/";
             }
         } else if (entityId.equals(SkinManager.ENTITY_ROMEO)) {
             if (skinId.equals("ROMEO")) {

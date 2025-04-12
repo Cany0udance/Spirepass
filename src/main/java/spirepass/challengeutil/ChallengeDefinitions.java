@@ -1,5 +1,6 @@
 package spirepass.challengeutil;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.localization.UIStrings;
 
@@ -37,8 +38,41 @@ public class ChallengeDefinitions {
         challenges.add(createChallenge("daily_silent", Challenge.ChallengeType.DAILY));
         challenges.add(createChallenge("daily_cactus", Challenge.ChallengeType.DAILY));
         challenges.add(createChallenge("daily_lightsout", Challenge.ChallengeType.DAILY, 5));
+        challenges.add(createChallenge("daily_ascender", Challenge.ChallengeType.DAILY, 50));
+        challenges.add(createChallenge("daily_philosopher", Challenge.ChallengeType.DAILY, 3));
+        challenges.add(createRandomizedStorytimeChallenge());
 
         return challenges;
+    }
+
+    /**
+     * Creates the storytime challenge with randomized text sets
+     */
+    private static Challenge createRandomizedStorytimeChallenge() {
+        UIStrings strings = CardCrawlGame.languagePack.getUIString(makeID("Challengedaily_storytime"));
+
+        // Random number between 0 and 2 to choose one of the three sets
+        int randomSet = MathUtils.random(0, 2);
+
+        String title, description;
+
+        switch (randomSet) {
+            case 0:
+                title = strings.TEXT[0];
+                description = strings.TEXT[3];
+                break;
+            case 1:
+                title = strings.TEXT[1];
+                description = strings.TEXT[4];
+                break;
+            case 2:
+            default:
+                title = strings.TEXT[2];
+                description = strings.TEXT[5];
+                break;
+        }
+
+        return new Challenge("daily_storytime", title, description, Challenge.ChallengeType.DAILY);
     }
 
     /**
@@ -59,6 +93,8 @@ public class ChallengeDefinitions {
         challenges.add(createChallenge("weekly_unknown", Challenge.ChallengeType.WEEKLY, 30));
         challenges.add(createChallenge("weekly_smith", Challenge.ChallengeType.WEEKLY, 50));
         challenges.add(createChallenge("weekly_snooze", Challenge.ChallengeType.WEEKLY, 25));
+        challenges.add(createChallenge("weekly_snooze", Challenge.ChallengeType.WEEKLY, 25));
+        challenges.add(createChallenge("weekly_midas", Challenge.ChallengeType.WEEKLY, 70));
         challenges.add(createChallenge("weekly_ghostbuster", Challenge.ChallengeType.WEEKLY));
         challenges.add(createChallenge("weekly_freeloader", Challenge.ChallengeType.WEEKLY));
         challenges.add(createChallenge("weekly_dailymaster", Challenge.ChallengeType.WEEKLY));

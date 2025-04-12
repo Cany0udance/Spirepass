@@ -333,7 +333,7 @@ public class ChallengeManager {
 
 //             logger.info("Loaded " + dailyChallenges.size() + " daily challenges and " +
 //                    weeklyChallenges.size() + " weekly challenges");
-             logger.info("Last daily refresh: " + new java.util.Date(lastDailyRefreshTime));
+        //     logger.info("Last daily refresh: " + new java.util.Date(lastDailyRefreshTime));
 //             logger.info("Last weekly refresh: " + new java.util.Date(lastWeeklyRefreshTime));
         } catch (Exception e) {
 //             logger.error("Failed to load challenge data: " + e.getMessage());

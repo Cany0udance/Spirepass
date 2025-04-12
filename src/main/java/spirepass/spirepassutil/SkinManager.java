@@ -25,8 +25,11 @@ public class SkinManager {
     public static final String ENTITY_CULTIST = "cultist";
     public static final String ENTITY_BLUE_SLAVER = "blue_slaver";
     public static final String ENTITY_RED_SLAVER = "red_slaver";
+    public static final String ENTITY_SNEAKY_GREMLIN = "sneaky_gremlin";
     public static final String ENTITY_SENTRY = "sentry";
     public static final String ENTITY_GREMLIN_NOB = "gremlin_nob";
+    public static final String ENTITY_SLIME_BOSS = "slime_boss";
+    public static final String ENTITY_SHELLED_PARASITE = "shelled_parasite";
     public static final String ENTITY_ROMEO = "romeo";
     public static final String ENTITY_BEAR = "bear";
     public static final String ENTITY_CENTURION = "centurion";
@@ -103,8 +106,11 @@ public class SkinManager {
             appliedSkins.put(ENTITY_CULTIST, config.has(ENTITY_CULTIST) ? config.getString(ENTITY_CULTIST) : "");
             appliedSkins.put(ENTITY_BLUE_SLAVER, config.has(ENTITY_BLUE_SLAVER) ? config.getString(ENTITY_BLUE_SLAVER) : "");
             appliedSkins.put(ENTITY_RED_SLAVER, config.has(ENTITY_RED_SLAVER) ? config.getString(ENTITY_RED_SLAVER) : "");
+            appliedSkins.put(ENTITY_SNEAKY_GREMLIN, config.has(ENTITY_SNEAKY_GREMLIN) ? config.getString(ENTITY_SNEAKY_GREMLIN) : "");
             appliedSkins.put(ENTITY_SENTRY, config.has(ENTITY_SENTRY) ? config.getString(ENTITY_SENTRY) : "");
             appliedSkins.put(ENTITY_GREMLIN_NOB, config.has(ENTITY_GREMLIN_NOB) ? config.getString(ENTITY_GREMLIN_NOB) : "");
+            appliedSkins.put(ENTITY_SLIME_BOSS, config.has(ENTITY_SLIME_BOSS) ? config.getString(ENTITY_SLIME_BOSS) : "");
+            appliedSkins.put(ENTITY_SHELLED_PARASITE, config.has(ENTITY_SHELLED_PARASITE) ? config.getString(ENTITY_SHELLED_PARASITE) : "");
             appliedSkins.put(ENTITY_ROMEO, config.has(ENTITY_ROMEO) ? config.getString(ENTITY_ROMEO) : "");
             appliedSkins.put(ENTITY_BEAR, config.has(ENTITY_BEAR) ? config.getString(ENTITY_BEAR) : "");
             appliedSkins.put(ENTITY_CENTURION, config.has(ENTITY_CENTURION) ? config.getString(ENTITY_CENTURION) : "");
@@ -162,8 +168,11 @@ public class SkinManager {
         defaults.setProperty(ENTITY_CULTIST, "");
         defaults.setProperty(ENTITY_BLUE_SLAVER, "");
         defaults.setProperty(ENTITY_RED_SLAVER, "");
+        defaults.setProperty(ENTITY_SNEAKY_GREMLIN, "");
         defaults.setProperty(ENTITY_SENTRY, "");
         defaults.setProperty(ENTITY_GREMLIN_NOB, "");
+        defaults.setProperty(ENTITY_SLIME_BOSS, "");
+        defaults.setProperty(ENTITY_SHELLED_PARASITE, "");
         defaults.setProperty(ENTITY_ROMEO, "");
         defaults.setProperty(ENTITY_BEAR, "");
         defaults.setProperty(ENTITY_CENTURION, "");

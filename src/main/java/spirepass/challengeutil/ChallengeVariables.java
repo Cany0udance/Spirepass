@@ -1,8 +1,8 @@
 package spirepass.challengeutil;
 
 public class ChallengeVariables {
-    // daily_setup - Play two Power cards on turn 1
     public static int dailySetupPowersPlayed = 0;
+    public static int dailyComboCardsPlayedThisTurn = 0;
 
     /**
      * Reset variables at the start of each turn
@@ -10,5 +10,6 @@ public class ChallengeVariables {
      */
     public static void resetVariablesEveryTurn() {
         dailySetupPowersPlayed = 0;
+        dailyComboCardsPlayedThisTurn = 0;
     }
 }

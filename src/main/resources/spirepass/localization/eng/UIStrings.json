@@ -184,6 +184,36 @@
       "\"Maybe Go Fish is more our speed...\""
     ]
   },
+  "${modID}:SpirepassRewardRobot": {
+    "TEXT": [
+      "\"Robot\" Sneaky Gremlin",
+      "Friends 'til the bzzzttt"
+    ]
+  },
+  "${modID}:SpirepassRewardPretty": {
+    "TEXT": [
+      "\"Pretty\" Jaw Worm(s)",
+      "Now in 6 distinct colors!"
+    ]
+  },
+  "${modID}:SpirepassRewardMagicConch": {
+    "TEXT": [
+      "\"Magic Conch\" Shelled Parasite",
+      "\"Maybe someday.\""
+    ]
+  },
+  "${modID}:SpirepassRewardSlaverhot": {
+    "TEXT": [
+      "\"SLAVERHOT\" Red Slaver",
+      "SLAVERHOT is the most innovative skin I've seen in years"
+    ]
+  },
+  "${modID}:SpirepassRewardBlueBaby": {
+    "TEXT": [
+      "\"???\" Slime Boss",
+      "Found inside of the Tiny Chest relic"
+    ]
+  },
   "${modID}:Challengedaily_setup": {
     "TEXT": [
       "Setup",
@@ -302,6 +332,34 @@
     "TEXT": [
       "Lights Out",
       "Extinguish 5 torches."
+    ]
+  },
+  "${modID}:Challengedaily_storytime": {
+    "TEXT": [
+      "Oh, hey!!! I've been playing this game and...",
+      "Hello? Hello hello?",
+      "According to all known laws of aviation, there is no way a bee should be able to fly.",
+      "bro i have to tell you this crazy story. okay so i was playing slay the spire and got a lizard tail, and the text for lizard tail EXPLICITLY STATES that i revive after dying, right? okay bro so i'm going through the run normally and my run is eeehhhhhhh but then i find one of those ? rooms that puts me into an event, its one ive never seen before bro, it upgraded my entire deck bro. it also gave me this weird purple swirly relic but thats bedsides the point. so at this point bro i was cooking, anyway that time dude (poorly designed boss btw bro) killed me and guess what?? lizard tail didn't go off??????? i was supposed to revive? that would'vet been my first win bro, anyway i uninstalled and posted this on reddit and they laughed at me bro. are you listening bro?",
+      "Uh, I wanted to record a message for you, to help you get settled in on your first night. Um, I actually worked in that office before you, I’m finishing up my last week now as a matter of fact. So, I know it can be a bit overwhelming, but I’m here to tell you there’s nothing to worry about, Uh, you’ll do fine. So, let’s just focus on getting you through your first week, okay? Uh, let’s see, first there’s an introductory greeting from the company, that I’m supposed to read. Uh, it’s kind of a legal thing, you know. Um, “Welcome to Freddy Fazbear’s Pizza, a magical place for kids and grown-ups alike, where fantasy and fun come to life. Fazbear Entertainment is not responsible for damage to property or person. Upon discovering that damage or death has occurred, a missing person report will be filed within 90 days, or as soon property and premises have been thoroughly cleaned and bleached, and the carpets have been replaced.” Blah blah blah.Now that might sound bad, I know. But, there’s really nothing to worry about.",
+      "Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little. Barry! Breakfast is ready! Coming! Hang on a second. Hello? - Barry? - Adam? - Can you believe this is happening? - I can't. I'll pick you up. Looking sharp. Use the stairs. Your father paid good money for those. Sorry. I'm excited. Here's the graduate. We're very proud of you, son. A perfect report card, all B's. Very proud. Ma! I got a thing going here. - You got lint on your fuzz. - Ow! That's me! - Wave to us! We'll be in row 118,000. - Bye! Barry, I told you, stop flying in the house! - Hey, Adam. - Hey, Barry. - Is that fuzz gel? - A little. Special day, graduation. Never thought I'd make it. Three days grade school, three days high school. Those were awkward. Three days college. I'm glad I took a day and hitchhiked around the hive. You did come back different. - Hi, Barry. - Artie, growing a mustache? Looks good. - Hear about Frankie? - Yeah. - You going to the funeral? - No, I'm not going. Everybody knows, sting someone, you die. Don't waste it on a squirrel. Such a hothead."
+    ]
+  },
+  "${modID}:Challengedaily_ascender": {
+    "TEXT": [
+      "Ascender",
+      "Climb 50 floors."
+    ]
+  },
+  "${modID}:Challengedaily_philosopher": {
+    "TEXT": [
+      "Philosopher",
+      "Think 3 times."
+    ]
+  },
+  "${modID}:Challengeweekly_midas": {
+    "TEXT": [
+      "Midas",
+      "Play 70 Rare cards."
     ]
   },
   "${modID}:Challengeweekly_hair": {

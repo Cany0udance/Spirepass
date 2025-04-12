@@ -42,8 +42,11 @@ public class SpirepassAnimationManager {
                 SkinManager.ENTITY_CULTIST,
                 SkinManager.ENTITY_BLUE_SLAVER,
                 SkinManager.ENTITY_RED_SLAVER,
+                SkinManager.ENTITY_SNEAKY_GREMLIN,
                 SkinManager.ENTITY_SENTRY,
                 SkinManager.ENTITY_GREMLIN_NOB,
+                SkinManager.ENTITY_SLIME_BOSS,
+                SkinManager.ENTITY_SHELLED_PARASITE,
                 SkinManager.ENTITY_ROMEO,
                 SkinManager.ENTITY_BEAR,
                 SkinManager.ENTITY_CENTURION,
@@ -138,8 +141,9 @@ public class SpirepassAnimationManager {
                         SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET
                 );
 
-                float scale = getScaleFactor(entityId);
-                skeleton.getRootBone().setScale(scale, scale);
+                float baseCalculatedScale = getScaleFactor(entityId);
+                float finalScale = baseCalculatedScale * Settings.scale;
+                skeleton.getRootBone().setScale(finalScale, finalScale);
 
                 skeleton.updateWorldTransform();
 
@@ -210,7 +214,11 @@ public class SpirepassAnimationManager {
                 return SpirepassPositionSettings.CHARACTER_MODEL_SCALE * 0.95f;
             case SkinManager.ENTITY_SENTRY:
                 return baseScale * 0.85f;
+            case SkinManager.ENTITY_SNEAKY_GREMLIN:
+                return baseScale * 1.5f;
             case SkinManager.ENTITY_WRITHING_MASS:
+                return baseScale * 0.9f;
+            case SkinManager.ENTITY_SLIME_BOSS:
                 return baseScale * 0.9f;
             default:
                 return baseScale;
@@ -231,13 +239,23 @@ public class SpirepassAnimationManager {
         } else if (entityId.equals(SkinManager.ENTITY_WATCHER)) {
             basePath = "spirepass/images/skins/watcher/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_JAW_WORM)) {
-            basePath = "spirepass/images/skins/jaw_worm/" + variant + "/";
+            if (variant.equals("pretty")) {
+                basePath = "spirepass/images/skins/jaw_worm/pretty2/";
+            } else {
+                basePath = "spirepass/images/skins/jaw_worm/" + variant + "/";
+            }
         } else if (entityId.equals(SkinManager.ENTITY_CULTIST)) {
             basePath = "spirepass/images/skins/cultist/" + variant + "/";
+        } else if (entityId.equals(SkinManager.ENTITY_SNEAKY_GREMLIN)) {
+            basePath = "spirepass/images/skins/sneaky_gremlin/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_SENTRY)) {
             basePath = "spirepass/images/skins/sentry/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_GREMLIN_NOB)) {
             basePath = "spirepass/images/skins/gremlin_nob/" + variant + "/";
+        } else if (entityId.equals(SkinManager.ENTITY_SLIME_BOSS)) {
+            basePath = "spirepass/images/skins/slime_boss/" + variant + "/";
+        } else if (entityId.equals(SkinManager.ENTITY_SHELLED_PARASITE)) {
+            basePath = "spirepass/images/skins/shelled_parasite/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_ROMEO)) {
             basePath = "spirepass/images/skins/romeo/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_BEAR)) {
@@ -280,10 +298,16 @@ public class SpirepassAnimationManager {
             prefix = "JAW_WORM_";
         } else if (entityId.equals(SkinManager.ENTITY_CULTIST)) {
             prefix = "CULTIST_";
+        } else if (entityId.equals(SkinManager.ENTITY_SNEAKY_GREMLIN)) {
+            prefix = "SNEAKY_GREMLIN_";
         } else if (entityId.equals(SkinManager.ENTITY_SENTRY)) {
             prefix = "SENTRY_";
         } else if (entityId.equals(SkinManager.ENTITY_GREMLIN_NOB)) {
             prefix = "GREMLIN_NOB_";
+        } else if (entityId.equals(SkinManager.ENTITY_SLIME_BOSS)) {
+            prefix = "SLIME_BOSS_";
+        } else if (entityId.equals(SkinManager.ENTITY_SHELLED_PARASITE)) {
+            prefix = "SHELLED_PARASITE_";
         } else if (entityId.equals(SkinManager.ENTITY_ROMEO)) {
             prefix = "ROMEO_";
         } else if (entityId.equals(SkinManager.ENTITY_BEAR)) {

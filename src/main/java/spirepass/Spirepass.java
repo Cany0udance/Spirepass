@@ -22,7 +22,6 @@ import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.localization.UIStrings;
-import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.scannotation.AnnotationDB;
@@ -72,7 +71,7 @@ public class Spirepass implements
     public static final int XP_PER_LEVEL = 50;
     public static final int DAILY_CHALLENGE_XP = 25;
     public static final int WEEKLY_CHALLENGE_XP = 75;
-    public static final int MAX_LEVEL = 30;
+    public static final int MAX_LEVEL = 35;
     public static final int REFRESH_HOUR_LOCAL = 12;
     public static final int REFRESH_MINUTE_LOCAL = 00;
 
@@ -489,7 +488,7 @@ public class Spirepass implements
         List<Challenge> allDailyChallenges = ChallengeDefinitions.getAllDailyChallenges();
 
         // Randomly select NUM_DAILY_CHALLENGES from the list
-        List<Challenge> selectedChallenges = selectRandomChallenges(allDailyChallenges, NUM_DAILY_CHALLENGES);
+        List<Challenge> selectedChallenges = selectRandomChallengesWithConstraints(allDailyChallenges, NUM_DAILY_CHALLENGES);
 
         // Clear completion status for old challenges that are no longer active
         for (String oldId : oldChallengeIds) {
@@ -523,7 +522,7 @@ public class Spirepass implements
         List<Challenge> allWeeklyChallenges = ChallengeDefinitions.getAllWeeklyChallenges();
 
         // Randomly select NUM_WEEKLY_CHALLENGES from the list
-        List<Challenge> selectedChallenges = selectRandomChallenges(allWeeklyChallenges, NUM_WEEKLY_CHALLENGES);
+        List<Challenge> selectedChallenges = selectRandomChallengesWithConstraints(allWeeklyChallenges, NUM_WEEKLY_CHALLENGES);
 
         // Clear completion status for old challenges that are no longer active
         for (String oldId : oldChallengeIds) {
@@ -542,6 +541,8 @@ public class Spirepass implements
         saveConfig();
     }
 
+    /*
+
     private static List<Challenge> selectRandomChallenges(List<Challenge> allChallenges, int count) {
         List<Challenge> result = new ArrayList<>();
 
@@ -556,6 +557,78 @@ public class Spirepass implements
         for (int i = 0; i < count; i++) {
             int index = random.nextInt(availableChallenges.size());
             result.add(availableChallenges.remove(index));
+        }
+
+        return result;
+    }
+
+     */
+
+    /**
+     * Select random challenges with additional constraints
+     * This method ensures that daily_storytime and daily_unbeatable are never selected together
+     */
+    private static List<Challenge> selectRandomChallengesWithConstraints(List<Challenge> allChallenges, int count) {
+        List<Challenge> result = new ArrayList<>();
+        // Create a copy of the list to avoid modifying the original
+        List<Challenge> availableChallenges = new ArrayList<>(allChallenges);
+        // Ensure we don't try to select more challenges than available
+        count = Math.min(count, availableChallenges.size());
+
+        Random random = new Random();
+        boolean hasStorytime = false;
+        boolean hasUnbeatable = false;
+
+        // First pass: Randomly select challenges
+        for (int i = 0; i < count; i++) {
+            int index = random.nextInt(availableChallenges.size());
+            Challenge selectedChallenge = availableChallenges.remove(index);
+
+            // Track if we've selected either of our constrained challenges
+            if (selectedChallenge.getId().equals("daily_storytime")) {
+                hasStorytime = true;
+            } else if (selectedChallenge.getId().equals("daily_unbeatable")) {
+                hasUnbeatable = true;
+            }
+
+            result.add(selectedChallenge);
+        }
+
+        // Second pass: If we selected both constrained challenges, replace one
+        if (hasStorytime && hasUnbeatable && count < allChallenges.size()) {
+            // Decide which one to replace (50/50 chance)
+            boolean replaceStorytime = random.nextBoolean();
+
+            // Find the challenge to replace
+            Challenge toReplace = null;
+            for (Challenge challenge : result) {
+                if ((replaceStorytime && challenge.getId().equals("daily_storytime")) ||
+                        (!replaceStorytime && challenge.getId().equals("daily_unbeatable"))) {
+                    toReplace = challenge;
+                    break;
+                }
+            }
+
+            if (toReplace != null) {
+                // Remove the challenge
+                result.remove(toReplace);
+
+                // Find a replacement that isn't already selected or one of the constrained ones
+                List<Challenge> possibleReplacements = allChallenges.stream()
+                        .filter(c -> !result.contains(c))
+                        .filter(c -> !(replaceStorytime ?
+                                c.getId().equals("daily_storytime") :
+                                c.getId().equals("daily_unbeatable")))
+                        .collect(Collectors.toList());
+
+                if (!possibleReplacements.isEmpty()) {
+                    int replacementIndex = random.nextInt(possibleReplacements.size());
+                    result.add(possibleReplacements.get(replacementIndex));
+                } else {
+                    // Fallback: re-add the challenge we removed if no replacements available
+                    result.add(toReplace);
+                }
+            }
         }
 
         return result;
@@ -680,23 +753,27 @@ public class Spirepass implements
 
     @Override
     public void receiveCardUsed(AbstractCard abstractCard) {
-        // First check if the challenge is active and incomplete
-        if (!ChallengeHelper.isActiveChallengeIncomplete("daily_setup")) {
-            return;
+        if (ChallengeHelper.isActiveChallengeIncomplete("daily_setup")) {
+            if (abstractCard.type == AbstractCard.CardType.POWER) {
+                if (AbstractDungeon.actionManager.turn == 1) {
+                    ChallengeVariables.dailySetupPowersPlayed++;
+                    if (ChallengeVariables.dailySetupPowersPlayed >= 2) {
+                        ChallengeHelper.completeChallenge("daily_setup");
+                    }
+                }
+            }
         }
 
-        // Check if the card is a Power card
-        if (abstractCard.type == AbstractCard.CardType.POWER) {
-            // Check if we're in turn 1
-            if (AbstractDungeon.actionManager.turn == 1) {
-                // Increment the counter for power cards played on turn 1
-                ChallengeVariables.dailySetupPowersPlayed++;
+        if (ChallengeHelper.isActiveChallengeIncomplete("daily_combo")) {
+            ChallengeVariables.dailyComboCardsPlayedThisTurn++;
+            if (ChallengeVariables.dailyComboCardsPlayedThisTurn >= 10) {
+                ChallengeHelper.completeChallenge("daily_combo");
+            }
+        }
 
-                // If we've played 2 or more power cards
-                if (ChallengeVariables.dailySetupPowersPlayed >= 2) {
-                    // Complete the challenge
-                    ChallengeHelper.completeChallenge("daily_setup");
-                }
+        if (ChallengeHelper.isActiveChallengeIncomplete("weekly_midas")) {
+            if (abstractCard.rarity == AbstractCard.CardRarity.RARE) {
+                ChallengeHelper.updateChallengeProgress("weekly_midas", 1);
             }
         }
     }
