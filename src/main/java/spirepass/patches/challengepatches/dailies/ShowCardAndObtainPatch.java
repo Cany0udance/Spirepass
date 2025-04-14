@@ -1,38 +1,35 @@
 package spirepass.patches.challengepatches.dailies;
 
 import com.evacipated.cardcrawl.modthespire.lib.*;
+import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.vfx.cardManip.ShowCardAndObtainEffect;
 import javassist.CtBehavior;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import spirepass.Spirepass;
 import spirepass.challengeutil.ChallengeHelper;
 
-// Second Patch: For ShowCardAndObtainEffect
 @SpirePatch(clz = ShowCardAndObtainEffect.class, method = "update")
 public class ShowCardAndObtainPatch {
-    private static final Logger logger = LogManager.getLogger(Spirepass.modID);
 
     @SpireInsertPatch(
             locator = ObtainCardLocator.class,
-            localvars = {"r"}
+            localvars = {"r", "card"}
     )
-    public static void onCardObtain(ShowCardAndObtainEffect __instance, AbstractRelic r) {
-        // Check for daily_hobbyist challenge
+    public static void onCardObtain(ShowCardAndObtainEffect __instance, AbstractRelic r, AbstractCard card) { // Add AbstractCard card parameter
+        // Existing challenges
         if (ChallengeHelper.isActiveChallengeIncomplete("daily_hobbyist")) {
-            // Update the progress for the Hobbyist challenge
             ChallengeHelper.updateChallengeProgress("daily_hobbyist", 1);
         }
-
-        // Check for weekly_collector challenge
         if (ChallengeHelper.isActiveChallengeIncomplete("weekly_collector")) {
-            // Update the progress for the Collector challenge
             ChallengeHelper.updateChallengeProgress("weekly_collector", 1);
+        }
+
+        if (ChallengeHelper.isActiveChallengeIncomplete("daily_colorless")) {
+            if (card != null && card.color == AbstractCard.CardColor.COLORLESS) {
+                ChallengeHelper.updateChallengeProgress("daily_colorless", 1);
+            }
         }
     }
 
-    // Locator to find the spot right after the card obtain line
     private static class ObtainCardLocator extends SpireInsertLocator {
         @Override
         public int[] Locate(CtBehavior ctMethodToPatch) throws Exception {

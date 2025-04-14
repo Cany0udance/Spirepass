@@ -17,7 +17,6 @@ public class ChallengeDefinitions {
     public static List<Challenge> getAllDailyChallenges() {
         List<Challenge> challenges = new ArrayList<>();
 
-        // Define all possible daily challenges here
         challenges.add(createChallenge("daily_setup", Challenge.ChallengeType.DAILY));
         challenges.add(createChallenge("daily_thanks", Challenge.ChallengeType.DAILY));
         challenges.add(createChallenge("daily_best", Challenge.ChallengeType.DAILY));
@@ -40,6 +39,11 @@ public class ChallengeDefinitions {
         challenges.add(createChallenge("daily_lightsout", Challenge.ChallengeType.DAILY, 5));
         challenges.add(createChallenge("daily_ascender", Challenge.ChallengeType.DAILY, 50));
         challenges.add(createChallenge("daily_philosopher", Challenge.ChallengeType.DAILY, 3));
+        challenges.add(createChallenge("daily_fashionista", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_protected", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_colorless", Challenge.ChallengeType.DAILY, 3));
+        challenges.add(createChallenge("daily_speech0", Challenge.ChallengeType.DAILY));
+        challenges.add(createChallenge("daily_protagonist", Challenge.ChallengeType.DAILY, 5));
         challenges.add(createRandomizedStorytimeChallenge());
 
         return challenges;
@@ -89,15 +93,15 @@ public class ChallengeDefinitions {
         challenges.add(createChallenge("weekly_chonky", Challenge.ChallengeType.WEEKLY));
         challenges.add(createChallenge("weekly_slayer", Challenge.ChallengeType.WEEKLY, 150));
         challenges.add(createChallenge("weekly_biggame", Challenge.ChallengeType.WEEKLY, 30));
-        challenges.add(createChallenge("weekly_chugger", Challenge.ChallengeType.WEEKLY, 75));
+        challenges.add(createChallenge("weekly_chugger", Challenge.ChallengeType.WEEKLY, 60));
         challenges.add(createChallenge("weekly_unknown", Challenge.ChallengeType.WEEKLY, 30));
-        challenges.add(createChallenge("weekly_smith", Challenge.ChallengeType.WEEKLY, 50));
-        challenges.add(createChallenge("weekly_snooze", Challenge.ChallengeType.WEEKLY, 25));
-        challenges.add(createChallenge("weekly_snooze", Challenge.ChallengeType.WEEKLY, 25));
+        challenges.add(createChallenge("weekly_smith", Challenge.ChallengeType.WEEKLY, 40));
+        challenges.add(createChallenge("weekly_snooze", Challenge.ChallengeType.WEEKLY, 20));
         challenges.add(createChallenge("weekly_midas", Challenge.ChallengeType.WEEKLY, 70));
         challenges.add(createChallenge("weekly_ghostbuster", Challenge.ChallengeType.WEEKLY));
         challenges.add(createChallenge("weekly_freeloader", Challenge.ChallengeType.WEEKLY));
         challenges.add(createChallenge("weekly_dailymaster", Challenge.ChallengeType.WEEKLY));
+        challenges.add(createChallenge("weekly_windowshopper", Challenge.ChallengeType.WEEKLY, 5));
 
         return challenges;
     }

@@ -356,6 +356,36 @@
       "思考3次。"
     ]
   },
+  "${modID}:Challengedaily_fashionista": {
+    "TEXT": [
+      "时尚达人",
+      "击败一个装备了尖塔通行证皮肤的敌人。"
+    ]
+  },
+  "${modID}:Challengedaily_protected": {
+    "TEXT": [
+      "受保护",
+      "在战斗中拥有50点或更多的格挡。"
+    ]
+  },
+  "${modID}:Challengedaily_colorless": {
+    "TEXT": [
+      "中立派对",
+      "向你的牌组添加3张无色牌。"
+    ]
+  },
+  "${modID}:Challengedaily_speech0": {
+    "TEXT": [
+      "讨价还价失败",
+      "接受关于价格概念的讲解。"
+    ]
+  },
+  "${modID}:Challengedaily_protagonist": {
+    "TEXT": [
+      "主角",
+      "击败5个喽啰。"
+    ]
+  },
   "${modID}:Challengeweekly_midas": {
     "TEXT": [
       "迈达斯",
@@ -407,7 +437,7 @@
   "Spirepass:Challengeweekly_chugger": {
     "TEXT": [
       "豪饮者",
-      "使用75瓶药水。"
+      "使用60瓶药水。"
     ]
   },
   "Spirepass:Challengeweekly_unknown": {
@@ -419,13 +449,13 @@
   "Spirepass:Challengeweekly_smith": {
     "TEXT": [
       "铁匠",
-      "在休息点锻造50次。"
+      "在休息点锻造40次。"
     ]
   },
   "Spirepass:Challengeweekly_snooze": {
     "TEXT": [
       "优质睡眠",
-      "在休息处休息25次。"
+      "在休息处休息20次。"
     ]
   },
   "Spirepass:Challengeweekly_ghostbuster": {
@@ -444,6 +474,12 @@
     "TEXT": [
       "每日大师",
       "同时完成所有3个每日挑战。"
+    ]
+  },
+  "${modID}:Challengeweekly_windowshopper": {
+    "TEXT": [
+      "橱窗购物者",
+      "离开5家商店而不购买任何东西。"
     ]
   },
   "Spirepass:MainMenuButton": {
@@ -485,7 +521,8 @@
       "没有可用的每周挑战。",
       "完成每周挑战可获得75点尖塔通行证经验。",
       "每日挑战 (",
-      "每周挑战 ("
+      "每周挑战 (",
+      "/啊？？？"
     ]
   },
   "Spirepass:MainMenuLevelDisplay": {

@@ -356,6 +356,36 @@
       "3번 생각하기."
     ]
   },
+  "${modID}:Challengedaily_fashionista": {
+    "TEXT": [
+      "패셔니스타",
+      "스파이어패스 스킨을 장착한 적을 물리치세요."
+    ]
+  },
+  "${modID}:Challengedaily_protected": {
+    "TEXT": [
+      "보호됨",
+      "전투 중 50 이상의 방어도를 가지세요."
+    ]
+  },
+  "${modID}:Challengedaily_colorless": {
+    "TEXT": [
+      "중립 파티",
+      "무색 카드 3장을 덱에 추가하세요."
+    ]
+  },
+  "${modID}:Challengedaily_speech0": {
+    "TEXT": [
+      "실패한 흥정",
+      "가격의 개념에 대한 강의를 받으세요."
+    ]
+  },
+  "${modID}:Challengedaily_protagonist": {
+    "TEXT": [
+      "주인공",
+      "하수인 5명을 물리치세요."
+    ]
+  },
   "${modID}:Challengeweekly_midas": {
     "TEXT": [
       "마이더스",
@@ -407,7 +437,7 @@
   "${modID}:Challengeweekly_chugger": {
     "TEXT": [
       "물약 마시기",
-      "75개의 물약을 사용하세요."
+      "60개의 물약을 사용하세요."
     ]
   },
   "${modID}:Challengeweekly_unknown": {
@@ -419,13 +449,13 @@
   "${modID}:Challengeweekly_smith": {
     "TEXT": [
       "대장장이",
-      "휴식 지점에서 50번 단조하세요."
+      "휴식 지점에서 40번 단조하세요."
     ]
   },
   "${modID}:Challengeweekly_snooze": {
     "TEXT": [
       "낮잠쟁이",
-      "휴식 지점에서 25번 휴식하세요."
+      "휴식 지점에서 20번 휴식하세요."
     ]
   },
   "${modID}:Challengeweekly_ghostbuster": {
@@ -444,6 +474,12 @@
     "TEXT": [
       "일일 마스터",
       "모든 3개의 일일 도전을 한 번에 완료하세요."
+    ]
+  },
+  "${modID}:Challengeweekly_windowshopper": {
+    "TEXT": [
+      "윈도우 쇼퍼",
+      "아무것도 구매하지 않고 상점 5곳을 떠나세요."
     ]
   },
   "${modID}:MainMenuButton": {
@@ -485,7 +521,8 @@
       "활성화된 주간 도전이 없습니다.",
       "주간 도전을 완료하면 스파이어패스 경험치 75를 획득합니다.",
       "일일 도전 (",
-      "주간 도전 ("
+      "주간 도전 (",
+      "/뭐지???"
     ]
   },
   "${modID}:MainMenuLevelDisplay": {

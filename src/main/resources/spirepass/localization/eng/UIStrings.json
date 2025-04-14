@@ -271,7 +271,7 @@
   "${modID}:Challengedaily_backtobasics": {
     "TEXT": [
       "Back to Basics",
-      "Smith a Basic card at a Rest Site."
+      "Upgrade a Basic card at a Rest Site."
     ]
   },
   "${modID}:Challengedaily_combo": {
@@ -353,7 +353,37 @@
   "${modID}:Challengedaily_philosopher": {
     "TEXT": [
       "Philosopher",
-      "Think 3 times."
+      "Have 3 thoughts."
+    ]
+  },
+  "${modID}:Challengedaily_fashionista": {
+    "TEXT": [
+      "Fashionista",
+      "Defeat an enemy that has a Spirepass skin equipped."
+    ]
+  },
+  "${modID}:Challengedaily_protected": {
+    "TEXT": [
+      "Protected",
+      "Have 50 or more Block during combat."
+    ]
+  },
+  "${modID}:Challengedaily_colorless": {
+    "TEXT": [
+      "Neutral Party",
+      "Add 3 Colorless cards to your deck."
+    ]
+  },
+  "${modID}:Challengedaily_speech0": {
+    "TEXT": [
+      "Failed Haggle",
+      "Receive a lecture on the concept of price."
+    ]
+  },
+  "${modID}:Challengedaily_protagonist": {
+    "TEXT": [
+      "Protagonist",
+      "Defeat 5 minions."
     ]
   },
   "${modID}:Challengeweekly_midas": {
@@ -407,7 +437,7 @@
   "${modID}:Challengeweekly_chugger": {
     "TEXT": [
       "Chugger",
-      "Use 75 potions."
+      "Use 60 potions."
     ]
   },
   "${modID}:Challengeweekly_unknown": {
@@ -419,13 +449,13 @@
   "${modID}:Challengeweekly_smith": {
     "TEXT": [
       "The Smith",
-      "Smith 50 times at Rest Sites."
+      "Smith 40 times at Rest Sites."
     ]
   },
   "${modID}:Challengeweekly_snooze": {
     "TEXT": [
       "The Snoozer",
-      "Rest 25 times at Rest Sites."
+      "Rest 20 times at Rest Sites."
     ]
   },
   "${modID}:Challengeweekly_ghostbuster": {
@@ -444,6 +474,12 @@
     "TEXT": [
       "Daily Master",
       "Have all 3 daily challenges completed at once."
+    ]
+  },
+  "${modID}:Challengeweekly_windowshopper": {
+    "TEXT": [
+      "Window Shopper",
+      "Visit 5 Merchants. Purchase nothing. Leave. Refuse to elaborate."
     ]
   },
   "${modID}:MainMenuButton": {
@@ -485,7 +521,8 @@
       "No active weekly challenges.",
       "Weekly challenges grant 75 Spirepass XP when completed.",
       "Daily Challenges (",
-      "Weekly Challenges ("
+      "Weekly Challenges (",
+      "/Huh???"
     ]
   },
   "${modID}:MainMenuLevelDisplay": {

@@ -245,12 +245,17 @@ public class MainMenuChallengePatch {
                         tipBody.append(TEXT[4]) // "  Progress: #b"
                                 .append(challenge.getCurrentProgress())
                                 .append(TEXT[5]); // "/LOL"
+                    } else if ("daily_storytime".equals(challenge.getId())) { // Added exception
+                        tipBody.append(TEXT[4]) // "  Progress: #b"
+                                .append(challenge.getCurrentProgress())
+                                .append(TEXT[11]); // Use new index for "/Huh???"
                     } else {
                         tipBody.append(TEXT[4]) // "  Progress: #b"
                                 .append(challenge.getCurrentProgress())
                                 .append("/").append(challenge.getMaxProgress());
                     }
                 }
+
 
                 if (i < dailyChallenges.size() - 1) {
                     tipBody.append(" NL NL ");
@@ -363,7 +368,6 @@ public class MainMenuChallengePatch {
             Random random = new Random();
             String url = PRANK_VIDEOS.get(random.nextInt(PRANK_VIDEOS.size()));
             Desktop.getDesktop().browse(new URI(url));
-            CardCrawlGame.sound.play("DEATH_STARE");
             refreshAllChallenges();
         } catch (Exception e) { /* Failed to open URL or refresh */ }
     }

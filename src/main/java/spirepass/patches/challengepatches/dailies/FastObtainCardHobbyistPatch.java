@@ -1,6 +1,7 @@
 package spirepass.patches.challengepatches.dailies;
 
 import com.evacipated.cardcrawl.modthespire.lib.*;
+import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.vfx.FastCardObtainEffect;
 import javassist.CtBehavior;
@@ -15,15 +16,21 @@ import spirepass.challengeutil.ChallengeManager;
 public class FastObtainCardHobbyistPatch {
 
     @SpireInsertPatch(
-            locator = PostSoulsObtainLocator.class
+            locator = PostSoulsObtainLocator.class,
+            localvars = {"card"}
     )
-    public static void insertAfterCardObtain(FastCardObtainEffect __instance) {
+    public static void insertAfterCardObtain(FastCardObtainEffect __instance, AbstractCard card) {
         if (ChallengeHelper.isActiveChallengeIncomplete("daily_hobbyist")) {
             ChallengeHelper.updateChallengeProgress("daily_hobbyist", 1);
         }
-
         if (ChallengeHelper.isActiveChallengeIncomplete("weekly_collector")) {
             ChallengeHelper.updateChallengeProgress("weekly_collector", 1);
+        }
+
+        if (ChallengeHelper.isActiveChallengeIncomplete("daily_colorless")) {
+            if (card != null && card.color == AbstractCard.CardColor.COLORLESS) {
+                ChallengeHelper.updateChallengeProgress("daily_colorless", 1);
+            }
         }
     }
 

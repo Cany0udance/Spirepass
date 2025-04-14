@@ -118,7 +118,7 @@ public class EntitySkinPatch {
 
     // ==================== HELPER METHODS ====================
 
-    private static String getEntityId(AbstractCreature creature) {
+    public static String getEntityId(AbstractCreature creature) {
         if (creature instanceof Ironclad) {
             return SkinManager.ENTITY_IRONCLAD;
         } else if (creature instanceof TheSilent) {

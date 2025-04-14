@@ -423,10 +423,7 @@ public class Spirepass implements
     }
 
     private static boolean needsDailyRefresh(Calendar now, Calendar lastRefresh) {
-        // If lastRefresh is effectively zero (or very old), assume refresh is needed
-        // Note: Relies on initial generation setting a valid timestamp.
         if (lastRefresh.getTimeInMillis() < 1000) { // Check against a small value to avoid issues with exact zero
-            // Consider if getDailyChallenges().isEmpty() is a better check for initial state
             return true;
         }
 
@@ -488,7 +485,7 @@ public class Spirepass implements
         List<Challenge> allDailyChallenges = ChallengeDefinitions.getAllDailyChallenges();
 
         // Randomly select NUM_DAILY_CHALLENGES from the list
-        List<Challenge> selectedChallenges = selectRandomChallengesWithConstraints(allDailyChallenges, NUM_DAILY_CHALLENGES);
+        List<Challenge> selectedChallenges = selectRandomChallenges(allDailyChallenges, NUM_DAILY_CHALLENGES);
 
         // Clear completion status for old challenges that are no longer active
         for (String oldId : oldChallengeIds) {
@@ -522,7 +519,7 @@ public class Spirepass implements
         List<Challenge> allWeeklyChallenges = ChallengeDefinitions.getAllWeeklyChallenges();
 
         // Randomly select NUM_WEEKLY_CHALLENGES from the list
-        List<Challenge> selectedChallenges = selectRandomChallengesWithConstraints(allWeeklyChallenges, NUM_WEEKLY_CHALLENGES);
+        List<Challenge> selectedChallenges = selectRandomChallenges(allWeeklyChallenges, NUM_WEEKLY_CHALLENGES);
 
         // Clear completion status for old challenges that are no longer active
         for (String oldId : oldChallengeIds) {
@@ -540,8 +537,6 @@ public class Spirepass implements
         // Save data after generating new challenges
         saveConfig();
     }
-
-    /*
 
     private static List<Challenge> selectRandomChallenges(List<Challenge> allChallenges, int count) {
         List<Challenge> result = new ArrayList<>();
@@ -562,12 +557,11 @@ public class Spirepass implements
         return result;
     }
 
-     */
-
     /**
      * Select random challenges with additional constraints
      * This method ensures that daily_storytime and daily_unbeatable are never selected together
      */
+    /*
     private static List<Challenge> selectRandomChallengesWithConstraints(List<Challenge> allChallenges, int count) {
         List<Challenge> result = new ArrayList<>();
         // Create a copy of the list to avoid modifying the original
@@ -633,6 +627,8 @@ public class Spirepass implements
 
         return result;
     }
+
+     */
 
     // ==================== DATE HELPERS ====================
 
