@@ -143,8 +143,7 @@ public class ChallengeManager {
             int completedWeeklies = 0;
             for (Challenge weeklyChallenge : weeklyChallenges) {
                 if (isCompleted(weeklyChallenge.getId()) &&
-                        !weeklyChallenge.getId().equals("weekly_freeloader") &&
-                        !weeklyChallenge.getId().equals("weekly_dailymaster")) {
+                        !weeklyChallenge.getId().equals("weekly_freeloader")) {
                     completedWeeklies++;
                 }
             }

@@ -22,6 +22,9 @@ public class AscenderChallengePatch {
             if (ChallengeHelper.isActiveChallengeIncomplete("daily_ascender")) {
                 ChallengeHelper.updateChallengeProgress("daily_ascender", 1);
             }
+            if (ChallengeHelper.isActiveChallengeIncomplete("weekly_ihatestairs")) {
+                ChallengeHelper.updateChallengeProgress("weekly_ihatestairs", 1);
+            }
         }
     }
 }

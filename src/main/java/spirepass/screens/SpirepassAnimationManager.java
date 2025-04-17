@@ -40,17 +40,22 @@ public class SpirepassAnimationManager {
                 SkinManager.ENTITY_WATCHER,
                 SkinManager.ENTITY_JAW_WORM,
                 SkinManager.ENTITY_CULTIST,
+                SkinManager.ENTITY_FUNGI_BEAST,
                 SkinManager.ENTITY_BLUE_SLAVER,
                 SkinManager.ENTITY_RED_SLAVER,
+                SkinManager.ENTITY_MAD_GREMLIN,
                 SkinManager.ENTITY_SNEAKY_GREMLIN,
                 SkinManager.ENTITY_SENTRY,
                 SkinManager.ENTITY_GREMLIN_NOB,
+                SkinManager.ENTITY_GUARDIAN,
                 SkinManager.ENTITY_SLIME_BOSS,
                 SkinManager.ENTITY_SHELLED_PARASITE,
                 SkinManager.ENTITY_ROMEO,
                 SkinManager.ENTITY_BEAR,
                 SkinManager.ENTITY_CENTURION,
                 SkinManager.ENTITY_SNECKO,
+                SkinManager.ENTITY_ORB_WALKER,
+                SkinManager.ENTITY_SPIRE_GROWTH,
                 SkinManager.ENTITY_WRITHING_MASS,
                 SkinManager.ENTITY_GIANT_HEAD,
                 SkinManager.ENTITY_DONU,
@@ -136,10 +141,19 @@ public class SpirepassAnimationManager {
                 state.update(Gdx.graphics.getDeltaTime());
                 state.apply(skeleton);
 
-                skeleton.setPosition(
-                        Settings.WIDTH / 2.0f,
-                        SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET
-                );
+                // Special position handling for Guardian
+                if (entityId.equals(SkinManager.ENTITY_GUARDIAN)) {
+                    skeleton.setPosition(
+                            Settings.WIDTH / 2.0f,
+                            SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET - 110f * Settings.scale
+                    );
+                } else {
+                    // Original positioning for all other entities
+                    skeleton.setPosition(
+                            Settings.WIDTH / 2.0f,
+                            SpirepassPositionSettings.REWARD_PREVIEW_Y - SpirepassPositionSettings.CHARACTER_MODEL_Y_OFFSET
+                    );
+                }
 
                 float baseCalculatedScale = getScaleFactor(entityId);
                 float finalScale = baseCalculatedScale * Settings.scale;
@@ -216,10 +230,16 @@ public class SpirepassAnimationManager {
                 return baseScale * 0.85f;
             case SkinManager.ENTITY_SNEAKY_GREMLIN:
                 return baseScale * 1.5f;
+            case SkinManager.ENTITY_MAD_GREMLIN:
+                return baseScale * 1.5f;
             case SkinManager.ENTITY_WRITHING_MASS:
                 return baseScale * 0.9f;
+            case SkinManager.ENTITY_SPIRE_GROWTH:
+                return baseScale * 0.65f;
             case SkinManager.ENTITY_SLIME_BOSS:
                 return baseScale * 0.9f;
+            case SkinManager.ENTITY_GUARDIAN:
+                return baseScale * 0.4f;
             default:
                 return baseScale;
         }
@@ -246,12 +266,18 @@ public class SpirepassAnimationManager {
             }
         } else if (entityId.equals(SkinManager.ENTITY_CULTIST)) {
             basePath = "spirepass/images/skins/cultist/" + variant + "/";
+        } else if (entityId.equals(SkinManager.ENTITY_FUNGI_BEAST)) {
+            basePath = "spirepass/images/skins/fungi_beast/" + variant + "/";
+        } else if (entityId.equals(SkinManager.ENTITY_MAD_GREMLIN)) {
+            basePath = "spirepass/images/skins/mad_gremlin/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_SNEAKY_GREMLIN)) {
             basePath = "spirepass/images/skins/sneaky_gremlin/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_SENTRY)) {
             basePath = "spirepass/images/skins/sentry/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_GREMLIN_NOB)) {
             basePath = "spirepass/images/skins/gremlin_nob/" + variant + "/";
+        } else if (entityId.equals(SkinManager.ENTITY_GUARDIAN)) {
+            basePath = "spirepass/images/skins/guardian/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_SLIME_BOSS)) {
             basePath = "spirepass/images/skins/slime_boss/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_SHELLED_PARASITE)) {
@@ -264,6 +290,10 @@ public class SpirepassAnimationManager {
             basePath = "spirepass/images/skins/centurion/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_SNECKO)) {
             basePath = "spirepass/images/skins/snecko/" + variant + "/";
+        } else if (entityId.equals(SkinManager.ENTITY_ORB_WALKER)) {
+            basePath = "spirepass/images/skins/orb_walker/" + variant + "/";
+        } else if (entityId.equals(SkinManager.ENTITY_SPIRE_GROWTH)) {
+            basePath = "spirepass/images/skins/spire_growth/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_WRITHING_MASS)) {
             basePath = "spirepass/images/skins/writhing_mass/" + variant + "/";
         } else if (entityId.equals(SkinManager.ENTITY_GIANT_HEAD)) {
@@ -298,12 +328,18 @@ public class SpirepassAnimationManager {
             prefix = "JAW_WORM_";
         } else if (entityId.equals(SkinManager.ENTITY_CULTIST)) {
             prefix = "CULTIST_";
+        } else if (entityId.equals(SkinManager.ENTITY_FUNGI_BEAST)) {
+            prefix = "FUNGI_BEAST_";
+        } else if (entityId.equals(SkinManager.ENTITY_MAD_GREMLIN)) {
+            prefix = "MAD_GREMLIN_";
         } else if (entityId.equals(SkinManager.ENTITY_SNEAKY_GREMLIN)) {
             prefix = "SNEAKY_GREMLIN_";
         } else if (entityId.equals(SkinManager.ENTITY_SENTRY)) {
             prefix = "SENTRY_";
         } else if (entityId.equals(SkinManager.ENTITY_GREMLIN_NOB)) {
             prefix = "GREMLIN_NOB_";
+        } else if (entityId.equals(SkinManager.ENTITY_GUARDIAN)) {
+            prefix = "GUARDIAN_";
         } else if (entityId.equals(SkinManager.ENTITY_SLIME_BOSS)) {
             prefix = "SLIME_BOSS_";
         } else if (entityId.equals(SkinManager.ENTITY_SHELLED_PARASITE)) {
@@ -316,6 +352,10 @@ public class SpirepassAnimationManager {
             prefix = "CENTURION_";
         } else if (entityId.equals(SkinManager.ENTITY_SNECKO)) {
             prefix = "SNECKO_";
+        } else if (entityId.equals(SkinManager.ENTITY_ORB_WALKER)) {
+            prefix = "ORB_WALKER_";
+        } else if (entityId.equals(SkinManager.ENTITY_SPIRE_GROWTH)) {
+            prefix = "SPIRE_GROWTH_";
         } else if (entityId.equals(SkinManager.ENTITY_WRITHING_MASS)) {
             prefix = "WRITHING_MASS_";
         } else if (entityId.equals(SkinManager.ENTITY_GIANT_HEAD)) {

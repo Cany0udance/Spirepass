@@ -214,6 +214,36 @@
       "Found inside of the Tiny Chest relic"
     ]
   },
+  "${modID}:SpirepassRewardSimon": {
+    "TEXT": [
+      "\"Simon\" Orb Walker",
+      "Watch, Remember, Repeat!"
+    ]
+  },
+  "${modID}:SpirepassRewardKraken": {
+    "TEXT": [
+      "\"Kraken\" Spire Growth",
+      "The more boat relics you have, the less safe you are"
+    ]
+  },
+  "${modID}:SpirepassRewardAlien": {
+    "TEXT": [
+      "\"Alien\" Mad Gremlin",
+      "One of the entities discovered at Spire 51"
+    ]
+  },
+  "${modID}:SpirepassReward1Up": {
+    "TEXT": [
+      "\"1-Up\" Fungi Beast",
+      "I don't think it worked."
+    ]
+  },
+  "${modID}:SpirepassRewardCherryBlossom": {
+    "TEXT": [
+      "\"Cherry Blossom\" Guardian",
+      "Pretty!"
+    ]
+  },
   "${modID}:Challengedaily_setup": {
     "TEXT": [
       "Setup",
@@ -480,6 +510,12 @@
     "TEXT": [
       "Window Shopper",
       "Visit 5 Merchants. Purchase nothing. Leave. Refuse to elaborate."
+    ]
+  },
+  "${modID}:Challengeweekly_ihatestairs": {
+    "TEXT": [
+      "I Hate Stairs",
+      "Climb 350 floors."
     ]
   },
   "${modID}:MainMenuButton": {

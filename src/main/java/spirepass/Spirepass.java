@@ -71,7 +71,7 @@ public class Spirepass implements
     public static final int XP_PER_LEVEL = 50;
     public static final int DAILY_CHALLENGE_XP = 25;
     public static final int WEEKLY_CHALLENGE_XP = 75;
-    public static final int MAX_LEVEL = 35;
+    public static final int MAX_LEVEL = 40;
     public static final int REFRESH_HOUR_LOCAL = 12;
     public static final int REFRESH_MINUTE_LOCAL = 00;
 

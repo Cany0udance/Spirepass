@@ -214,6 +214,36 @@
       "작은 상자 유물 속에서 발견됨"
     ]
   },
+  "${modID}:SpirepassRewardSimon": {
+    "TEXT": [
+      "\"사이먼\" 오브 워커",
+      "보고, 기억하고, 반복하라!"
+    ]
+  },
+  "${modID}:SpirepassRewardKraken": {
+    "TEXT": [
+      "\"크라켄\" 스파이어 성장",
+      "배 유물이 많을수록 더 위험해진다"
+    ]
+  },
+  "${modID}:SpirepassRewardAlien": {
+    "TEXT": [
+      "\"에일리언\" 미친 그렘린",
+      "스파이어 51에서 발견된 존재들 중 하나"
+    ]
+  },
+  "${modID}:SpirepassReward1Up": {
+    "TEXT": [
+      "\"1-업\" 버섯 야수",
+      "효과가 있었던 것 같지는 않아."
+    ]
+  },
+  "${modID}:SpirepassRewardCherryBlossom": {
+    "TEXT": [
+      "\"벚꽃\" 가디언",
+      "예쁘다!"
+    ]
+  },
   "${modID}:Challengedaily_setup": {
     "TEXT": [
       "설정",
@@ -480,6 +510,12 @@
     "TEXT": [
       "윈도우 쇼퍼",
       "아무것도 구매하지 않고 상점 5곳을 떠나세요."
+    ]
+  },
+  "${modID}:Challengeweekly_ihatestairs": {
+    "TEXT": [
+      "나는 계단이 싫어",
+      "300층을 오르세요."
     ]
   },
   "${modID}:MainMenuButton": {

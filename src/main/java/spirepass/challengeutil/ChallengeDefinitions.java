@@ -44,7 +44,7 @@ public class ChallengeDefinitions {
         challenges.add(createChallenge("daily_colorless", Challenge.ChallengeType.DAILY, 3));
         challenges.add(createChallenge("daily_speech0", Challenge.ChallengeType.DAILY));
         challenges.add(createChallenge("daily_protagonist", Challenge.ChallengeType.DAILY, 5));
-        challenges.add(createRandomizedStorytimeChallenge());
+    //    challenges.add(createRandomizedStorytimeChallenge());
 
         return challenges;
     }
@@ -102,6 +102,7 @@ public class ChallengeDefinitions {
         challenges.add(createChallenge("weekly_freeloader", Challenge.ChallengeType.WEEKLY));
         challenges.add(createChallenge("weekly_dailymaster", Challenge.ChallengeType.WEEKLY));
         challenges.add(createChallenge("weekly_windowshopper", Challenge.ChallengeType.WEEKLY, 5));
+        challenges.add(createChallenge("weekly_ihatestairs", Challenge.ChallengeType.WEEKLY, 300));
 
         return challenges;
     }

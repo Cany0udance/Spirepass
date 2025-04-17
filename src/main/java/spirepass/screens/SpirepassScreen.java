@@ -41,7 +41,7 @@ public class SpirepassScreen {
     private static final float DRAG_THRESHOLD = 5.0f * Settings.scale;
 
     // Configuration
-    private int maxLevel = 35;
+    private int maxLevel = 40;
     private int currentLevel = 0;
     private float levelBoxSpacing = 150f * Settings.scale;
     public float edgePadding = 100f * Settings.scale;

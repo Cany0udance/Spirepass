@@ -214,6 +214,36 @@
       "在小宝箱遗物内发现"
     ]
   },
+  "${modID}:SpirepassRewardSimon": {
+    "TEXT": [
+      "\"西蒙\" 宝玉行者",
+      "观察，记忆，重复！"
+    ]
+  },
+  "${modID}:SpirepassRewardKraken": {
+    "TEXT": [
+      "\"海怪\" 尖塔生长",
+      "船只遗物越多，你就越不安全"
+    ]
+  },
+  "${modID}:SpirepassRewardAlien": {
+    "TEXT": [
+      "\"外星\" 疯狂地精",
+      "在尖塔51区发现的实体之一"
+    ]
+  },
+  "${modID}:SpirepassReward1Up": {
+    "TEXT": [
+      "\"1-Up\" 真菌野兽",
+      "我想它没有起作用。"
+    ]
+  },
+  "${modID}:SpirepassRewardCherryBlossom": {
+    "TEXT": [
+      "\"樱花\" 守护者",
+      "真漂亮！"
+    ]
+  },
   "Spirepass:Challengedaily_setup": {
     "TEXT": [
       "设置",
@@ -480,6 +510,12 @@
     "TEXT": [
       "橱窗购物者",
       "离开5家商店而不购买任何东西。"
+    ]
+  },
+  "${modID}:Challengeweekly_ihatestairs": {
+    "TEXT": [
+      "我讨厌楼梯",
+      "攀爬300层。"
     ]
   },
   "Spirepass:MainMenuButton": {
