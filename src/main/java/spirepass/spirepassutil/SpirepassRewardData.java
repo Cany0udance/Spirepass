@@ -120,7 +120,7 @@ public class SpirepassRewardData {
     public boolean isBackgroundReward() {
         // Return true if this is one of our background rewards
         return this.getType() == RewardType.IMAGE &&
-                (this.getLevel() == 4);
+                (this.getLevel() == 4 || this.getLevel() == 41);
     }
 
     // Helper method to get the appropriate background texture based on rarity (unchanged)

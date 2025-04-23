@@ -10,6 +10,22 @@
       "You've unlocked...A SENSE OF PRIDE AND ACCOMPLISHMENT!!!"
     ]
   },
+  "${modID}:SpirepassFrostMessage": {
+    "TEXT": [
+      "Hi, Frost! You've reached the end of the Spirepass.",
+      "",
+      "Now that you're here, I need to thank you.",
+      "Over the past few weeks, it has been such a joy seeing you play through my mod,",
+      "completing challenges and unlocking silly skins for you and your chat to react to.",
+      "As you know, this mod started off as an April Fool's joke, but I think",
+      "because of you and your incredible community, it's",
+      "grown to be something a tiny bit more than that.",
+      "",
+      "There's one more thing you need to do.",
+      "Go to this mod's config, toggle \"marcus\" on/off 5 times,",
+      "then come back here."
+    ]
+  },
   "${modID}:SpirepassRewardLawAbidingCitizen": {
     "TEXT": [
       "\"Law Abiding Citizen\" Defect",
@@ -238,10 +254,16 @@
       "I don't think it worked."
     ]
   },
-  "${modID}:SpirepassRewardCherryBlossom": {
+  "${modID}:SpirepassRewardChristmasTree": {
     "TEXT": [
-      "\"Cherry Blossom\" Guardian",
-      "Pretty!"
+      "\"Christmas Tree\" Cultist",
+      "Cultist would never be on the naughty list."
+    ]
+  },
+  "${modID}:SpirepassRewardTheDate": {
+    "TEXT": [
+      "\"The Date\" Spirepass Screen Background",
+      "WE LOVE YOU FROST"
     ]
   },
   "${modID}:Challengedaily_setup": {

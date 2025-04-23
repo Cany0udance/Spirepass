@@ -1,118 +1,104 @@
 
-Disarmed.png
-size: 512,256
+skeleton.png
+size: 256,512
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-images/armleft
+LeftArmBone
   rotate: false
-  xy: 113, 3
-  size: 67, 64
-  orig: 67, 64
+  xy: 1, 293
+  size: 200, 103
+  orig: 200, 103
   offset: 0, 0
   index: -1
-images/armright
+RightArmBone
   rotate: false
-  xy: 292, 91
-  size: 70, 36
-  orig: 70, 36
+  xy: 1, 188
+  size: 200, 103
+  orig: 200, 103
   offset: 0, 0
   index: -1
-images/bandage
+images/shadow
   rotate: false
-  xy: 472, 165
-  size: 16, 17
-  orig: 16, 17
-  offset: 0, 0
-  index: -1
-images/bandageflap
-  rotate: false
-  xy: 378, 138
-  size: 32, 12
-  orig: 32, 12
-  offset: 0, 0
-  index: -1
-images/body
-  rotate: false
-  xy: 2, 69
-  size: 172, 185
-  orig: 172, 185
-  offset: 0, 0
-  index: -1
-images/fingersleft
-  rotate: false
-  xy: 230, 57
-  size: 18, 24
-  orig: 18, 24
-  offset: 0, 0
-  index: -1
-images/fingersright
-  rotate: false
-  xy: 204, 33
-  size: 24, 22
-  orig: 24, 22
-  offset: 0, 0
-  index: -1
-images/head
-  rotate: false
-  xy: 420, 184
-  size: 75, 70
-  orig: 75, 70
-  offset: 0, 0
-  index: -1
-images/leftwing
-  rotate: false
-  xy: 326, 152
-  size: 92, 102
-  orig: 92, 102
+  xy: 1, 398
+  size: 200, 21
+  orig: 200, 21
   offset: 0, 0
   index: -1
 images/legleft
   rotate: false
-  xy: 182, 2
+  xy: 234, 1
   size: 20, 79
   orig: 20, 79
   offset: 0, 0
   index: -1
 images/legright
-  rotate: true
-  xy: 420, 163
+  rotate: false
+  xy: 70, 459
   size: 19, 50
   orig: 19, 50
   offset: 0, 0
   index: -1
-images/rightwing
+images/armleft
   rotate: false
-  xy: 176, 152
-  size: 148, 102
-  orig: 148, 102
+  xy: 1, 421
+  size: 67, 64
+  orig: 67, 64
   offset: 0, 0
   index: -1
-images/shadow
+images/body
   rotate: false
-  xy: 176, 129
-  size: 200, 21
-  orig: 200, 21
-  offset: 0, 0
-  index: -1
-images/shoulderright
-  rotate: false
-  xy: 204, 57
-  size: 24, 24
-  orig: 24, 24
+  xy: 1, 1
+  size: 172, 185
+  orig: 172, 185
   offset: 0, 0
   index: -1
 images/weaponleft
-  rotate: true
-  xy: 176, 83
+  rotate: false
+  xy: 203, 184
   size: 44, 114
   orig: 44, 114
   offset: 0, 0
   index: -1
+images/fingersleft
+  rotate: false
+  xy: 234, 82
+  size: 18, 24
+  orig: 18, 24
+  offset: 0, 0
+  index: -1
+images/armright
+  rotate: false
+  xy: 70, 421
+  size: 70, 36
+  orig: 70, 36
+  offset: 0, 0
+  index: -1
 images/weaponright
-  rotate: true
-  xy: 2, 10
+  rotate: false
+  xy: 175, 1
   size: 57, 109
   orig: 57, 109
   offset: 0, 0
+  index: -1
+images/head
+  rotate: false
+  xy: 175, 112
+  size: 75, 70
+  orig: 75, 70
+  offset: 0, 0
+  index: -1
+images/bandageflap
+  rotate: false
+  xy: 1, 487
+  size: 32, 12
+  orig: 32, 12
+  offset: 0, 0
+  index: -1
+images/bandage
+  rotate: false
+  xy: 35, 487
+  size: 15, 15
+  orig: 16, 17
+  offset: 1, 1
   index: -1

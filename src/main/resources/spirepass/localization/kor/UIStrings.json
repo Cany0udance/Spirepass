@@ -10,6 +10,22 @@
       "당신은...자부심과 성취감을 획득했습니다!!!"
     ]
   },
+  "${modID}:SpirepassFrostMessage": {
+    "TEXT": [
+      "Hi, Frost! You've reached the end of the Spirepass.",
+      "",
+      "Now that you're here, I need to thank you.",
+      "Over the past few weeks, it has been such a joy seeing you play through my mod,",
+      "completing challenges and unlocking silly skins for you and your chat to react to.",
+      "As you know, this mod started off as an April Fool's joke, but I think",
+      "because of you and your incredible community, it's",
+      "grown to be something a tiny bit more than that.",
+      "",
+      "There's one more thing you need to do.",
+      "Go to this mod's config, toggle \"marcus\" on/off 5 times,",
+      "then come back here."
+    ]
+  },
   "${modID}:SpirepassRewardLawAbidingCitizen": {
     "TEXT": [
       "\"준법시민\" 결함",
@@ -238,10 +254,16 @@
       "효과가 있었던 것 같지는 않아."
     ]
   },
-  "${modID}:SpirepassRewardCherryBlossom": {
+  "${modID}:SpirepassRewardChristmasTree": {
     "TEXT": [
-      "\"벚꽃\" 가디언",
-      "예쁘다!"
+      "\"크리스마스 트리\" 광신도",
+      "광신도는 절대 산타의 나쁜 아이 명단에 오르지 않을 것이다."
+    ]
+  },
+  "${modID}:SpirepassRewardTheDate": {
+    "TEXT": [
+      "\"The Date\" Spirepass Screen Background",
+      "WE LOVE YOU FROST"
     ]
   },
   "${modID}:Challengedaily_setup": {

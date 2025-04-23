@@ -65,6 +65,8 @@ public class Spirepass implements
 
     public static final String DRUM_KEY = "Drum";
     public static final String DRUM_OGG = "spirepass/audio/Drum.ogg";
+    public static final String LIP_THING_KEY = "LipThing";
+    public static final String LIP_THING_OGG = "spirepass/audio/LipThing.ogg";
 
     // ==================== LEVEL & CHALLENGE CONSTANTS ====================
 
@@ -80,6 +82,11 @@ public class Spirepass implements
     private static final int REFRESH_HOUR_EST = 12; // 12 PM EST
 
     // ==================== STATE VARIABLES ====================
+
+    private static final String EASTER_EGG_ACTIVATED_KEY = "easterEggActivated";
+    private static final int REQUIRED_TOGGLE_COUNT = 5;
+    private static int marcusToggleCount = 0;
+    public static boolean easterEggActivated = false;
 
     public static boolean jumpToCurrentLevel;
     public static boolean hideSpirepassPremium;
@@ -135,6 +142,10 @@ public class Spirepass implements
                 totalXP = config.getInt(TOTAL_XP_KEY);
             }
 
+            if (config.has(EASTER_EGG_ACTIVATED_KEY)) {
+                easterEggActivated = config.getBool(EASTER_EGG_ACTIVATED_KEY);
+            }
+
             // Load skin data AFTER config is fully initialized
             skinManager.loadData(config);
 
@@ -168,6 +179,8 @@ public class Spirepass implements
 
             // Save XP data
             config.setInt(TOTAL_XP_KEY, totalXP);
+
+            config.setBool(EASTER_EGG_ACTIVATED_KEY, easterEggActivated);
 
             config.save();
         } catch (Exception e) {
@@ -267,6 +280,22 @@ public class Spirepass implements
             marcus = button.enabled;
             try {
                 config.setBool(MARCUS, marcus);
+
+                // Track toggle count and check for easter egg activation (in-memory only)
+                marcusToggleCount++;
+
+                // Check if easter egg should be activated
+                if (marcusToggleCount >= REQUIRED_TOGGLE_COUNT &&
+                        totalXP >= 2000 &&
+                        CardCrawlGame.playerName != null &&
+                        CardCrawlGame.playerName.equals("pee") &&
+                        !easterEggActivated) {
+
+                    easterEggActivated = true;
+                    CardCrawlGame.sound.play("UNLOCK_PING");
+                    config.setBool(EASTER_EGG_ACTIVATED_KEY, true);
+                }
+
                 config.save();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -649,8 +678,17 @@ public class Spirepass implements
     // ==================== XP MANAGEMENT ====================
 
     public static int getCurrentLevel() {
+        // Calculate level normally based on XP
         int level = totalXP / XP_PER_LEVEL;
-        return Math.min(level, MAX_LEVEL);
+        int normalLevel = Math.min(level, MAX_LEVEL);
+
+        // If easter egg is activated, return level 41
+        if (easterEggActivated) {
+            return MAX_LEVEL + 1;
+        }
+
+        // Otherwise return the normally calculated level
+        return normalLevel;
     }
 
     public static int getXPForNextLevel() {
@@ -797,5 +835,16 @@ public class Spirepass implements
     @Override
     public void receiveAddAudio() {
         BaseMod.addAudio(DRUM_KEY, DRUM_OGG);
+        BaseMod.addAudio(LIP_THING_KEY, LIP_THING_OGG);
+    }
+
+    // Add getter method for easter egg state
+    public static boolean isEasterEggActivated() {
+        return easterEggActivated;
+    }
+
+    // Add method to check if level 41 should be available
+    public static int getMaxAvailableLevel() {
+        return easterEggActivated ? MAX_LEVEL + 1 : MAX_LEVEL;
     }
 }

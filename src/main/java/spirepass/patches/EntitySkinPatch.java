@@ -1,5 +1,6 @@
 package spirepass.patches;
 
+import basemod.BaseMod;
 import basemod.ReflectionHacks;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -20,6 +21,7 @@ import com.megacrit.cardcrawl.monsters.beyond.*;
 import com.megacrit.cardcrawl.monsters.city.*;
 import com.megacrit.cardcrawl.monsters.exordium.*;
 import com.megacrit.cardcrawl.relics.PreservedInsect;
+import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import spirepass.spirepassutil.SkinManager;
 
 import java.io.PrintWriter;
@@ -88,11 +90,19 @@ public class EntitySkinPatch {
 
                         SkeletonJson json = new SkeletonJson(atlas);
                         float finalScale = scale;
-                        if (CardCrawlGame.dungeon != null && AbstractDungeon.player != null && AbstractDungeon.getCurrRoom() != null) {
-                            if (AbstractDungeon.player.hasRelic(PreservedInsect.ID) && !__instance.isPlayer && AbstractDungeon.getCurrRoom().eliteTrigger) {
+                        if (CardCrawlGame.dungeon != null && AbstractDungeon.player != null) {
+                            AbstractRoom currentRoom = null;
+                            try {
+                                currentRoom = AbstractDungeon.getCurrRoom();
+                            } catch (Exception e) {
+
+                            }
+
+                            if (currentRoom != null && AbstractDungeon.player.hasRelic(PreservedInsect.ID) && !__instance.isPlayer && currentRoom.eliteTrigger) {
                                 finalScale += 0.3F;
                             }
                         }
+
                         json.setScale(Settings.renderScale / finalScale);
                         SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal(customSkeletonUrl));
 

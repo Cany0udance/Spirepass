@@ -60,19 +60,24 @@ public class SpirepassScreen {
         this.levelBoxes = new ArrayList<>();
     }
 
+    // In SpirepassScreen class, modify the open() method
     public void open() {
         this.cancelButton.show(CardCrawlGame.languagePack.getUIString("DungeonMapScreen").TEXT[1]);
         this.isScreenOpened = true;
 
-        this.maxLevel = Spirepass.MAX_LEVEL;
+        // Set the max level first
+        this.maxLevel = Spirepass.getMaxAvailableLevel();
+
+        // Then get the current level (which may be 41 if easter egg is active)
         this.currentLevel = Spirepass.getCurrentLevel();
+
+        int displayLevel = Math.min(this.currentLevel, 40);
 
         initializeLevelBoxes();
         calculateScrollBounds();
-
         if (Spirepass.jumpToCurrentLevel) {
-            centerOnLevel(currentLevel);
-            setSelectedLevel(currentLevel);
+            centerOnLevel(displayLevel);
+            setSelectedLevel(displayLevel);
         } else {
             centerOnLevel(0);
             setSelectedLevel(0);
@@ -125,17 +130,29 @@ public class SpirepassScreen {
 
         for (int i = 0; i <= maxLevel; i++) {
             Texture boxTexture;
-            if (i == currentLevel) {
-                boxTexture = renderer.getCurrentLevelBoxTexture();
-            } else if (i > currentLevel) {
-                boxTexture = renderer.getLockedLevelBoxTexture();
-            } else {
+
+            // Determine if the level should be unlocked
+            boolean isUnlocked;
+
+            if (i == 41 && Spirepass.isEasterEggActivated()) {
+                // Always unlock level 41 when easter egg is activated
+                isUnlocked = true;
                 boxTexture = renderer.getLevelBoxTexture();
+            } else {
+                // Normal unlocking logic for other levels
+                isUnlocked = i <= currentLevel;
+
+                if (i == currentLevel) {
+                    boxTexture = renderer.getCurrentLevelBoxTexture();
+                } else if (i > currentLevel) {
+                    boxTexture = renderer.getLockedLevelBoxTexture();
+                } else {
+                    boxTexture = renderer.getLevelBoxTexture();
+                }
             }
 
             float boxX = (i * levelBoxSpacing) + edgePadding - scrollX;
             float boxY = SpirepassPositionSettings.LEVEL_BOX_Y;
-            boolean isUnlocked = i <= currentLevel;
 
             SpirepassLevelBox levelBox = new SpirepassLevelBox(i, boxX, boxY, isUnlocked, boxTexture, this.rewardManager);
 

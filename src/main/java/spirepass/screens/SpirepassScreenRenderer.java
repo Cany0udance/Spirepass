@@ -389,7 +389,6 @@ public class SpirepassScreenRenderer {
         if (button == null) return;
 
         try {
-            // Access button's width and middle_width fields
             Field wField = ModLabeledButton.class.getDeclaredField("w");
             Field middleWidthField = ModLabeledButton.class.getDeclaredField("middle_width");
             Field hbField = ModLabeledButton.class.getDeclaredField("hb");
@@ -398,22 +397,16 @@ public class SpirepassScreenRenderer {
             middleWidthField.setAccessible(true);
             hbField.setAccessible(true);
 
-            // Calculate middle_width based on desired total width
-            // The original button width is calculated as:
-            // w = (textureLeft.getWidth() + textureRight.getWidth()) * Settings.scale + middle_width
             float textureWidth = ((float)ImageMaster.loadImage("img/ButtonLeft.png").getWidth() +
                     (float)ImageMaster.loadImage("img/ButtonRight.png").getWidth()) *
                     Settings.scale;
 
-            // Force the new width
             float newMiddleWidth = fixedWidth - textureWidth;
             if (newMiddleWidth < 0) newMiddleWidth = 0;
 
-            // Set the width fields
             wField.set(button, fixedWidth);
             middleWidthField.set(button, newMiddleWidth);
 
-            // Update hitbox width
             Hitbox hb = (Hitbox) hbField.get(button);
             if (hb != null) {
                 hb.width = fixedWidth - 2.0f * Settings.scale;

@@ -10,6 +10,22 @@
       "你解锁了……一股子骄傲和成就感！！！"
     ]
   },
+  "${modID}:SpirepassFrostMessage": {
+    "TEXT": [
+      "Hi, Frost! You've reached the end of the Spirepass.",
+      "",
+      "Now that you're here, I need to thank you.",
+      "Over the past few weeks, it has been such a joy seeing you play through my mod,",
+      "completing challenges and unlocking silly skins for you and your chat to react to.",
+      "As you know, this mod started off as an April Fool's joke, but I think",
+      "because of you and your incredible community, it's",
+      "grown to be something a tiny bit more than that.",
+      "",
+      "There's one more thing you need to do.",
+      "Go to this mod's config, toggle \"marcus\" on/off 5 times,",
+      "then come back here."
+    ]
+  },
   "Spirepass:SpirepassRewardLawAbidingCitizen": {
     "TEXT": [
       "“守法公民” 故障机器人",
@@ -238,10 +254,16 @@
       "我想它没有起作用。"
     ]
   },
-  "${modID}:SpirepassRewardCherryBlossom": {
+  "${modID}:SpirepassRewardChristmasTree": {
     "TEXT": [
-      "\"樱花\" 守护者",
-      "真漂亮！"
+      "\"圣诞树\" 邪教徒",
+      "邪教徒永远不会上淘气名单。"
+    ]
+  },
+  "${modID}:SpirepassRewardTheDate": {
+    "TEXT": [
+      "\"The Date\" Spirepass Screen Background",
+      "WE LOVE YOU FROST"
     ]
   },
   "Spirepass:Challengedaily_setup": {

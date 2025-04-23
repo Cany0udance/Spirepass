@@ -228,6 +228,8 @@ public class SpirepassAnimationManager {
                 return SpirepassPositionSettings.CHARACTER_MODEL_SCALE * 0.95f;
             case SkinManager.ENTITY_SENTRY:
                 return baseScale * 0.85f;
+            case SkinManager.ENTITY_CULTIST:
+                return baseScale * 0.85f;
             case SkinManager.ENTITY_SNEAKY_GREMLIN:
                 return baseScale * 1.5f;
             case SkinManager.ENTITY_MAD_GREMLIN:

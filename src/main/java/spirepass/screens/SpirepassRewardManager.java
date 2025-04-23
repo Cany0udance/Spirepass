@@ -18,8 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static spirepass.Spirepass.DRUM_KEY;
-import static spirepass.Spirepass.makeID;
+import static spirepass.Spirepass.*;
 
 public class SpirepassRewardManager implements Disposable {
     // ==================== STATIC & MEMBER VARIABLES ====================
@@ -144,15 +143,41 @@ public class SpirepassRewardManager implements Disposable {
                     sb, FontHelper.tipBodyFont, messageText, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y, Color.WHITE
             );
         } else if (reward.getLevel() == 40) {
-            UIStrings maxLevelStrings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassMaxLevelMessage"));
-            String line1 = maxLevelStrings.TEXT[0];
-            String line2 = maxLevelStrings.TEXT[1];
-            FontHelper.renderFontCentered(
-                    sb, FontHelper.tipBodyFont, line1, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y + 15.0f * Settings.scale, Color.GOLD
-            );
-            FontHelper.renderFontCentered(
-                    sb, FontHelper.tipBodyFont, line2, Settings.WIDTH / 2.0f, SpirepassPositionSettings.REWARD_PREVIEW_Y - 15.0f * Settings.scale, Color.GOLD
-            );
+            if (CardCrawlGame.playerName != null && !easterEggActivated && CardCrawlGame.playerName.equals("pee")) {
+                // Special message for Frost
+                UIStrings frostStrings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassFrostMessage"));
+                float baseY = SpirepassPositionSettings.REWARD_PREVIEW_Y;
+                float lineGap = 30.0f * Settings.scale;
+
+                // Calculate total height to center all lines properly
+                int totalLines = frostStrings.TEXT.length;
+                float totalHeight = (totalLines - 1) * lineGap;
+                float startY = baseY + totalHeight / 2.0f;
+
+                // Render each line
+                for (int i = 0; i < frostStrings.TEXT.length; i++) {
+                    FontHelper.renderFontCentered(
+                            sb, FontHelper.tipBodyFont, frostStrings.TEXT[i],
+                            Settings.WIDTH / 2.0f,
+                            startY - i * lineGap,
+                            Color.GOLD
+                    );
+                }
+            } else {
+                // Default max level message for everyone else
+                UIStrings maxLevelStrings = CardCrawlGame.languagePack.getUIString(makeID("SpirepassMaxLevelMessage"));
+                String line1 = maxLevelStrings.TEXT[0];
+                String line2 = maxLevelStrings.TEXT[1];
+
+                FontHelper.renderFontCentered(
+                        sb, FontHelper.tipBodyFont, line1, Settings.WIDTH / 2.0f,
+                        SpirepassPositionSettings.REWARD_PREVIEW_Y + 15.0f * Settings.scale, Color.GOLD
+                );
+                FontHelper.renderFontCentered(
+                        sb, FontHelper.tipBodyFont, line2, Settings.WIDTH / 2.0f,
+                        SpirepassPositionSettings.REWARD_PREVIEW_Y - 15.0f * Settings.scale, Color.GOLD
+                );
+            }
         } else {
             String messageText = "Level " + reward.getLevel() + " Reward";
             FontHelper.renderFontCentered(
@@ -274,7 +299,7 @@ public class SpirepassRewardManager implements Disposable {
 
     // ==================== REWARD MANAGEMENT ====================
 
-    private void initializeRewardData() {
+    public void initializeRewardData() {
         rewardData.put(0, new SpirepassRewardData(
                 0,
                 "",
@@ -660,11 +685,11 @@ public class SpirepassRewardManager implements Disposable {
 
         rewardData.put(39, createReward(
                 39,
-                "CherryBlossom",
-                SpirepassRewardData.RewardRarity.UNCOMMON,
+                "ChristmasTree",
+                SpirepassRewardData.RewardRarity.RARE,
                 SpirepassRewardData.RewardType.CHARACTER_MODEL,
-                SkinManager.ENTITY_GUARDIAN,
-                "GUARDIAN_CHERRYBLOSSOM"
+                SkinManager.ENTITY_CULTIST,
+                "CULTIST_CHRISTMASTREE"
         ));
 
         rewardData.put(40, new SpirepassRewardData(
@@ -674,6 +699,15 @@ public class SpirepassRewardManager implements Disposable {
                 SpirepassRewardData.RewardRarity.RARE,
                 SpirepassRewardData.RewardType.TEXT
         ));
+
+        rewardData.put(41, createReward(
+                41,
+                "TheDate",
+                SpirepassRewardData.RewardRarity.RARE,
+                SpirepassRewardData.RewardType.IMAGE,
+                "spirepass/images/screen/SpirepassDateBackground.jpg"
+        ));
+
 
         // Default reward for all other levels (badge image)
         Texture badgeTexture = null;
@@ -753,6 +787,10 @@ public class SpirepassRewardManager implements Disposable {
             String currentBackground = SkinManager.getInstance().getAppliedSkin(SkinManager.BACKGROUND_SCREEN);
             boolean shouldUnequip = reward.getImagePath().equals(currentBackground);
             String newValue = shouldUnequip ? "" : reward.getImagePath();
+            if (!shouldUnequip && reward.getLevel() == 41) {
+                float volumeMultiplier = 4.0f;
+                CardCrawlGame.sound.playV(LIP_THING_KEY, volumeMultiplier);
+            }
             if (!newValue.equals(currentBackground)) {
                 SkinManager.getInstance().setAppliedSkin(SkinManager.BACKGROUND_SCREEN, newValue);
                 stateChanged = true;
@@ -791,17 +829,21 @@ public class SpirepassRewardManager implements Disposable {
     // ==================== GETTERS ====================
 
     public SpirepassRewardData getRewardData(int level) {
+        if (level == 41 && !Spirepass.isEasterEggActivated()) {
+            return null;
+        }
         return rewardData.getOrDefault(level, null);
     }
 
     public Texture getRewardTexture(int level) {
+        if (level == 41 && !Spirepass.isEasterEggActivated()) {
+            return null;
+        }
+
         if (rewardTextures != null && rewardTextures.containsKey(level)) {
             return rewardTextures.get(level);
-        } else if (rewardTextures != null) {
-            for (Texture texture : rewardTextures.values()) {
-                if (texture != null) return texture;
-            }
         }
+
         return null;
     }
 
