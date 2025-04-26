@@ -368,8 +368,12 @@ public class MainMenuChallengePatch {
             Random random = new Random();
             String url = PRANK_VIDEOS.get(random.nextInt(PRANK_VIDEOS.size()));
             Desktop.getDesktop().browse(new URI(url));
-            refreshAllChallenges();
-        } catch (Exception e) { /* Failed to open URL or refresh */ }
+        } catch (Exception e) {
+            /* Failed to open URL */
+        }
+
+        // This will always run, even if opening the URL fails
+        refreshAllChallenges();
     }
 
     private static String getDailyButtonText() { return TEXT[9] + getTimeUntilDailyReset() + ")"; } // "Daily Challenges ("
